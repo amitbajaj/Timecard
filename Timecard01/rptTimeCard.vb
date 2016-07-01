@@ -45,7 +45,7 @@ Public Class rptTimeCard
     
     Public Overrides Property FullResourceName() As String
         Get
-            Return "Timecard01.rptTimeCard.rpt"
+            Return "TimeCard.rptTimeCard.rpt"
         End Get
         Set
             'Do nothing

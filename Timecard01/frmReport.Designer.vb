@@ -23,7 +23,7 @@ Partial Class frmReport
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.rptViewTimeCard = New CrystalDecisions.Windows.Forms.CrystalReportViewer()
-        Me.rptTimeCard1 = New Timecard01.rptTimeCard()
+        Me.rptTimeCard1 = New TimeCard.rptTimeCard()
         Me.SuspendLayout()
         '
         'rptViewTimeCard

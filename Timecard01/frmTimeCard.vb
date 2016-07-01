@@ -472,10 +472,20 @@ Public Class frmTimeCard
             cmd.CommandText = sSQL
             If cmd.ExecuteNonQuery() >= 1 Then
                 pStartTime = sStartTime
+                lblStartTime.Text = pStartTime
+
                 pEndTime = sEndTime
+                lblEndTime.Text = pEndTime
+
                 pRegularRate = sRegRate
+                lblRegRate.Text = pRegularRate
+
                 pOT1Rate = sOT1Rate
+                lblOT1.Text = pOT1Rate
+
                 pOT2Rate = sOT2Rate
+                lblOT2.Text = pOT2Rate
+
                 MsgBox("Parameters saved!")
             Else
                 MsgBox("Error saving parameters!", vbExclamation)

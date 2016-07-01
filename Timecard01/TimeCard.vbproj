@@ -6,9 +6,9 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{5C552B90-9CE9-4E71-B90E-41DDA5AE835A}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <StartupObject>Timecard01.My.MyApplication</StartupObject>
-    <RootNamespace>Timecard01</RootNamespace>
-    <AssemblyName>Timecard01</AssemblyName>
+    <StartupObject>TimeCard.My.MyApplication</StartupObject>
+    <RootNamespace>TimeCard</RootNamespace>
+    <AssemblyName>TimeCard</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <MyType>WindowsForms</MyType>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
@@ -21,7 +21,7 @@
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
     <OutputPath>bin\Debug\</OutputPath>
-    <DocumentationFile>Timecard01.xml</DocumentationFile>
+    <DocumentationFile>TimeCard.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -31,7 +31,7 @@
     <DefineTrace>true</DefineTrace>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DocumentationFile>Timecard01.xml</DocumentationFile>
+    <DocumentationFile>TimeCard.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
   </PropertyGroup>
   <PropertyGroup>
@@ -57,10 +57,6 @@
     <Reference Include="System.Deployment" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Web" />
-    <Reference Include="System.Web.Services, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\..\WINDOWS\Microsoft.Net\assembly\GAC_MSIL\System.Web.Services\v4.0_4.0.0.0__b03f5f7f11d50a3a\System.Web.Services.dll</HintPath>
-    </Reference>
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
@@ -90,6 +86,12 @@
       <DependentUpon>frmReport.vb</DependentUpon>
     </Compile>
     <Compile Include="frmReport.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmTimeCardv2.Designer.vb">
+      <DependentUpon>frmTimeCardv2.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmTimeCardv2.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="frmTimeCard.vb">
@@ -127,6 +129,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="frmReport.resx">
       <DependentUpon>frmReport.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmTimeCardv2.resx">
+      <DependentUpon>frmTimeCardv2.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmTimeCard.resx">
       <DependentUpon>frmTimeCard.vb</DependentUpon>
