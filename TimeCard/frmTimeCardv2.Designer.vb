@@ -22,12 +22,12 @@ Partial Class frmTimeCardv2
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
-        Dim DataGridViewCellStyle7 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
-        Dim DataGridViewCellStyle8 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
-        Dim DataGridViewCellStyle9 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
-        Dim DataGridViewCellStyle10 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
-        Dim DataGridViewCellStyle11 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
-        Dim DataGridViewCellStyle12 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle1 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle2 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle3 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle4 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle5 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle6 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Me.DataGridView1 = New System.Windows.Forms.DataGridView()
         Me.UserId = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.InTime = New System.Windows.Forms.DataGridViewTextBoxColumn()
@@ -44,8 +44,6 @@ Partial Class frmTimeCardv2
         Me.btnSaveData = New System.Windows.Forms.Button()
         Me.btnReport = New System.Windows.Forms.Button()
         Me.btnParameters = New System.Windows.Forms.Button()
-        Me.lblStartTime = New System.Windows.Forms.Label()
-        Me.lblEndTime = New System.Windows.Forms.Label()
         Me.lblRegRate = New System.Windows.Forms.Label()
         Me.lblOT1 = New System.Windows.Forms.Label()
         Me.lblOT2 = New System.Windows.Forms.Label()
@@ -73,16 +71,16 @@ Partial Class frmTimeCardv2
         '
         'InTime
         '
-        DataGridViewCellStyle7.Format = "T"
-        DataGridViewCellStyle7.NullValue = Nothing
-        Me.InTime.DefaultCellStyle = DataGridViewCellStyle7
+        DataGridViewCellStyle1.Format = "T"
+        DataGridViewCellStyle1.NullValue = Nothing
+        Me.InTime.DefaultCellStyle = DataGridViewCellStyle1
         Me.InTime.HeaderText = "In Time"
         Me.InTime.Name = "InTime"
         '
         'OutTime
         '
-        DataGridViewCellStyle8.Format = "T"
-        Me.OutTime.DefaultCellStyle = DataGridViewCellStyle8
+        DataGridViewCellStyle2.Format = "T"
+        Me.OutTime.DefaultCellStyle = DataGridViewCellStyle2
         Me.OutTime.HeaderText = "Out Time"
         Me.OutTime.Name = "OutTime"
         '
@@ -95,36 +93,36 @@ Partial Class frmTimeCardv2
         '
         'RegularHrs
         '
-        DataGridViewCellStyle9.Format = "N0"
-        DataGridViewCellStyle9.NullValue = "0"
-        Me.RegularHrs.DefaultCellStyle = DataGridViewCellStyle9
+        DataGridViewCellStyle3.Format = "N0"
+        DataGridViewCellStyle3.NullValue = "0"
+        Me.RegularHrs.DefaultCellStyle = DataGridViewCellStyle3
         Me.RegularHrs.HeaderText = "Regular Hours"
         Me.RegularHrs.Name = "RegularHrs"
         Me.RegularHrs.ReadOnly = True
         '
         'OT1Hrs
         '
-        DataGridViewCellStyle10.Format = "N0"
-        DataGridViewCellStyle10.NullValue = "0"
-        Me.OT1Hrs.DefaultCellStyle = DataGridViewCellStyle10
+        DataGridViewCellStyle4.Format = "N0"
+        DataGridViewCellStyle4.NullValue = "0"
+        Me.OT1Hrs.DefaultCellStyle = DataGridViewCellStyle4
         Me.OT1Hrs.HeaderText = "Over Time 1"
         Me.OT1Hrs.Name = "OT1Hrs"
         Me.OT1Hrs.ReadOnly = True
         '
         'OT2Hrs
         '
-        DataGridViewCellStyle11.Format = "N0"
-        DataGridViewCellStyle11.NullValue = "0"
-        Me.OT2Hrs.DefaultCellStyle = DataGridViewCellStyle11
+        DataGridViewCellStyle5.Format = "N0"
+        DataGridViewCellStyle5.NullValue = "0"
+        Me.OT2Hrs.DefaultCellStyle = DataGridViewCellStyle5
         Me.OT2Hrs.HeaderText = "Over Time 2"
         Me.OT2Hrs.Name = "OT2Hrs"
         Me.OT2Hrs.ReadOnly = True
         '
         'TotalCost
         '
-        DataGridViewCellStyle12.Format = "N0"
-        DataGridViewCellStyle12.NullValue = "0"
-        Me.TotalCost.DefaultCellStyle = DataGridViewCellStyle12
+        DataGridViewCellStyle6.Format = "N0"
+        DataGridViewCellStyle6.NullValue = "0"
+        Me.TotalCost.DefaultCellStyle = DataGridViewCellStyle6
         Me.TotalCost.HeaderText = "Total Cost"
         Me.TotalCost.Name = "TotalCost"
         Me.TotalCost.ReadOnly = True
@@ -190,28 +188,10 @@ Partial Class frmTimeCardv2
         Me.btnParameters.Text = "Parameters"
         Me.btnParameters.UseVisualStyleBackColor = True
         '
-        'lblStartTime
-        '
-        Me.lblStartTime.AutoSize = True
-        Me.lblStartTime.Location = New System.Drawing.Point(12, 252)
-        Me.lblStartTime.Name = "lblStartTime"
-        Me.lblStartTime.Size = New System.Drawing.Size(55, 13)
-        Me.lblStartTime.TabIndex = 6
-        Me.lblStartTime.Text = "Start Time"
-        '
-        'lblEndTime
-        '
-        Me.lblEndTime.AutoSize = True
-        Me.lblEndTime.Location = New System.Drawing.Point(12, 275)
-        Me.lblEndTime.Name = "lblEndTime"
-        Me.lblEndTime.Size = New System.Drawing.Size(52, 13)
-        Me.lblEndTime.TabIndex = 8
-        Me.lblEndTime.Text = "End Time"
-        '
         'lblRegRate
         '
         Me.lblRegRate.AutoSize = True
-        Me.lblRegRate.Location = New System.Drawing.Point(160, 275)
+        Me.lblRegRate.Location = New System.Drawing.Point(5, 275)
         Me.lblRegRate.Name = "lblRegRate"
         Me.lblRegRate.Size = New System.Drawing.Size(70, 13)
         Me.lblRegRate.TabIndex = 11
@@ -220,7 +200,7 @@ Partial Class frmTimeCardv2
         'lblOT1
         '
         Me.lblOT1.AutoSize = True
-        Me.lblOT1.Location = New System.Drawing.Point(334, 252)
+        Me.lblOT1.Location = New System.Drawing.Point(179, 252)
         Me.lblOT1.Name = "lblOT1"
         Me.lblOT1.Size = New System.Drawing.Size(54, 13)
         Me.lblOT1.TabIndex = 13
@@ -229,7 +209,7 @@ Partial Class frmTimeCardv2
         'lblOT2
         '
         Me.lblOT2.AutoSize = True
-        Me.lblOT2.Location = New System.Drawing.Point(334, 275)
+        Me.lblOT2.Location = New System.Drawing.Point(179, 275)
         Me.lblOT2.Name = "lblOT2"
         Me.lblOT2.Size = New System.Drawing.Size(54, 13)
         Me.lblOT2.TabIndex = 15
@@ -238,7 +218,7 @@ Partial Class frmTimeCardv2
         'lblRegHrs
         '
         Me.lblRegHrs.AutoSize = True
-        Me.lblRegHrs.Location = New System.Drawing.Point(160, 252)
+        Me.lblRegHrs.Location = New System.Drawing.Point(5, 252)
         Me.lblRegHrs.Name = "lblRegHrs"
         Me.lblRegHrs.Size = New System.Drawing.Size(63, 13)
         Me.lblRegHrs.TabIndex = 16
@@ -267,9 +247,7 @@ Partial Class frmTimeCardv2
         Me.Controls.Add(Me.btnReport)
         Me.Controls.Add(Me.btnSaveData)
         Me.Controls.Add(Me.btnLoadData)
-        Me.Controls.Add(Me.lblEndTime)
         Me.Controls.Add(Me.btnAddRow)
-        Me.Controls.Add(Me.lblStartTime)
         Me.Controls.Add(Me.lblStatus)
         Me.Controls.Add(Me.DataGridView1)
         Me.Name = "frmTimeCardv2"
@@ -296,8 +274,6 @@ Partial Class frmTimeCardv2
     Friend WithEvents btnSaveData As Button
     Friend WithEvents btnReport As Button
     Friend WithEvents btnParameters As Button
-    Friend WithEvents lblStartTime As Label
-    Friend WithEvents lblEndTime As Label
     Friend WithEvents lblRegRate As Label
     Friend WithEvents lblOT1 As Label
     Friend WithEvents lblOT2 As Label

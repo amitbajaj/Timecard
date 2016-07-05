@@ -533,26 +533,56 @@ Public Class frmTimeCardv2
         Dim cmd As OleDb.OleDbCommand
         Dim sSQL As String
         Dim rs As OleDb.OleDbDataReader
+        Dim oTable As Object
+        Dim oCheck As Object
+        Dim oCat As Object
         If OpenConn() Then
+            oTable = CreateObject("ADOX.Table")
+            oTable.Name = "ParametersV2"
+
+            oTable.Columns.Append("RegularHours", 5)
+            oTable.Columns.Append("RegularRate", 5)
+            oTable.Columns.Append("OT1Rate", 5)
+            oTable.Columns.Append("OT2Rate", 5)
+
+
+            oCat = CreateObject("ADOX.Catalog")
+            oCat.ActiveConnection = conn.ConnectionString
+            'oCat.ActiveConnection.Open()
+
+            Try
+                oCheck = oCat.Tables.Item("ParametersV2")
+            Catch ex As Exception
+                oCat.tables.Append(oTable)
+                oCat.Tables.Refresh()
+            End Try
+
+            oCat.ActiveConnection.Close()
+            oCat = Nothing
+
             cmd = conn.CreateCommand()
-            sSQL = "SELECT * FROM [Parameters]"
+            sSQL = "SELECT * FROM [Parametersv2]"
             cmd.CommandText = sSQL
             Try
                 rs = cmd.ExecuteReader()
                 If rs.Read() Then
-                    pStartTime = rs.GetDateTime(0)
-                    lblStartTime.Text = "Start Time : " & pStartTime.TimeOfDay.ToString()
-                    pEndTime = rs.GetDateTime(1)
-                    lblEndTime.Text = "End Time : " & pEndTime.TimeOfDay.ToString()
-                    pRegularRate = rs.GetDouble(2)
-                    lblRegRate.Text = "Regular Rate : " & pRegularRate.ToString()
-                    pOT1Rate = rs.GetDouble(3)
-                    lblOT1.Text = "OT1 Rate : " & pOT1Rate.ToString()
-                    pOT2Rate = rs.GetDouble(4)
-                    lblOT2.Text = "OT2 Rate : " & pOT2Rate.ToString()
-                    lblRegHrs.Text = "Regular Hrs : " & pRegularHrs.ToString()
+                    pRegularHrs = rs.GetDouble(0)
+                    pRegularRate = rs.GetDouble(1)
+                    pOT1Rate = rs.GetDouble(2)
+                    pOT2Rate = rs.GetDouble(3)
+                    SetLabels()
+                    rs.Close()
+                Else
+                    rs.Close()
+                    sSQL = "INSERT INTO [ParametersV2] VALUES(8,10,15,20);"
+                    cmd.CommandText = sSQL
+                    cmd.ExecuteNonQuery()
+                    pRegularHrs = 8
+                    pRegularRate = 10
+                    pOT1Rate = 15
+                    pOT2Rate = 20
+                    SetLabels()
                 End If
-                rs.Close()
             Catch ex As Exception
                 MsgBox("Error loading parameters! Aborting!", vbOKOnly)
                 Application.Exit()
@@ -563,34 +593,23 @@ Public Class frmTimeCardv2
         End If
     End Sub
 
-    Friend Sub SaveParameters(sStartTime As DateTime, sEndTime As DateTime, sRegRate As Double, sOT1Rate As Double, sOT2Rate As Double)
+    Friend Sub SaveParameters(sRegHrs As Double, sRegRate As Double, sOT1Rate As Double, sOT2Rate As Double)
         Dim cmd As OleDb.OleDbCommand
         Dim sSQL As String
         If OpenConn() Then
             cmd = conn.CreateCommand()
-            sSQL = "UPDATE [Parameters] SET "
-            sSQL = sSQL & "StartTime = '" & sStartTime.ToString() & "'"
-            sSQL = sSQL & ", EndTime = '" & sEndTime.ToString() & "'"
+            sSQL = "UPDATE [Parametersv2] SET "
+            sSQL = sSQL & "RegularHours = " & sRegHrs.ToString()
             sSQL = sSQL & ", RegularRate = " & sRegRate.ToString()
             sSQL = sSQL & ", OT1Rate = " & sOT1Rate.ToString()
             sSQL = sSQL & ", OT2Rate = " & sOT2Rate.ToString()
             cmd.CommandText = sSQL
             If cmd.ExecuteNonQuery() >= 1 Then
-                pStartTime = sStartTime
-                lblStartTime.Text = pStartTime
-
-                pEndTime = sEndTime
-                lblEndTime.Text = pEndTime
-
+                pRegularHrs = sRegHrs
                 pRegularRate = sRegRate
-                lblRegRate.Text = pRegularRate
-
                 pOT1Rate = sOT1Rate
-                lblOT1.Text = pOT1Rate
-
                 pOT2Rate = sOT2Rate
-                lblOT2.Text = pOT2Rate
-
+                SetLabels()
                 MsgBox("Parameters saved!")
             Else
                 MsgBox("Error saving parameters!", vbExclamation)
@@ -600,9 +619,16 @@ Public Class frmTimeCardv2
         End If
     End Sub
 
+    Private Sub SetLabels()
+        lblRegHrs.Text = "Regular Hours: " & pRegularHrs.ToString()
+        lblRegRate.Text = "Regular Rate: " & pRegularRate.ToString()
+        lblOT1.Text = "OT1 Rate: " & pOT1Rate.ToString()
+        lblOT2.Text = "OT2 Rate: " & pOT2Rate.ToString()
+    End Sub
+
     Private Sub btnParameters_Click(sender As Object, e As EventArgs) Handles btnParameters.Click
-        Dim frmParams As New frmParameters
-        frmParams.LoadValues(pStartTime, pEndTime, pRegularRate, pOT1Rate, pOT2Rate)
+        Dim frmParams As New frmParametersv2
+        frmParams.LoadValues(pRegularHrs, pRegularRate, pOT1Rate, pOT2Rate)
         frmParams.StartPosition = FormStartPosition.CenterParent
         frmParams.ShowDialog()
     End Sub

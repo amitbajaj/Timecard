@@ -76,6 +76,12 @@
     <Import Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="frmParametersv2.Designer.vb">
+      <DependentUpon>frmParametersv2.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmParametersv2.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="frmParameters.Designer.vb">
       <DependentUpon>frmParameters.vb</DependentUpon>
     </Compile>
@@ -124,6 +130,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="frmParametersv2.resx">
+      <DependentUpon>frmParametersv2.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="frmParameters.resx">
       <DependentUpon>frmParameters.vb</DependentUpon>
     </EmbeddedResource>
