@@ -94,6 +94,18 @@
     <Compile Include="frmReport.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="frmTimeCardDetails.Designer.vb">
+      <DependentUpon>frmTimeCardDetails.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmTimeCardDetails.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmTimeCardMaster.Designer.vb">
+      <DependentUpon>frmTimeCardMaster.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmTimeCardMaster.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="frmTimeCardv2.Designer.vb">
       <DependentUpon>frmTimeCardv2.vb</DependentUpon>
     </Compile>
@@ -105,6 +117,12 @@
     </Compile>
     <Compile Include="frmTimeCard.Designer.vb">
       <DependentUpon>frmTimeCard.vb</DependentUpon>
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmUserMaster.Designer.vb">
+      <DependentUpon>frmUserMaster.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmUserMaster.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="My Project\AssemblyInfo.vb" />
@@ -128,6 +146,15 @@
       <DependentUpon>rptTimeCard.rpt</DependentUpon>
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="TimeCardDataAccess.vb" />
+    <Compile Include="TimeCardMainForm.Designer.vb">
+      <DependentUpon>TimeCardMainForm.vb</DependentUpon>
+    </Compile>
+    <Compile Include="TimeCardMainForm.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TimeCardMasterDetails.vb" />
+    <Compile Include="UserDetails.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="frmParametersv2.resx">
@@ -139,11 +166,20 @@
     <EmbeddedResource Include="frmReport.resx">
       <DependentUpon>frmReport.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="frmTimeCardDetails.resx">
+      <DependentUpon>frmTimeCardDetails.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmTimeCardMaster.resx">
+      <DependentUpon>frmTimeCardMaster.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="frmTimeCardv2.resx">
       <DependentUpon>frmTimeCardv2.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmTimeCard.resx">
       <DependentUpon>frmTimeCard.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmUserMaster.resx">
+      <DependentUpon>frmUserMaster.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
@@ -154,6 +190,9 @@
     <EmbeddedResource Include="rptTimeCard.rpt">
       <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
       <LastGenOutput>rptTimeCard.vb</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TimeCardMainForm.resx">
+      <DependentUpon>TimeCardMainForm.vb</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

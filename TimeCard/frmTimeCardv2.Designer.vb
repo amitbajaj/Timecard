@@ -22,12 +22,12 @@ Partial Class frmTimeCardv2
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
-        Dim DataGridViewCellStyle1 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
-        Dim DataGridViewCellStyle2 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
-        Dim DataGridViewCellStyle3 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
-        Dim DataGridViewCellStyle4 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
-        Dim DataGridViewCellStyle5 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
-        Dim DataGridViewCellStyle6 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle7 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle8 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle9 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle10 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle11 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle12 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Me.DataGridView1 = New System.Windows.Forms.DataGridView()
         Me.UserId = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.InTime = New System.Windows.Forms.DataGridViewTextBoxColumn()
@@ -49,6 +49,7 @@ Partial Class frmTimeCardv2
         Me.lblOT2 = New System.Windows.Forms.Label()
         Me.lblRegHrs = New System.Windows.Forms.Label()
         Me.btnCalculate = New System.Windows.Forms.Button()
+        Me.lblTotalAmount = New System.Windows.Forms.Label()
         CType(Me.DataGridView1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
@@ -71,16 +72,16 @@ Partial Class frmTimeCardv2
         '
         'InTime
         '
-        DataGridViewCellStyle1.Format = "T"
-        DataGridViewCellStyle1.NullValue = Nothing
-        Me.InTime.DefaultCellStyle = DataGridViewCellStyle1
+        DataGridViewCellStyle7.Format = "T"
+        DataGridViewCellStyle7.NullValue = Nothing
+        Me.InTime.DefaultCellStyle = DataGridViewCellStyle7
         Me.InTime.HeaderText = "In Time"
         Me.InTime.Name = "InTime"
         '
         'OutTime
         '
-        DataGridViewCellStyle2.Format = "T"
-        Me.OutTime.DefaultCellStyle = DataGridViewCellStyle2
+        DataGridViewCellStyle8.Format = "T"
+        Me.OutTime.DefaultCellStyle = DataGridViewCellStyle8
         Me.OutTime.HeaderText = "Out Time"
         Me.OutTime.Name = "OutTime"
         '
@@ -93,36 +94,36 @@ Partial Class frmTimeCardv2
         '
         'RegularHrs
         '
-        DataGridViewCellStyle3.Format = "N0"
-        DataGridViewCellStyle3.NullValue = "0"
-        Me.RegularHrs.DefaultCellStyle = DataGridViewCellStyle3
+        DataGridViewCellStyle9.Format = "N0"
+        DataGridViewCellStyle9.NullValue = "0"
+        Me.RegularHrs.DefaultCellStyle = DataGridViewCellStyle9
         Me.RegularHrs.HeaderText = "Regular Hours"
         Me.RegularHrs.Name = "RegularHrs"
         Me.RegularHrs.ReadOnly = True
         '
         'OT1Hrs
         '
-        DataGridViewCellStyle4.Format = "N0"
-        DataGridViewCellStyle4.NullValue = "0"
-        Me.OT1Hrs.DefaultCellStyle = DataGridViewCellStyle4
+        DataGridViewCellStyle10.Format = "N0"
+        DataGridViewCellStyle10.NullValue = "0"
+        Me.OT1Hrs.DefaultCellStyle = DataGridViewCellStyle10
         Me.OT1Hrs.HeaderText = "Over Time 1"
         Me.OT1Hrs.Name = "OT1Hrs"
         Me.OT1Hrs.ReadOnly = True
         '
         'OT2Hrs
         '
-        DataGridViewCellStyle5.Format = "N0"
-        DataGridViewCellStyle5.NullValue = "0"
-        Me.OT2Hrs.DefaultCellStyle = DataGridViewCellStyle5
+        DataGridViewCellStyle11.Format = "N0"
+        DataGridViewCellStyle11.NullValue = "0"
+        Me.OT2Hrs.DefaultCellStyle = DataGridViewCellStyle11
         Me.OT2Hrs.HeaderText = "Over Time 2"
         Me.OT2Hrs.Name = "OT2Hrs"
         Me.OT2Hrs.ReadOnly = True
         '
         'TotalCost
         '
-        DataGridViewCellStyle6.Format = "N0"
-        DataGridViewCellStyle6.NullValue = "0"
-        Me.TotalCost.DefaultCellStyle = DataGridViewCellStyle6
+        DataGridViewCellStyle12.Format = "N0"
+        DataGridViewCellStyle12.NullValue = "0"
+        Me.TotalCost.DefaultCellStyle = DataGridViewCellStyle12
         Me.TotalCost.HeaderText = "Total Cost"
         Me.TotalCost.Name = "TotalCost"
         Me.TotalCost.ReadOnly = True
@@ -226,18 +227,28 @@ Partial Class frmTimeCardv2
         '
         'btnCalculate
         '
-        Me.btnCalculate.Location = New System.Drawing.Point(472, 261)
+        Me.btnCalculate.Location = New System.Drawing.Point(403, 261)
         Me.btnCalculate.Name = "btnCalculate"
         Me.btnCalculate.Size = New System.Drawing.Size(75, 23)
         Me.btnCalculate.TabIndex = 17
         Me.btnCalculate.Text = "Calculate"
         Me.btnCalculate.UseVisualStyleBackColor = True
         '
+        'lblTotalAmount
+        '
+        Me.lblTotalAmount.AutoSize = True
+        Me.lblTotalAmount.Location = New System.Drawing.Point(484, 266)
+        Me.lblTotalAmount.Name = "lblTotalAmount"
+        Me.lblTotalAmount.Size = New System.Drawing.Size(45, 13)
+        Me.lblTotalAmount.TabIndex = 18
+        Me.lblTotalAmount.Text = "TOTAL:"
+        '
         'frmTimeCardv2
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1058, 301)
+        Me.Controls.Add(Me.lblTotalAmount)
         Me.Controls.Add(Me.btnCalculate)
         Me.Controls.Add(Me.lblOT2)
         Me.Controls.Add(Me.lblRegHrs)
@@ -250,6 +261,9 @@ Partial Class frmTimeCardv2
         Me.Controls.Add(Me.btnAddRow)
         Me.Controls.Add(Me.lblStatus)
         Me.Controls.Add(Me.DataGridView1)
+        Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D
+        Me.MaximizeBox = False
+        Me.MinimizeBox = False
         Me.Name = "frmTimeCardv2"
         Me.Text = "Time Card"
         CType(Me.DataGridView1, System.ComponentModel.ISupportInitialize).EndInit()
@@ -279,4 +293,5 @@ Partial Class frmTimeCardv2
     Friend WithEvents lblOT2 As Label
     Friend WithEvents lblRegHrs As Label
     Friend WithEvents btnCalculate As Button
+    Friend WithEvents lblTotalAmount As Label
 End Class

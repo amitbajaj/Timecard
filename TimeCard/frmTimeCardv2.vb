@@ -75,11 +75,9 @@ Public Class frmTimeCardv2
     End Sub
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles Me.Load
-        Dim iColCount As Integer
         LoadParameters()
-        For iColCount = 0 To DataGridView1.Columns.Count - 1
-            DataGridView1.Columns.RemoveAt(0)
-        Next
+        DataGridView1.Columns.Clear()
+        DataGridView1.MultiSelect = False
         Dim col1 As Object
         With DataGridView1.Columns
             col1 = New DataGridViewTextBoxColumn()
@@ -179,7 +177,6 @@ Public Class frmTimeCardv2
             .Add(col1)
 
         End With
-        DataGridView1.MultiSelect = False
         LoadData()
     End Sub
 
@@ -710,8 +707,12 @@ Public Class frmTimeCardv2
 
     Private Sub btnCalculate_Click(sender As Object, e As EventArgs) Handles btnCalculate.Click
         Dim rw As DataGridViewRow
+        Dim dTotalCost As Double
+        dTotalCost = 0
         For Each rw In DataGridView1.Rows
             CalculateCost(rw)
+            dTotalCost = dTotalCost + Double.Parse(rw.Cells("totalCost").Value)
         Next
+        lblTotalAmount.Text = "Total Cost : " & Math.Round(dTotalCost, 2).ToString()
     End Sub
 End Class
