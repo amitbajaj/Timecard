@@ -1,9 +1,9 @@
-﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
+﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
 Partial Class TimeCardMainForm
     Inherits System.Windows.Forms.Form
 
     'Form overrides dispose to clean up the component list.
-    <System.Diagnostics.DebuggerNonUserCode()> _
+    <System.Diagnostics.DebuggerNonUserCode()>
     Protected Overrides Sub Dispose(ByVal disposing As Boolean)
         Try
             If disposing AndAlso components IsNot Nothing Then
@@ -21,7 +21,7 @@ Partial Class TimeCardMainForm
     'NOTE: The following procedure is required by the Windows Form Designer
     'It can be modified using the Windows Form Designer.  
     'Do not modify it using the code editor.
-    <System.Diagnostics.DebuggerStepThrough()> _
+    <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
         Me.MenuStrip = New System.Windows.Forms.MenuStrip()
@@ -48,19 +48,19 @@ Partial Class TimeCardMainForm
         '
         Me.UserMasterToolStripMenuItem.Name = "UserMasterToolStripMenuItem"
         Me.UserMasterToolStripMenuItem.Size = New System.Drawing.Size(81, 20)
-        Me.UserMasterToolStripMenuItem.Text = "User Master"
+        Me.UserMasterToolStripMenuItem.Text = "&User Master"
         '
         'TimeCardMasterToolStripMenuItem
         '
         Me.TimeCardMasterToolStripMenuItem.Name = "TimeCardMasterToolStripMenuItem"
         Me.TimeCardMasterToolStripMenuItem.Size = New System.Drawing.Size(110, 20)
-        Me.TimeCardMasterToolStripMenuItem.Text = "TimeCard Master"
+        Me.TimeCardMasterToolStripMenuItem.Text = "&TimeCard Master"
         '
         'TimeCardDetailsToolStripMenuItem
         '
         Me.TimeCardDetailsToolStripMenuItem.Name = "TimeCardDetailsToolStripMenuItem"
         Me.TimeCardDetailsToolStripMenuItem.Size = New System.Drawing.Size(109, 20)
-        Me.TimeCardDetailsToolStripMenuItem.Text = "TimeCard Details"
+        Me.TimeCardDetailsToolStripMenuItem.Text = "TimeCard &Details"
         '
         'StatusStrip
         '

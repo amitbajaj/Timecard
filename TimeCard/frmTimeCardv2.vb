@@ -15,12 +15,12 @@ Public Class frmTimeCardv2
     Dim pOutTimeColumnNumber As Integer
     Dim pFirstVisibleColumnNumber As Integer
 
-    Private Sub DataGridView1_CellClick(sender As Object, e As DataGridViewCellEventArgs) Handles DataGridView1.CellClick
-        If e.RowIndex >= 0 And e.ColumnIndex <> DataGridView1.Columns("addNextRow").Index And e.ColumnIndex <> DataGridView1.Columns("delCurRow").Index Then
-            'DataGridView1.Rows(e.RowIndex).Selected = True
-            'ReadValues(DataGridView1.Rows(e.RowIndex))
-        End If
-    End Sub
+    'Private Sub DataGridView1_CellClick(sender As Object, e As DataGridViewCellEventArgs) Handles DataGridView1.CellClick
+    '    If e.RowIndex >= 0 And e.ColumnIndex <> DataGridView1.Columns("addNextRow").Index And e.ColumnIndex <> DataGridView1.Columns("delCurRow").Index Then
+    '        'DataGridView1.Rows(e.RowIndex).Selected = True
+    '        'ReadValues(DataGridView1.Rows(e.RowIndex))
+    '    End If
+    'End Sub
 
     Private Sub DataGridView1_CellContentClick(sender As Object, e As DataGridViewCellEventArgs) Handles DataGridView1.CellContentClick
         If e.RowIndex >= 0 And e.ColumnIndex = DataGridView1.Columns("addNextRow").Index Then
@@ -694,16 +694,16 @@ Public Class frmTimeCardv2
     '    End If
     'End Sub
 
-    Private Sub DataGridView1_CellValidated(sender As Object, e As DataGridViewCellEventArgs) Handles DataGridView1.CellValidated
-        'If e.ColumnIndex < DataGridView1.ColumnCount - 2 Then
-        '    DataGridView1.CurrentCell = DataGridView1.Rows.Item(e.RowIndex).Cells.Item(e.ColumnIndex + 1)
-        'ElseIf e.RowIndex < DataGridView1.Rows.Count - 1 Then
-        '    DataGridView1.CurrentCell = DataGridView1.Rows.Item(e.RowIndex + 1).Cells.Item(0)
-        'ElseIf e.RowIndex = DataGridView1.Rows.Count - 1 And e.ColumnIndex = DataGridView1.ColumnCount - 2 Then
-        '    DataGridView1.Rows.Add()
-        '    DataGridView1.CurrentCell = DataGridView1.Rows.Item(DataGridView1.Rows.Count - 1).Cells(0)
-        'End If
-    End Sub
+    'Private Sub DataGridView1_CellValidated(sender As Object, e As DataGridViewCellEventArgs) Handles DataGridView1.CellValidated
+    '    'If e.ColumnIndex < DataGridView1.ColumnCount - 2 Then
+    '    '    DataGridView1.CurrentCell = DataGridView1.Rows.Item(e.RowIndex).Cells.Item(e.ColumnIndex + 1)
+    '    'ElseIf e.RowIndex < DataGridView1.Rows.Count - 1 Then
+    '    '    DataGridView1.CurrentCell = DataGridView1.Rows.Item(e.RowIndex + 1).Cells.Item(0)
+    '    'ElseIf e.RowIndex = DataGridView1.Rows.Count - 1 And e.ColumnIndex = DataGridView1.ColumnCount - 2 Then
+    '    '    DataGridView1.Rows.Add()
+    '    '    DataGridView1.CurrentCell = DataGridView1.Rows.Item(DataGridView1.Rows.Count - 1).Cells(0)
+    '    'End If
+    'End Sub
 
     Private Sub btnCalculate_Click(sender As Object, e As EventArgs) Handles btnCalculate.Click
         Dim rw As DataGridViewRow

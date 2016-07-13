@@ -30,13 +30,11 @@ Partial Class frmTimeCardDetails
         '
         'DGVTimeCardDetails
         '
-        Me.DGVTimeCardDetails.AllowUserToAddRows = False
-        Me.DGVTimeCardDetails.AllowUserToDeleteRows = False
         Me.DGVTimeCardDetails.AllowUserToResizeRows = False
         Me.DGVTimeCardDetails.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.DGVTimeCardDetails.Location = New System.Drawing.Point(12, 49)
         Me.DGVTimeCardDetails.Name = "DGVTimeCardDetails"
-        Me.DGVTimeCardDetails.Size = New System.Drawing.Size(1058, 246)
+        Me.DGVTimeCardDetails.Size = New System.Drawing.Size(823, 246)
         Me.DGVTimeCardDetails.TabIndex = 1
         '
         'cboUsers
@@ -61,7 +59,7 @@ Partial Class frmTimeCardDetails
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1083, 307)
+        Me.ClientSize = New System.Drawing.Size(849, 307)
         Me.Controls.Add(Me.cboTimeCards)
         Me.Controls.Add(Me.cboUsers)
         Me.Controls.Add(Me.DGVTimeCardDetails)

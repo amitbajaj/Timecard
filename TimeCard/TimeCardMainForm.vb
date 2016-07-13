@@ -70,4 +70,25 @@ Public Class TimeCardMainForm
     Private Sub TimeCardMainForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.WindowState = FormWindowState.Maximized
     End Sub
+
+    Private Sub TimeCardOldToolStripMenuItem_Click(sender As Object, e As EventArgs)
+        Dim frmTCD As frmTimeCardv2
+        Dim iChilds As Integer
+        Dim bFound As Boolean
+        bFound = False
+        For iChilds = 0 To MdiChildren.Count - 1
+            If MdiChildren(iChilds).Name = "frmTimeCardv2" Then
+                bFound = True
+                Exit For
+            End If
+        Next
+        If bFound Then
+            frmTCD = MdiChildren(iChilds)
+            frmTCD.Activate()
+        Else
+            frmTCD = New frmTimeCardv2
+            frmTCD.MdiParent = Me
+            frmTCD.Show()
+        End If
+    End Sub
 End Class
