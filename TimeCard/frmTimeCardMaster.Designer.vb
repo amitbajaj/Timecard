@@ -24,8 +24,6 @@ Partial Class frmTimeCardMaster
     Private Sub InitializeComponent()
         Me.cboUsers = New System.Windows.Forms.ComboBox()
         Me.DGVTimeCardMaster = New System.Windows.Forms.DataGridView()
-        Me.btnDelete = New System.Windows.Forms.Button()
-        Me.btnAdd = New System.Windows.Forms.Button()
         CType(Me.DGVTimeCardMaster, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
@@ -34,9 +32,9 @@ Partial Class frmTimeCardMaster
         Me.cboUsers.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboUsers.FlatStyle = System.Windows.Forms.FlatStyle.System
         Me.cboUsers.FormattingEnabled = True
-        Me.cboUsers.Location = New System.Drawing.Point(13, 13)
+        Me.cboUsers.Location = New System.Drawing.Point(13, 12)
         Me.cboUsers.Name = "cboUsers"
-        Me.cboUsers.Size = New System.Drawing.Size(622, 21)
+        Me.cboUsers.Size = New System.Drawing.Size(288, 21)
         Me.cboUsers.TabIndex = 0
         '
         'DGVTimeCardMaster
@@ -49,34 +47,13 @@ Partial Class frmTimeCardMaster
         Me.DGVTimeCardMaster.Size = New System.Drawing.Size(622, 264)
         Me.DGVTimeCardMaster.TabIndex = 1
         '
-        'btnDelete
-        '
-        Me.btnDelete.Location = New System.Drawing.Point(586, 311)
-        Me.btnDelete.Name = "btnDelete"
-        Me.btnDelete.Size = New System.Drawing.Size(49, 23)
-        Me.btnDelete.TabIndex = 4
-        Me.btnDelete.Text = "Delete"
-        Me.btnDelete.UseVisualStyleBackColor = True
-        '
-        'btnAdd
-        '
-        Me.btnAdd.Location = New System.Drawing.Point(531, 311)
-        Me.btnAdd.Name = "btnAdd"
-        Me.btnAdd.Size = New System.Drawing.Size(49, 23)
-        Me.btnAdd.TabIndex = 3
-        Me.btnAdd.Text = "Add"
-        Me.btnAdd.UseVisualStyleBackColor = True
-        '
         'frmTimeCardMaster
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(643, 339)
-        Me.Controls.Add(Me.btnDelete)
-        Me.Controls.Add(Me.btnAdd)
         Me.Controls.Add(Me.DGVTimeCardMaster)
         Me.Controls.Add(Me.cboUsers)
-        Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D
         Me.MaximizeBox = False
         Me.MinimizeBox = False
         Me.Name = "frmTimeCardMaster"
@@ -88,6 +65,4 @@ Partial Class frmTimeCardMaster
 
     Friend WithEvents cboUsers As ComboBox
     Friend WithEvents DGVTimeCardMaster As DataGridView
-    Friend WithEvents btnDelete As Button
-    Friend WithEvents btnAdd As Button
 End Class

@@ -1,32 +1,40 @@
 ﻿Public Class frmTimeCardDetails
-    Private pFirstVisibleColumnNumber As Integer
-    Private pUserIdColumnNumber As Integer
-    Private pLogDateColumnNumber As Integer
-    Private pInTimeColumnNumber As Integer
-    Private pOutTimeColumnNumber As Integer
     Private dbConnection As TimeCardDataAccess
+    Private iDecimals As Integer = My.Settings.Item("NumberOfDecimals")
+    Private sNumberFormat As String = My.Settings.Item("NumberFormat")
 
     Private Sub frmTimeCardDetails_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         dbConnection = New TimeCardDataAccess()
-        dbConnection.DatabaseFile = "C:\db\TimeCard.mdb"
+        dbConnection.DatabaseFile = My.Settings.Item("DBFile")
+        lblTotalCost.Text = ""
+        lblTotalCost.TextAlign = ContentAlignment.TopRight
+        lblRegHrs.Text = ""
+        lblRegHrs.TextAlign = ContentAlignment.TopRight
+
+        lblOT1.Text = ""
+        lblOT1.TextAlign = ContentAlignment.TopLeft
+
+        lblOT2.Text = ""
+        lblOT2.TextAlign = ContentAlignment.TopLeft
         InitializeGrid()
         LoadUserMaster()
     End Sub
+
 
     Private Sub LoadUserMaster()
         Dim cmd As OleDb.OleDbCommand
         Dim dr As OleDb.OleDbDataReader
         Dim sSQL As String
-        Dim udUser As UserDetails
+        Dim udUser As TimeCardSupport.UserDetails
         cboUsers.Items.Clear()
         cboUsers.DisplayMember = "DisplayName"
-        sSQL = "SELECT * FROM UserMaster"
+        sSQL = "SELECT RecordId, UserNumber, UserName, Trade, Basic FROM UserMaster"
         If dbConnection.GetConnection() Then
             cmd = dbConnection.Connection.CreateCommand()
             cmd.CommandText = sSQL
             dr = cmd.ExecuteReader()
             While dr.Read()
-                udUser = New UserDetails
+                udUser = New TimeCardSupport.UserDetails
                 With udUser
                     .recordId = dr.GetInt32(0)
                     .userId = dr.GetInt16(1)
@@ -63,14 +71,12 @@
             col1.ReadOnly = True
             col1.Width = 60
             .Add(col1)
-            pFirstVisibleColumnNumber = 1
 
             col1 = New DataGridViewTextBoxColumn()
             col1.Name = "logDay"
             col1.HeaderText = "Day"
             col1.ReadOnly = False
             .Add(col1)
-            pLogDateColumnNumber = 2
 
             col1 = New DataGridViewTextBoxColumn()
             col1.Name = "inTime"
@@ -78,7 +84,6 @@
             col1.DefaultCellStyle.Format = "T"
             col1.ReadOnly = False
             .Add(col1)
-            pInTimeColumnNumber = 3
 
             col1 = New DataGridViewTextBoxColumn()
             col1.Name = "outTime"
@@ -86,7 +91,6 @@
             col1.DefaultCellStyle.Format = "T"
             col1.ReadOnly = False
             .Add(col1)
-            pOutTimeColumnNumber = 4
 
             col1 = New DataGridViewCheckBoxColumn()
             col1.Name = "isHoliday"
@@ -174,19 +178,22 @@
         Else
             DGVTimeCardDetails.Rows.RemoveAt(iRowIndex)
         End If
+        UpdateGridTotal(TimeCardSupport.GridTotal(DGVTimeCardDetails))
     End Sub
 
     Private Sub cboUsers_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cboUsers.SelectedIndexChanged
+        DGVTimeCardDetails.Rows.Clear()
+        lblTotalCost.Text = ""
         If cboUsers.SelectedIndex >= 0 Then
             LoadTimeCardMaster(cboUsers.SelectedItem)
         End If
     End Sub
 
-    Private Sub LoadTimeCardMaster(udUser As UserDetails)
+    Private Sub LoadTimeCardMaster(udUser As TimeCardSupport.UserDetails)
         Dim cmd As OleDb.OleDbCommand
         Dim dr As OleDb.OleDbDataReader
         Dim sSQL As String
-        Dim tcmTimeCard As TimeCardMasterDetails
+        Dim tcmTimeCard As TimeCardSupport.TimeCardMasterDetails
         cboTimeCards.Items.Clear()
         cboTimeCards.DisplayMember = "DisplayName"
         If dbConnection.GetConnection() Then
@@ -195,7 +202,7 @@
             cmd.CommandText = sSQL
             dr = cmd.ExecuteReader()
             While dr.Read()
-                tcmTimeCard = New TimeCardMasterDetails()
+                tcmTimeCard = New TimeCardSupport.TimeCardMasterDetails()
                 tcmTimeCard.RecordId = dr.GetInt32(0)
                 tcmTimeCard.UserId = dr.GetInt32(1)
                 tcmTimeCard.TimeCardNumber = dr.GetInt32(2)
@@ -223,7 +230,15 @@
         Dim sSQL As String
         Dim iNewItem As Integer
         Dim rw As DataGridViewRow
+        Dim dReg, dOT1, dOT2, dTotalCost As Double
+        Dim oGridTotal As New TimeCardSupport.GridTotals
+        Dim oTime As New TimeCardSupport.TimeField
+        dReg = 0
+        dOT1 = 0
+        dOT2 = 0
+        dTotalCost = 0
         DGVTimeCardDetails.Rows.Clear()
+        lblTotalCost.Text = ""
         If dbConnection.GetConnection() Then
             sSQL = "SELECT * FROM TimeCardDetailData WHERE TimeCardId = " & iRecordId & " ORDER BY TimeCardDay"
             cmd = dbConnection.Connection.CreateCommand()
@@ -258,27 +273,37 @@
                     If dr.IsDBNull(6) Then
                         rw.Cells("regularHrs").Value = Nothing
                     Else
-                        rw.Cells("regularHrs").Value = dr.GetDouble(6).ToString("0.00")
+                        oTime.SetTime(dr.GetDouble(6))
+                        dReg = dReg + oTime.GetTime()
+                        rw.Cells("regularHrs").Value = oTime.DisplayTime
                     End If
                     If dr.IsDBNull(7) Then
                         rw.Cells("OT1").Value = Nothing
                     Else
-                        rw.Cells("OT1").Value = dr.GetDouble(7).ToString("0.00")
+                        oTime.SetTime(dr.GetDouble(7))
+                        dOT1 = dOT1 + oTime.GetTime()
+                        rw.Cells("OT1").Value = oTime.DisplayTime
                     End If
                     If dr.IsDBNull(8) Then
                         rw.Cells("OT2").Value = Nothing
                     Else
-                        rw.Cells("OT2").Value = dr.GetDouble(8).ToString("0.00")
+                        oTime.SetTime(dr.GetDouble(8))
+                        dOT2 = dOT2 + oTime.GetTime()
+                        rw.Cells("OT2").Value = oTime.DisplayTime
                     End If
                     If dr.IsDBNull(9) Then
                         rw.Cells("totalCost").Value = Nothing
                     Else
-                        rw.Cells("totalCost").Value = dr.GetDouble(9).ToString("0.00")
+                        rw.Cells("totalCost").Value = dr.GetDouble(9).ToString(sNumberFormat)
+                        dTotalCost = dTotalCost + dr.GetDouble(8)
                     End If
                 End While
+                oGridTotal.AddValues(dReg, dOT1, dOT2, dTotalCost)
+                UpdateGridTotal(oGridTotal)
+                DGVTimeCardDetails.CurrentCell = DGVTimeCardDetails.Rows(0).Cells(1)
             Else
                 iNewItem = DGVTimeCardDetails.Rows.Add()
-                DGVTimeCardDetails.CurrentCell = DGVTimeCardDetails.Rows(iNewItem).Cells(pFirstVisibleColumnNumber + 1)
+                DGVTimeCardDetails.CurrentCell = DGVTimeCardDetails.Rows(iNewItem).Cells(1)
             End If
             dr.Close()
             cmd.Dispose()
@@ -290,79 +315,19 @@
 
     Private Sub frmTimeCardDetails_Resize(sender As Object, e As EventArgs) Handles Me.Resize
         DGVTimeCardDetails.Width = Width - 40
-        DGVTimeCardDetails.Height = Height - 120
+        DGVTimeCardDetails.Height = Height - 130
+        lblTotalCost.Left = Width - lblTotalCost.Width - 40
+        lblTotalCost.Top = Height - 70
+        lblRegHrs.Top = Height - 70
+        lblOT1.Top = Height - 70
+        lblOT2.Top = Height - 70
+
+
     End Sub
-
-    Private Function ValidateCell(iColumnIndex As Integer, iRowIndex As Integer, sValue As String) As Boolean
-        Dim dDate As Date
-        Dim iDay As Integer
-        Dim currentMonth As Integer
-        Dim currentYear As Integer
-        Dim rw As DataGridViewRow
-        currentMonth = cboTimeCards.SelectedItem.TimeCardMonth
-        currentYear = cboTimeCards.SelectedItem.TimeCardYear
-        ValidateCell = True
-        If DGVTimeCardDetails.Columns(iColumnIndex).Name = "logDay" Then
-            If sValue <> "" Then
-                If Not Integer.TryParse(sValue, iDay) Then
-                    MsgBox("Enter a valid day!")
-                    ValidateCell = False
-                    Exit Function
-                ElseIf Not ValidateDate(iDay, currentMonth, currentYear) Then
-                    MsgBox("Enter a valid day!")
-                    ValidateCell = False
-                    Exit Function
-                End If
-                For Each rw In DGVTimeCardDetails.Rows
-                    If rw.Cells("logDay").Value = iDay And rw.Index <> iRowIndex Then
-                        MsgBox("Duplicate day for the month!")
-                        ValidateCell = False
-                        Exit Function
-                    End If
-                Next
-            End If
-        End If
-        If DGVTimeCardDetails.Columns(iColumnIndex).Name = "inTime" Or DGVTimeCardDetails.Columns(iColumnIndex).Name = "outTime" Then
-            If sValue <> "" Then
-                If Not Date.TryParse(sValue, dDate) Then
-                    MsgBox("Enter a valid time!")
-                    ValidateCell = False
-                    Exit Function
-                End If
-            End If
-        End If
-
-    End Function
 
     Private Sub DGVTimeCardDetails_CellValidating(sender As Object, e As DataGridViewCellValidatingEventArgs) Handles DGVTimeCardDetails.CellValidating
-        e.Cancel = Not ValidateCell(e.ColumnIndex, e.RowIndex, e.FormattedValue.ToString())
+        e.Cancel = Not TimeCardSupport.ValidateCell(cboTimeCards, DGVTimeCardDetails, e.ColumnIndex, e.RowIndex, e.FormattedValue.ToString())
     End Sub
-
-    Private Function ValidateDate(iDay As Integer, iMonth As Integer, iYear As Integer) As Boolean
-        Dim days_in_month(13) As Integer
-        ValidateDate = True
-        days_in_month = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}
-        If isLeapYear(iYear) Then
-            days_in_month(2) = 29
-        End If
-        If iMonth < 1 Or iMonth > 12 Then
-            ValidateDate = False
-        ElseIf iDay < 1 Or iDay > days_in_month(iMonth) Then
-            ValidateDate = False
-        End If
-    End Function
-
-    Private Function isLeapYear(iYear As Integer) As Boolean
-        If iYear Mod 4 <> 0 Then
-            isLeapYear = False
-        ElseIf iYear Mod 400 = 0 Then
-            isLeapYear = True
-        ElseIf iYear Mod 100 = 0 Then
-            isLeapYear = False
-        Else
-            isLeapYear = True
-        End If
-    End Function
 
     Private Sub DGVTimeCardDetails_CellEndEdit(sender As Object, e As DataGridViewCellEventArgs) Handles DGVTimeCardDetails.CellEndEdit
         SaveData(e.RowIndex)
@@ -374,8 +339,10 @@
         Dim rw As DataGridViewRow
         Dim tInTime, tOutTime As Date
         Dim bNewRow As Boolean
-        rw = DGVTimeCardDetails.Rows(iRow)
         Dim bInTime, bOutTime, bHoliday As Boolean
+        Dim oTimeField As TimeCardSupport.TimeField
+        oTimeField = New TimeCardSupport.TimeField
+        rw = DGVTimeCardDetails.Rows(iRow)
         bInTime = False
         bOutTime = False
         bHoliday = False
@@ -412,26 +379,31 @@
                 sSQL = sSQL & "NULL"
             End If
             If bInTime And bOutTime Then
-                CalculateCost(rw, tInTime, tOutTime, bHoliday)
+                TimeCardSupport.CalculateCost(cboUsers.SelectedItem.Basic, rw, iDecimals, sNumberFormat, tInTime, tOutTime, bHoliday)
+                UpdateGridTotal(TimeCardSupport.GridTotal(DGVTimeCardDetails))
             End If
 
             sSQL = sSQL & ", "
             If rw.Cells("regularHrs").Value Is Nothing Then
                 sSQL = sSQL & "NULL"
             Else
-                sSQL = sSQL & rw.Cells("regularHrs").Value
+                oTimeField.SetTime(rw.Cells("regularHrs").Value)
+                sSQL = sSQL & oTimeField.GetTime()
             End If
             sSQL = sSQL & ", "
+
             If rw.Cells("OT1").Value Is Nothing Then
                 sSQL = sSQL & "NULL"
             Else
-                sSQL = sSQL & rw.Cells("OT1").Value
+                oTimeField.SetTime(rw.Cells("OT1").Value)
+                sSQL = sSQL & oTimeField.GetTime()
             End If
             sSQL = sSQL & ", "
             If rw.Cells("OT2").Value Is Nothing Then
                 sSQL = sSQL & "NULL"
             Else
-                sSQL = sSQL & rw.Cells("OT2").Value
+                oTimeField.SetTime(rw.Cells("OT2").Value)
+                sSQL = sSQL & oTimeField.GetTime()
             End If
             sSQL = sSQL & ", "
             If rw.Cells("totalCost").Value Is Nothing Then
@@ -478,25 +450,29 @@
                 sSQL = sSQL & "NULL"
             End If
             If bInTime And bOutTime Then
-                CalculateCost(rw, tInTime, tOutTime, bHoliday)
+                TimeCardSupport.CalculateCost(cboUsers.SelectedItem.Basic, rw, iDecimals, sNumberFormat, tInTime, tOutTime, bHoliday)
+                UpdateGridTotal(TimeCardSupport.GridTotal(DGVTimeCardDetails))
             End If
             sSQL = sSQL & ", RegHrs = "
             If rw.Cells("regularHrs").Value Is Nothing Then
                 sSQL = sSQL & "NULL"
             Else
-                sSQL = sSQL & rw.Cells("regularHrs").Value
+                oTimeField.SetTime(rw.Cells("regularHrs").Value)
+                sSQL = sSQL & oTimeField.GetTime()
             End If
             sSQL = sSQL & ", OT1Hrs = "
             If rw.Cells("OT1").Value Is Nothing Then
                 sSQL = sSQL & "NULL"
             Else
-                sSQL = sSQL & rw.Cells("OT1").Value
+                oTimeField.SetTime(rw.Cells("OT1").Value)
+                sSQL = sSQL & oTimeField.GetTime()
             End If
             sSQL = sSQL & ", OT2Hrs = "
             If rw.Cells("OT2").Value Is Nothing Then
                 sSQL = sSQL & "NULL"
             Else
-                sSQL = sSQL & rw.Cells("OT2").Value
+                oTimeField.SetTime(rw.Cells("OT2").Value)
+                sSQL = sSQL & oTimeField.GetTime()
             End If
             sSQL = sSQL & ", TotalCost = "
             If rw.Cells("totalCost").Value Is Nothing Then
@@ -521,40 +497,26 @@
         End If
     End Sub
 
-    Private Sub CalculateCost(rw As DataGridViewRow, inTime As Date, outTime As Date, isHoliday As Boolean)
-        Dim dBasic As Double
-        Dim dReg, dOT1, dOT2, dTotal As Double
-        dReg = 0
-        dOT1 = 0
-        dOT2 = 0
-        dBasic = cboUsers.SelectedItem.Basic
-        dReg = outTime.Subtract(inTime).TotalHours
-        If isHoliday Then
-            dOT2 = dReg
-            dReg = 0
-            dOT1 = 0
-        ElseIf dReg > 8 Then
-            dOT1 = dReg - 8
-            dReg = 8
-        End If
-        dTotal = (dReg * dBasic) + (dOT1 * dBasic * 1.25) + (dOT2 * dBasic * 1.5)
-        rw.Cells("regularHrs").Value = Math.Round(dReg, 2).ToString("0.00")
-        rw.Cells("OT1").Value = Math.Round(dOT1, 2).ToString("0.00")
-        rw.Cells("OT2").Value = Math.Round(dOT2, 2).ToString("0.00")
-        rw.Cells("totalCost").Value = Math.Round(dTotal, 2).ToString("0.00")
+    Sub UpdateGridTotal(oGridTotal As TimeCardSupport.GridTotals)
+        lblTotalCost.Text = "Total Cost: " & Math.Round(oGridTotal.TotalCost, iDecimals).ToString(sNumberFormat)
+        lblTotalCost.AutoSize = True
+        lblTotalCost.Left = Width - lblTotalCost.Width - 40
+        lblRegHrs.Text = "Total Regular : " & TimeCardSupport.DisplayDays(oGridTotal.RegularHours)
+        lblOT1.Text = "Total OT1 : " & TimeCardSupport.DisplayDays(oGridTotal.OT1Hours)
+        lblOT2.Text = "Total OT2 : " & TimeCardSupport.DisplayDays(oGridTotal.OT2Hours)
     End Sub
 
     Private Sub DGVTimeCardDetails_KeyDown(sender As Object, e As KeyEventArgs) Handles DGVTimeCardDetails.KeyDown
         If e.KeyCode = Asc(vbCr) Then
             With DGVTimeCardDetails
-                If ValidateCell(.CurrentCell.ColumnIndex, .CurrentRow.Index, .CurrentCell.Value) Then
+                If TimeCardSupport.ValidateCell(cboTimeCards, DGVTimeCardDetails, .CurrentCell.ColumnIndex, .CurrentRow.Index, .CurrentCell.Value) Then
                     If .CurrentCell.ColumnIndex < .ColumnCount - 2 Then
                         .CurrentCell = .Rows.Item(.CurrentCell.RowIndex).Cells.Item(.CurrentCell.ColumnIndex + 1)
                     ElseIf .CurrentCell.RowIndex < .Rows.Count - 1 Then
-                        .CurrentCell = .Rows.Item(.CurrentCell.RowIndex + 1).Cells.Item(pFirstVisibleColumnNumber)
+                        .CurrentCell = .Rows.Item(.CurrentCell.RowIndex + 1).Cells.Item(1)
                     ElseIf .CurrentCell.RowIndex = .Rows.Count - 1 And .CurrentCell.ColumnIndex = .ColumnCount - 2 Then
                         .Rows.Add()
-                        .CurrentCell = .Rows.Item(.Rows.Count - 1).Cells(pFirstVisibleColumnNumber)
+                        .CurrentCell = .Rows.Item(.Rows.Count - 1).Cells(1)
                     End If
                     e.Handled = True
                 End If

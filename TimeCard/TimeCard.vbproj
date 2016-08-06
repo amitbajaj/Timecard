@@ -76,6 +76,31 @@
     <Import Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="frmProjectMaster.Designer.vb">
+      <DependentUpon>frmProjectMaster.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmProjectMaster.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmProjectTimeCard.Designer.vb">
+      <DependentUpon>frmProjectTimeCard.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmProjectTimeCard.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmProjectTimeCardMaster.Designer.vb">
+      <DependentUpon>frmProjectTimeCardMaster.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmProjectTimeCardMaster.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TimeCardSupport.vb" />
+    <Compile Include="frmCustomerMaster.Designer.vb">
+      <DependentUpon>frmCustomerMaster.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmCustomerMaster.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="frmParametersv2.Designer.vb">
       <DependentUpon>frmParametersv2.vb</DependentUpon>
     </Compile>
@@ -147,21 +172,28 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="TimeCardDataAccess.vb" />
-    <Compile Include="TimeCardMainForm.Designer.vb">
-      <DependentUpon>TimeCardMainForm.vb</DependentUpon>
+    <Compile Include="frmTimeCardMainForm.Designer.vb">
+      <DependentUpon>frmTimeCardMainForm.vb</DependentUpon>
     </Compile>
-    <Compile Include="TimeCardMainForm.vb">
+    <Compile Include="frmTimeCardMainForm.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="TimeCardMasterDetails.vb" />
-    <Compile Include="UserDetails.vb" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="frmCustomerMaster.resx">
+      <DependentUpon>frmCustomerMaster.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="frmParametersv2.resx">
       <DependentUpon>frmParametersv2.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmParameters.resx">
       <DependentUpon>frmParameters.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmProjectMaster.resx">
+      <DependentUpon>frmProjectMaster.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmProjectTimeCardMaster.resx">
+      <DependentUpon>frmProjectTimeCardMaster.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmReport.resx">
       <DependentUpon>frmReport.vb</DependentUpon>
@@ -187,12 +219,15 @@
       <CustomToolNamespace>My.Resources</CustomToolNamespace>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="frmProjectTimeCard.resx">
+      <DependentUpon>frmProjectTimeCard.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="rptTimeCard.rpt">
       <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
       <LastGenOutput>rptTimeCard.vb</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="TimeCardMainForm.resx">
-      <DependentUpon>TimeCardMainForm.vb</DependentUpon>
+    <EmbeddedResource Include="frmTimeCardMainForm.resx">
+      <DependentUpon>frmTimeCardMainForm.vb</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

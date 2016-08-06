@@ -300,7 +300,8 @@ Public Class frmTimeCard
         Dim sConn As String
         'Microsoft.Jet.OLEDB.4.0
         'Microsoft.ACE.OLEDB.12.0
-        sConn = "Provider = Microsoft.Jet.OLEDB.4.0;Data Source=C:\db\Timecard.mdb;Persist Security Info=False;User Id=Admin;"
+        Dim sDBFile As String = My.Settings.Item("DBFile")
+        sConn = "Provider = Microsoft.Jet.OLEDB.4.0;Data Source=" & sDBFile & ";Persist Security Info=False;User Id=Admin;"
         If conn Is Nothing Then
             conn = New OleDb.OleDbConnection(sConn)
         Else

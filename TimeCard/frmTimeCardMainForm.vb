@@ -1,0 +1,159 @@
+﻿Imports System.Windows.Forms
+
+Public Class frmTimeCardMainForm
+    Private Sub UserMasterToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles UserMasterToolStripMenuItem.Click
+        Dim frmUM As frmUserMaster
+        Dim iChilds As Integer
+        Dim bFound As Boolean
+        bFound = False
+        For iChilds = 0 To MdiChildren.Count - 1
+            If MdiChildren(iChilds).Name = "frmUserMaster" Then
+                bFound = True
+                Exit For
+            End If
+        Next
+        If bFound Then
+            frmUM = MdiChildren(iChilds)
+            frmUM.Activate()
+        Else
+            frmUM = New frmUserMaster
+            frmUM.MdiParent = Me
+            frmUM.Show()
+        End If
+
+    End Sub
+
+    Private Sub TimeCardMasterToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles TimeCardMasterToolStripMenuItem.Click
+        Dim frmTCM As frmTimeCardMaster
+        Dim iChilds As Integer
+        Dim bFound As Boolean
+        bFound = False
+        For iChilds = 0 To MdiChildren.Count - 1
+            If MdiChildren(iChilds).Name = "frmTimeCardMaster" Then
+                bFound = True
+                Exit For
+            End If
+        Next
+        If bFound Then
+            frmTCM = MdiChildren(iChilds)
+            frmTCM.Activate()
+        Else
+            frmTCM = New frmTimeCardMaster
+            frmTCM.MdiParent = Me
+            frmTCM.Show()
+        End If
+
+    End Sub
+
+    Private Sub TimeCardDetailsToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles TimeCardDetailsToolStripMenuItem.Click
+        Dim frmTCD As frmTimeCardDetails
+        Dim iChilds As Integer
+        Dim bFound As Boolean
+        bFound = False
+        For iChilds = 0 To MdiChildren.Count - 1
+            If MdiChildren(iChilds).Name = "frmTimeCardDetails" Then
+                bFound = True
+                Exit For
+            End If
+        Next
+        If bFound Then
+            frmTCD = MdiChildren(iChilds)
+            frmTCD.Activate()
+        Else
+            frmTCD = New frmTimeCardDetails
+            frmTCD.MdiParent = Me
+            frmTCD.Show()
+        End If
+
+    End Sub
+
+    Private Sub TimeCardMainForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        Me.WindowState = FormWindowState.Maximized
+    End Sub
+
+    Private Sub CustomerToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles CustomerToolStripMenuItem.Click
+        Dim frmCustMaster As frmCustomerMaster
+        Dim iChilds As Integer
+        Dim bFound As Boolean
+        bFound = False
+        For iChilds = 0 To MdiChildren.Count - 1
+            If MdiChildren(iChilds).Name = "frmCustomerMaster" Then
+                bFound = True
+                Exit For
+            End If
+        Next
+        If bFound Then
+            frmCustMaster = MdiChildren(iChilds)
+            frmCustMaster.Activate()
+        Else
+            frmCustMaster = New frmCustomerMaster
+            frmCustMaster.MdiParent = Me
+            frmCustMaster.Show()
+        End If
+    End Sub
+
+    Private Sub CustomerProjectStripMenuItem_Click(sender As Object, e As EventArgs) Handles CustomerProjectStripMenuItem.Click
+        Dim frmProjMaster As frmProjectMaster
+        Dim iChilds As Integer
+        Dim bFound As Boolean
+        bFound = False
+        For iChilds = 0 To MdiChildren.Count - 1
+            If MdiChildren(iChilds).Name = "frmProjectMaster" Then
+                bFound = True
+                Exit For
+            End If
+        Next
+        If bFound Then
+            frmProjMaster = MdiChildren(iChilds)
+            frmProjMaster.Activate()
+        Else
+            frmProjMaster = New frmProjectMaster
+            frmProjMaster.MdiParent = Me
+            frmProjMaster.Show()
+        End If
+    End Sub
+
+    Private Sub ProjectTimeCardToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ProjectTimeCardToolStripMenuItem.Click
+        Dim frmPrjTmCrdMaster As frmProjectTimeCardMaster
+        Dim iChilds As Integer
+        Dim bFound As Boolean
+        bFound = False
+        For iChilds = 0 To MdiChildren.Count - 1
+            If MdiChildren(iChilds).Name = "frmProjectTimeCardMaster" Then
+                bFound = True
+                Exit For
+            End If
+        Next
+        If bFound Then
+            frmPrjTmCrdMaster = MdiChildren(iChilds)
+            frmPrjTmCrdMaster.Activate()
+        Else
+            frmPrjTmCrdMaster = New frmProjectTimeCardMaster
+            frmPrjTmCrdMaster.MdiParent = Me
+            frmPrjTmCrdMaster.Show()
+        End If
+
+    End Sub
+
+    Private Sub ProjectTimeCardDetailsToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ProjectTimeCardDetailsToolStripMenuItem.Click
+        Dim frmProjTimeCard As frmProjectTimeCard
+        Dim iChilds As Integer
+        Dim bFound As Boolean
+        bFound = False
+        For iChilds = 0 To MdiChildren.Count - 1
+            If MdiChildren(iChilds).Name = "frmProjectTimeCard" Then
+                bFound = True
+                Exit For
+            End If
+        Next
+        If bFound Then
+            frmProjTimeCard = MdiChildren(iChilds)
+            frmProjTimeCard.Activate()
+        Else
+            frmProjTimeCard = New frmProjectTimeCard
+            frmProjTimeCard.MdiParent = Me
+            frmProjTimeCard.Show()
+        End If
+
+    End Sub
+End Class

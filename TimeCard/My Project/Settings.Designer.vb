@@ -53,6 +53,42 @@ Namespace My
                 Return defaultInstance
             End Get
         End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("C:\DB\TimeCard.mdb")>  _
+        Public Property DBFile() As String
+            Get
+                Return CType(Me("DBFile"),String)
+            End Get
+            Set
+                Me("DBFile") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("0.000")>  _
+        Public Property NumberFormat() As String
+            Get
+                Return CType(Me("NumberFormat"),String)
+            End Get
+            Set
+                Me("NumberFormat") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("3")>  _
+        Public Property NumberOfDecimals() As Integer
+            Get
+                Return CType(Me("NumberOfDecimals"),Integer)
+            End Get
+            Set
+                Me("NumberOfDecimals") = value
+            End Set
+        End Property
     End Class
 End Namespace
 

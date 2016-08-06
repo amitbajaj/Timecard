@@ -1,5 +1,5 @@
 ﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
-Partial Class TimeCardMainForm
+Partial Class frmTimeCardMainForm
     Inherits System.Windows.Forms.Form
 
     'Form overrides dispose to clean up the component list.
@@ -25,9 +25,15 @@ Partial Class TimeCardMainForm
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
         Me.MenuStrip = New System.Windows.Forms.MenuStrip()
+        Me.UserMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.UserMasterToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.TimeCardMasterToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.TimeCardDetailsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.CustomerMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.CustomerToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.CustomerProjectStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ProjectTimeCardToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ProjectTimeCardDetailsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.StatusStrip = New System.Windows.Forms.StatusStrip()
         Me.ToolStripStatusLabel = New System.Windows.Forms.ToolStripStatusLabel()
         Me.ToolTip = New System.Windows.Forms.ToolTip(Me.components)
@@ -37,30 +43,68 @@ Partial Class TimeCardMainForm
         '
         'MenuStrip
         '
-        Me.MenuStrip.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.UserMasterToolStripMenuItem, Me.TimeCardMasterToolStripMenuItem, Me.TimeCardDetailsToolStripMenuItem})
+        Me.MenuStrip.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.UserMenuItem, Me.CustomerMenuItem})
         Me.MenuStrip.Location = New System.Drawing.Point(0, 0)
         Me.MenuStrip.Name = "MenuStrip"
         Me.MenuStrip.Size = New System.Drawing.Size(766, 24)
         Me.MenuStrip.TabIndex = 5
         Me.MenuStrip.Text = "MenuStrip"
         '
+        'UserMenuItem
+        '
+        Me.UserMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.UserMasterToolStripMenuItem, Me.TimeCardMasterToolStripMenuItem, Me.TimeCardDetailsToolStripMenuItem})
+        Me.UserMenuItem.Name = "UserMenuItem"
+        Me.UserMenuItem.Size = New System.Drawing.Size(47, 20)
+        Me.UserMenuItem.Text = "Users"
+        '
         'UserMasterToolStripMenuItem
         '
         Me.UserMasterToolStripMenuItem.Name = "UserMasterToolStripMenuItem"
-        Me.UserMasterToolStripMenuItem.Size = New System.Drawing.Size(81, 20)
+        Me.UserMasterToolStripMenuItem.Size = New System.Drawing.Size(165, 22)
         Me.UserMasterToolStripMenuItem.Text = "&User Master"
         '
         'TimeCardMasterToolStripMenuItem
         '
         Me.TimeCardMasterToolStripMenuItem.Name = "TimeCardMasterToolStripMenuItem"
-        Me.TimeCardMasterToolStripMenuItem.Size = New System.Drawing.Size(110, 20)
+        Me.TimeCardMasterToolStripMenuItem.Size = New System.Drawing.Size(165, 22)
         Me.TimeCardMasterToolStripMenuItem.Text = "&TimeCard Master"
         '
         'TimeCardDetailsToolStripMenuItem
         '
         Me.TimeCardDetailsToolStripMenuItem.Name = "TimeCardDetailsToolStripMenuItem"
-        Me.TimeCardDetailsToolStripMenuItem.Size = New System.Drawing.Size(109, 20)
+        Me.TimeCardDetailsToolStripMenuItem.Size = New System.Drawing.Size(165, 22)
         Me.TimeCardDetailsToolStripMenuItem.Text = "TimeCard &Details"
+        '
+        'CustomerMenuItem
+        '
+        Me.CustomerMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.CustomerToolStripMenuItem, Me.CustomerProjectStripMenuItem, Me.ProjectTimeCardToolStripMenuItem, Me.ProjectTimeCardDetailsToolStripMenuItem})
+        Me.CustomerMenuItem.Name = "CustomerMenuItem"
+        Me.CustomerMenuItem.Size = New System.Drawing.Size(76, 20)
+        Me.CustomerMenuItem.Text = "Customers"
+        '
+        'CustomerToolStripMenuItem
+        '
+        Me.CustomerToolStripMenuItem.Name = "CustomerToolStripMenuItem"
+        Me.CustomerToolStripMenuItem.Size = New System.Drawing.Size(204, 22)
+        Me.CustomerToolStripMenuItem.Text = "&Customer Master"
+        '
+        'CustomerProjectStripMenuItem
+        '
+        Me.CustomerProjectStripMenuItem.Name = "CustomerProjectStripMenuItem"
+        Me.CustomerProjectStripMenuItem.Size = New System.Drawing.Size(204, 22)
+        Me.CustomerProjectStripMenuItem.Text = "Customer &Project"
+        '
+        'ProjectTimeCardToolStripMenuItem
+        '
+        Me.ProjectTimeCardToolStripMenuItem.Name = "ProjectTimeCardToolStripMenuItem"
+        Me.ProjectTimeCardToolStripMenuItem.Size = New System.Drawing.Size(204, 22)
+        Me.ProjectTimeCardToolStripMenuItem.Text = "Project TimeCard"
+        '
+        'ProjectTimeCardDetailsToolStripMenuItem
+        '
+        Me.ProjectTimeCardDetailsToolStripMenuItem.Name = "ProjectTimeCardDetailsToolStripMenuItem"
+        Me.ProjectTimeCardDetailsToolStripMenuItem.Size = New System.Drawing.Size(204, 22)
+        Me.ProjectTimeCardDetailsToolStripMenuItem.Text = "Project TimeCard Details"
         '
         'StatusStrip
         '
@@ -77,7 +121,7 @@ Partial Class TimeCardMainForm
         Me.ToolStripStatusLabel.Size = New System.Drawing.Size(39, 17)
         Me.ToolStripStatusLabel.Text = "Status"
         '
-        'TimeCardMainForm
+        'frmTimeCardMainForm
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
@@ -86,7 +130,7 @@ Partial Class TimeCardMainForm
         Me.Controls.Add(Me.StatusStrip)
         Me.IsMdiContainer = True
         Me.MainMenuStrip = Me.MenuStrip
-        Me.Name = "TimeCardMainForm"
+        Me.Name = "frmTimeCardMainForm"
         Me.Text = "TimeCardMainForm"
         Me.MenuStrip.ResumeLayout(False)
         Me.MenuStrip.PerformLayout()
@@ -100,7 +144,13 @@ Partial Class TimeCardMainForm
     Friend WithEvents ToolStripStatusLabel As System.Windows.Forms.ToolStripStatusLabel
     Friend WithEvents StatusStrip As System.Windows.Forms.StatusStrip
     Friend WithEvents MenuStrip As System.Windows.Forms.MenuStrip
+    Friend WithEvents UserMenuItem As ToolStripMenuItem
+    Friend WithEvents CustomerMenuItem As ToolStripMenuItem
+    Friend WithEvents CustomerProjectStripMenuItem As ToolStripMenuItem
     Friend WithEvents UserMasterToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents TimeCardMasterToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents TimeCardDetailsToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents CustomerToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ProjectTimeCardToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ProjectTimeCardDetailsToolStripMenuItem As ToolStripMenuItem
 End Class

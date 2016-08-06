@@ -1,77 +1,22 @@
 ﻿Public Class frmTimeCardMaster
     Private dbConnection As TimeCardDataAccess
-    Private Class MonthClass
-        Private _monthNumber As Short
-        Private _monthName As String
-        Public Property MonthName As String
-            Get
-                Return _monthName
-            End Get
-            Set(value As String)
-                _monthName = value
-            End Set
-        End Property
-
-        Public Property MonthNumber As Short
-            Get
-                Return _monthNumber
-            End Get
-            Set(value As Short)
-                _monthNumber = value
-            End Set
-        End Property
-
-        Public ReadOnly Property DisplayName As String
-            Get
-                Return _monthNumber & " - " & _monthName
-            End Get
-        End Property
-    End Class
-
-
     Private Sub frmTimeCardMaster_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         dbConnection = New TimeCardDataAccess()
-        dbConnection.DatabaseFile = "C:\db\TimeCard.mdb"
+        dbConnection.DatabaseFile = My.Settings.Item("DBFile")
         InitializeGrid()
         LoadUsers()
     End Sub
 
     Private Sub InitializeGrid()
         Dim col1 As Object
-        'Dim sMonthName(11) As String
-        'Dim iMonthNumber(11) As Short
-        'Dim col2 As DataGridViewComboBoxColumn
-        'Dim mMonth As MonthClass
-        'Dim iMonthCount As Integer
-        DGVTimeCardMaster.Columns.Clear()
-        DGVTimeCardMaster.AllowUserToAddRows = False
-        DGVTimeCardMaster.AllowUserToDeleteRows = False
-        'sMonthName(0) = "January"
-        'sMonthName(1) = "February"
-        'sMonthName(2) = "March"
-        'sMonthName(3) = "April"
-        'sMonthName(4) = "May"
-        'sMonthName(5) = "June"
-        'sMonthName(6) = "July"
-        'sMonthName(7) = "August"
-        'sMonthName(8) = "September"
-        'sMonthName(9) = "October"
-        'sMonthName(10) = "November"
-        'sMonthName(11) = "December"
-
-        'iMonthNumber(0) = 1
-        'iMonthNumber(1) = 2
-        'iMonthNumber(2) = 3
-        'iMonthNumber(3) = 4
-        'iMonthNumber(4) = 5
-        'iMonthNumber(5) = 6
-        'iMonthNumber(6) = 7
-        'iMonthNumber(7) = 8
-        'iMonthNumber(8) = 9
-        'iMonthNumber(9) = 10
-        'iMonthNumber(10) = 11
-        'iMonthNumber(11) = 12
-
+        With DGVTimeCardMaster
+            .Columns.Clear()
+            .AllowUserToAddRows = False
+            .AllowUserToDeleteRows = False
+            .AllowUserToResizeRows = False
+            .AllowUserToOrderColumns = False
+            .MultiSelect = False
+        End With
 
         With DGVTimeCardMaster.Columns
             col1 = New DataGridViewTextBoxColumn()
@@ -89,21 +34,6 @@
             col1.Width = 120
             .Add(col1)
 
-            'col2 = New DataGridViewComboBoxColumn()
-            'col2.Name = "timeCardMonth"
-            'col2.HeaderText = "Month"
-            ''col2.DisplayMember = "DisplayMonth"
-            ''col2.ValueMember = "MonthNumber"
-            'col2.ReadOnly = False
-
-            'For iMonthCount = 0 To 11
-            '    mMonth = New MonthClass
-            '    mMonth.MonthNumber = iMonthNumber(iMonthCount)
-            '    mMonth.MonthName = sMonthName(iMonthCount)
-            '    col2.Items.Add(mMonth.MonthNumber)
-            'Next
-            '.Add(col2)
-
             col1 = New DataGridViewTextBoxColumn()
             col1.Name = "timeCardMonth"
             col1.HeaderText = "Month"
@@ -115,25 +45,45 @@
             col1.HeaderText = "Year"
             col1.ReadOnly = False
             .Add(col1)
+
+            col1 = New DataGridViewButtonColumn()
+            col1.name = "addNextRow"
+            col1.HeaderText = "A"
+            col1.Text = "A"
+            col1.UseColumnTextForButtonValue = True
+            col1.ReadOnly = True
+            col1.Width = 25
+            .Add(col1)
+
+            col1 = New DataGridViewButtonColumn()
+            col1.Name = "delCurRow"
+            col1.HeaderText = "D"
+            col1.Text = "D"
+            col1.UseColumnTextForButtonValue = True
+            col1.ReadOnly = True
+            col1.Width = 25
+            .Add(col1)
+
         End With
-        'DGVTimeCardMaster.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.ColumnHeader)
     End Sub
+
 
     Private Sub LoadUsers()
         Dim sSQL As String
         Dim cmd As OleDb.OleDbCommand
         Dim dr As OleDb.OleDbDataReader
         Dim iNewItem As Integer
-        Dim userMaster As userDetails
+        Dim userMaster As TimeCardSupport.UserDetails
         If dbConnection.GetConnection() Then
             cmd = dbConnection.Connection.CreateCommand()
-            sSQL = "SELECT * FROM UserMaster"
+            sSQL = "SELECT RecordId, UserNumber, UserName FROM UserMaster"
             cmd.CommandText = sSQL
             dr = cmd.ExecuteReader()
+            DGVTimeCardMaster.Rows.Clear()
             cboUsers.Items.Clear()
             cboUsers.DisplayMember = "displayName"
             While dr.Read()
-                userMaster = New userDetails
+                userMaster = New TimeCardSupport.UserDetails
                 userMaster.recordId = dr.GetInt32(0)
                 If dr.IsDBNull(1) Then
                     userMaster.userId = -1
@@ -157,7 +107,6 @@
     End Sub
 
     Private Sub cboUsers_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cboUsers.SelectedIndexChanged
-        Debug.Print(cboUsers.SelectedItem.displayName)
         LoadData(cboUsers.SelectedItem.recordId)
     End Sub
 
@@ -196,10 +145,13 @@
             dr.Close()
             cmd.Dispose()
             dbConnection.Connection.Close()
+            If DGVTimeCardMaster.Rows.Count = 0 Then
+                DGVTimeCardMaster.Rows.Add()
+            End If
         End If
     End Sub
 
-    Private Sub btnAdd_Click(sender As Object, e As EventArgs) Handles btnAdd.Click
+    Private Sub btnAdd_Click(sender As Object, e As EventArgs)
         Dim iNewItem As Integer
         Dim cmd As OleDb.OleDbCommand
         Dim sSQL As String
@@ -222,33 +174,64 @@
         Dim sSQL As String
         Dim rw As DataGridViewRow
         rw = DGVTimeCardMaster.Rows(e.RowIndex)
-        sSQL = "UPDATE TimeCardMaster SET "
-        If rw.Cells("timeCardNumber").Value IsNot Nothing Then
-            sSQL = sSQL & " timeCardNumber = " & rw.Cells("timeCardNumber").Value
+        If rw.Cells("recordId").FormattedValue = "" Then
+            sSQL = "INSERT INTO TimeCardMaster (UserId, timeCardNumber, timeCardMonth, timeCardYear) VALUES("
+            sSQL = sSQL & cboUsers.SelectedItem.UserId
+            If rw.Cells("timeCardNumber").Value IsNot Nothing Then
+                sSQL = sSQL & "," & rw.Cells("timeCardNumber").Value
+            Else
+                sSQL = sSQL & " NULL"
+            End If
+            If rw.Cells("timeCardMonth").Value IsNot Nothing Then
+                sSQL = sSQL & "," & rw.Cells("timeCardMonth").Value
+            Else
+                sSQL = sSQL & ",NULL"
+            End If
+            If rw.Cells("timeCardYear").Value IsNot Nothing Then
+                sSQL = sSQL & "," & rw.Cells("timeCardYear").Value
+            Else
+                sSQL = sSQL & ",NULL"
+            End If
+            sSQL = sSQL & ")"
+            If dbConnection.GetConnection() Then
+                cmd = dbConnection.Connection.CreateCommand()
+                cmd.CommandText = sSQL
+                cmd.ExecuteNonQuery()
+                cmd.CommandText = "SELECT @@IDENTITY"
+                rw.Cells("recordId").Value = cmd.ExecuteScalar()
+                cmd.Dispose()
+                dbConnection.Connection.Close()
+            End If
         Else
-            sSQL = sSQL & " timeCardNumber = NULL"
-        End If
-        If rw.Cells("timeCardMonth").Value IsNot Nothing Then
-            sSQL = sSQL & ", timeCardMonth = " & rw.Cells("timeCardMonth").Value
-        Else
-            sSQL = sSQL & ", timeCardMonth = NULL"
-        End If
-        If rw.Cells("timeCardYear").Value IsNot Nothing Then
-            sSQL = sSQL & ", timeCardYear = " & rw.Cells("timeCardYear").Value
-        Else
-            sSQL = sSQL & ", timeCardYear = NULL"
-        End If
+            sSQL = "UPDATE TimeCardMaster SET "
+            If rw.Cells("timeCardNumber").Value IsNot Nothing Then
+                sSQL = sSQL & " timeCardNumber = " & rw.Cells("timeCardNumber").Value
+            Else
+                sSQL = sSQL & " timeCardNumber = NULL"
+            End If
+            If rw.Cells("timeCardMonth").Value IsNot Nothing Then
+                sSQL = sSQL & ", timeCardMonth = " & rw.Cells("timeCardMonth").Value
+            Else
+                sSQL = sSQL & ", timeCardMonth = NULL"
+            End If
+            If rw.Cells("timeCardYear").Value IsNot Nothing Then
+                sSQL = sSQL & ", timeCardYear = " & rw.Cells("timeCardYear").Value
+            Else
+                sSQL = sSQL & ", timeCardYear = NULL"
+            End If
 
-        sSQL = sSQL & " WHERE timeCardId = " & rw.Cells("recordId").Value
-        If dbConnection.GetConnection() Then
-            cmd = dbConnection.Connection.CreateCommand()
-            cmd.CommandText = sSQL
-            cmd.ExecuteNonQuery()
-            cmd.Dispose()
+            sSQL = sSQL & " WHERE timeCardId = " & rw.Cells("recordId").Value
+            If dbConnection.GetConnection() Then
+                cmd = dbConnection.Connection.CreateCommand()
+                cmd.CommandText = sSQL
+                cmd.ExecuteNonQuery()
+                cmd.Dispose()
+                dbConnection.Connection.Close()
+            End If
         End If
     End Sub
 
-    Private Sub btnDelete_Click(sender As Object, e As EventArgs) Handles btnDelete.Click
+    Private Sub btnDelete_Click(sender As Object, e As EventArgs)
         Dim rw As DataGridViewRow
         Dim sSQL As String
         Dim cmd As OleDb.OleDbCommand
@@ -272,10 +255,113 @@
                     MsgBox("Error deleting records!" & vbCrLf & e.ToString())
                 End Try
                 dbConnection.Connection.Close()
-                LoadData(cboUsers.SelectedIndex)
+                LoadData(cboUsers.SelectedItem.recordId)
             Else
                 MsgBox("Error connecting to database!" & vbCrLf & dbConnection.LastError)
             End If
         End If
     End Sub
+
+    Private Sub DGVTimeCardMaster_CellValidating(sender As Object, e As DataGridViewCellValidatingEventArgs) Handles DGVTimeCardMaster.CellValidating
+        Dim bRetVal As Boolean = False
+        Dim iMonth, iYear As Integer
+        Dim rw As DataGridViewRow
+        Dim currentRow As DataGridViewRow = DGVTimeCardMaster.Rows(e.RowIndex)
+        If e.FormattedValue IsNot Nothing Then
+            If e.FormattedValue <> "" Then
+                If e.RowIndex >= 0 And e.ColumnIndex = DGVTimeCardMaster.Columns("TimeCardMonth").Index Then
+                    If Integer.TryParse(e.FormattedValue, iMonth) Then
+                        If iMonth > 12 Or iMonth < 0 Then
+                            bRetVal = True
+                            MsgBox("Enter a valid month!")
+                        Else
+                            For Each rw In DGVTimeCardMaster.Rows
+                                If rw.Cells("TimeCardMonth").Value = iMonth And rw.Index <> e.RowIndex And rw.Cells("TimeCardYear").FormattedValue = currentRow.Cells("TimeCardYear").FormattedValue Then
+                                    MsgBox("Duplicate month and year combination!")
+                                    bRetVal = True
+                                End If
+                            Next
+                        End If
+                    Else
+                        bRetVal = True
+                        MsgBox("Enter a valid month!")
+                    End If
+                ElseIf e.RowIndex >= 0 And e.ColumnIndex = DGVTimeCardMaster.Columns("timeCardYear").Index Then
+                    If Integer.TryParse(e.FormattedValue, iYear) Then
+                        For Each rw In DGVTimeCardMaster.Rows
+                            If rw.Cells("TimeCardYear").Value = iYear And rw.Index <> e.RowIndex And rw.Cells("TimeCardMonth").FormattedValue = currentRow.Cells("TimeCardMonth").FormattedValue Then
+                                MsgBox("Duplicate month and year combination!")
+                                bRetVal = True
+                            End If
+                        Next
+                    Else
+                        bRetVal = True
+                        MsgBox("Enter a valid year!")
+                    End If
+                End If
+            End If
+        End If
+        e.Cancel = bRetVal
+    End Sub
+
+    Private Sub DGVTimeCardMaster_CellContentClick(sender As Object, e As DataGridViewCellEventArgs) Handles DGVTimeCardMaster.CellContentClick
+        If e.RowIndex >= 0 And e.ColumnIndex = DGVTimeCardMaster.Columns("addNextRow").Index Then
+            DGVTimeCardMaster.Rows.Add()
+        End If
+
+        If e.RowIndex >= 0 And e.ColumnIndex = DGVTimeCardMaster.Columns("delCurRow").Index Then
+            RemoveRow(e.RowIndex)
+        End If
+    End Sub
+
+    Private Sub frmTimeCardMaster_Resize(sender As Object, e As EventArgs) Handles Me.Resize
+        DGVTimeCardMaster.Width = Width - 40
+        DGVTimeCardMaster.Height = Height - 90
+    End Sub
+
+    Private Sub DGVTimeCardMaster_KeyDown(sender As Object, e As KeyEventArgs) Handles DGVTimeCardMaster.KeyDown
+        If e.KeyCode = Asc(vbCr) Then
+            With DGVTimeCardMaster
+                If .CurrentCell.ColumnIndex < .ColumnCount - 2 Then
+                    .CurrentCell = .Rows.Item(.CurrentCell.RowIndex).Cells.Item(.CurrentCell.ColumnIndex + 1)
+                ElseIf .CurrentCell.ColumnIndex = .ColumnCount - 1 Then
+                    RemoveRow(.CurrentCell.RowIndex)
+                    .CurrentCell = .CurrentRow.Cells(1)
+                ElseIf .CurrentCell.RowIndex = .Rows.Count - 1 And .CurrentCell.ColumnIndex = .ColumnCount - 2 Then
+                    .Rows.Add()
+                    .CurrentCell = .Rows.Item(.Rows.Count - 1).Cells.Item(1)
+                ElseIf .CurrentCell.RowIndex < .Rows.Count - 1 Then
+                    .CurrentCell = .Rows.Item(.CurrentCell.RowIndex + 1).Cells.Item(1)
+                End If
+                e.Handled = True
+            End With
+        End If
+
+    End Sub
+
+    Private Sub RemoveRow(iRowIndex As Integer)
+        Dim rw As DataGridViewRow
+        Dim sSQL As String
+        Dim cmd As OleDb.OleDbCommand
+        rw = DGVTimeCardMaster.Rows(iRowIndex)
+        If dbConnection.GetConnection() Then
+            Try
+                cmd = dbConnection.Connection.CreateCommand()
+                If rw.Cells("recordId").Value IsNot Nothing Then
+                    sSQL = "DELETE FROM TimeCardMaster WHERE TimeCardId = " & rw.Cells("recordId").Value
+                    cmd.CommandText = sSQL
+                    cmd.ExecuteNonQuery()
+                End If
+                DGVTimeCardMaster.Rows.Remove(rw)
+                cmd.Dispose()
+                dbConnection.Connection.Close()
+            Catch ex As Exception
+                MsgBox("Error deleting record!" & vbCrLf & ex.Message)
+            End Try
+            dbConnection.Connection.Close()
+        Else
+            MsgBox("Error connecting to database!" & vbCrLf & dbConnection.LastError)
+        End If
+    End Sub
+
 End Class
