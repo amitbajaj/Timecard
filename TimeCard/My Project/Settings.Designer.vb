@@ -56,7 +56,8 @@ Namespace My
         
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("C:\DB\TimeCard.mdb")>  _
+         Global.System.Configuration.DefaultSettingValueAttribute("C:\Users\mamta_000\Documents\Visual%20Studio%202015\Projects\TimeCard\TimeCard\Ti"& _ 
+            "meCard.mdb")>  _
         Public Property DBFile() As String
             Get
                 Return CType(Me("DBFile"),String)
