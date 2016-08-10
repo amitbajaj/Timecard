@@ -156,4 +156,25 @@ Public Class frmTimeCardMainForm
         End If
 
     End Sub
+
+    Private Sub ProjectJobsStripMenuItem_Click(sender As Object, e As EventArgs) Handles ProjectJobsStripMenuItem.Click
+        Dim frmProjJobs As frmProjectJobs
+        Dim iChilds As Integer
+        Dim bFound As Boolean
+        bFound = False
+        For iChilds = 0 To MdiChildren.Count - 1
+            If MdiChildren(iChilds).Name = "frmProjectJobs" Then
+                bFound = True
+                Exit For
+            End If
+        Next
+        If bFound Then
+            frmProjJobs = MdiChildren(iChilds)
+            frmProjJobs.Activate()
+        Else
+            frmProjJobs = New frmProjectJobs
+            frmProjJobs.MdiParent = Me
+            frmProjJobs.Show()
+        End If
+    End Sub
 End Class

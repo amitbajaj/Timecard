@@ -1,6 +1,6 @@
-﻿Public Class frmProjectTimeCardMaster
+﻿Public Class frmProjectJobs
     Private dbConnection As TimeCardDataAccess
-    Private Sub frmProjectTimeCardMaster_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+    Private Sub frmProjectJobs_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         dbConnection = New TimeCardDataAccess()
         dbConnection.DatabaseFile = My.Settings.Item("DBFile")
         InitializeGrid()
@@ -10,7 +10,7 @@
     Sub InitializeGrid()
         Dim col1 As DataGridViewTextBoxColumn
         Dim col2 As DataGridViewButtonColumn
-        With DGVTimeCardMaster
+        With DGVProjectJobs
             .Columns.Clear()
             .AllowUserToAddRows = False
             .AllowUserToDeleteRows = False
@@ -25,22 +25,22 @@
             .Columns.Add(col1)
 
             col1 = New DataGridViewTextBoxColumn()
-            col1.Name = "timeCardNumber"
-            col1.HeaderText = "TimeCard Number"
+            col1.Name = "jobId"
+            col1.HeaderText = "Job Id"
             col1.ReadOnly = False
             col1.SortMode = DataGridViewColumnSortMode.NotSortable
             .Columns.Add(col1)
 
             col1 = New DataGridViewTextBoxColumn()
-            col1.Name = "timeCardMonth"
-            col1.HeaderText = "TimeCard Month"
+            col1.Name = "jobDesc"
+            col1.HeaderText = "Job Description"
             col1.ReadOnly = False
             col1.SortMode = DataGridViewColumnSortMode.NotSortable
             .Columns.Add(col1)
 
             col1 = New DataGridViewTextBoxColumn()
-            col1.Name = "timeCardYear"
-            col1.HeaderText = "TimeCard Year"
+            col1.Name = "jobRate"
+            col1.HeaderText = "Job Rate"
             col1.ReadOnly = False
             col1.SortMode = DataGridViewColumnSortMode.NotSortable
             .Columns.Add(col1)
@@ -89,13 +89,13 @@
         End If
     End Sub
 
-    Private Sub frmProjectTimeCardMaster_Resize(sender As Object, e As EventArgs) Handles Me.Resize
-        DGVTimeCardMaster.Width = Width - 40
-        DGVTimeCardMaster.Height = Height - 90
+    Private Sub frmProjectJobs_Resize(sender As Object, e As EventArgs) Handles Me.Resize
+        DGVProjectJobs.Width = Width - 40
+        DGVProjectJobs.Height = Height - 90
     End Sub
 
     Private Sub cboCustomers_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cboCustomers.SelectedIndexChanged
-        DGVTimeCardMaster.Rows.Clear()
+        DGVProjectJobs.Rows.Clear()
         If cboCustomers.SelectedIndex >= 0 Then
             LoadCustomerProjects(cboCustomers.SelectedItem)
         End If
@@ -105,8 +105,6 @@
         Dim cmd As OleDb.OleDbCommand
         Dim dr As OleDb.OleDbDataReader
         Dim oProj As TimeCardSupport.ProjectDetails
-        cboProjJobs.Items.Clear()
-        DGVTimeCardMaster.Rows.Clear()
         cboProjects.Items.Clear()
         cboProjects.DisplayMember = "DisplayName"
         If dbConnection.GetConnection() Then
@@ -136,59 +134,33 @@
     Sub LoadProjectJobs(oProj As TimeCardSupport.ProjectDetails)
         Dim cmd As OleDb.OleDbCommand
         Dim dr As OleDb.OleDbDataReader
-        Dim oProjJob As TimeCardSupport.ProjectJobDetails
-        DGVTimeCardMaster.Rows.Clear()
-        cboProjJobs.Items.Clear()
-        cboProjJobs.DisplayMember = "DisplayName"
+        Dim rw As DataGridViewRow
+        DGVProjectJobs.Rows.Clear()
         If dbConnection.GetConnection() Then
             cmd = dbConnection.Connection.CreateCommand()
             cmd.CommandText = "SELECT RecordId, JobId, JobDesc, JobRate FROM ProjectJobs WHERE ProjectId = " & oProj.recordId
             dr = cmd.ExecuteReader()
             While dr.Read()
-                oProjJob = New TimeCardSupport.ProjectJobDetails
-                oProjJob.recordId = dr.GetInt32(0)
-                oProjJob.JobId = dr.GetString(1)
-                oProjJob.JobDescription = dr.GetString(2)
-                oProjJob.JobRate = dr.GetDouble(3)
-                cboProjJobs.Items.Add(oProjJob)
-            End While
-            dr.Close()
-            cmd.Dispose()
-            dbConnection.Connection.Close()
-        End If
-    End Sub
-
-
-    Sub LoadProjectTimeCards(oProjJob As TimeCardSupport.ProjectJobDetails)
-        Dim cmd As OleDb.OleDbCommand
-        Dim dr As OleDb.OleDbDataReader
-        Dim rw As DataGridViewRow
-        DGVTimeCardMaster.Rows.Clear()
-        If dbConnection.GetConnection() Then
-            cmd = dbConnection.Connection.CreateCommand()
-            cmd.CommandText = "SELECT RecordId, TimeCardNumber, TimeCardMonth, TimeCardYear FROM ProjectTimeCardMaster WHERE JobId = " & oProjJob.recordId
-            dr = cmd.ExecuteReader()
-            While dr.Read()
-                rw = DGVTimeCardMaster.Rows(DGVTimeCardMaster.Rows.Add())
+                rw = DGVProjectJobs.Rows(DGVProjectJobs.Rows.Add())
                 rw.Cells("recordId").Value = dr.GetInt32(0)
                 If dr.IsDBNull(1) Then
-                    rw.Cells("timeCardNumber").Value = Nothing
+                    rw.Cells("jobId").Value = Nothing
                 Else
-                    rw.Cells("timeCardNumber").Value = dr.GetInt32(1)
+                    rw.Cells("jobId").Value = dr.GetString(1)
                 End If
                 If dr.IsDBNull(2) Then
-                    rw.Cells("timeCardMonth").Value = Nothing
+                    rw.Cells("jobDesc").Value = Nothing
                 Else
-                    rw.Cells("timeCardMonth").Value = dr.GetInt16(2)
+                    rw.Cells("jobDesc").Value = dr.GetString(2)
                 End If
                 If dr.IsDBNull(3) Then
-                    rw.Cells("timeCardYear").Value = Nothing
+                    rw.Cells("jobRate").Value = Nothing
                 Else
-                    rw.Cells("timeCardYear").Value = dr.GetInt16(3)
+                    rw.Cells("jobRate").Value = dr.GetDouble(3)
                 End If
             End While
-            If DGVTimeCardMaster.Rows.Count = 0 Then
-                DGVTimeCardMaster.Rows.Add()
+            If DGVProjectJobs.Rows.Count = 0 Then
+                DGVProjectJobs.Rows.Add()
             End If
             dr.Close()
             cmd.Dispose()
@@ -196,12 +168,12 @@
         End If
     End Sub
 
-    Private Sub DGVTimeCardMaster_CellContentClick(sender As Object, e As DataGridViewCellEventArgs) Handles DGVTimeCardMaster.CellContentClick
+    Private Sub DGVProjectJobs_CellContentClick(sender As Object, e As DataGridViewCellEventArgs) Handles DGVProjectJobs.CellContentClick
         If e.RowIndex >= 0 Then
-            If e.ColumnIndex = DGVTimeCardMaster.Columns("addNewRow").Index Then
-                DGVTimeCardMaster.Rows.Add()
-            ElseIf e.ColumnIndex = DGVTimeCardMaster.Columns("delCurRow").Index Then
-                removeRow(e.RowIndex)
+            If e.ColumnIndex = DGVProjectJobs.Columns("addNewRow").Index Then
+                DGVProjectJobs.Rows.Add()
+            ElseIf e.ColumnIndex = DGVProjectJobs.Columns("delCurRow").Index Then
+                RemoveRow(e.RowIndex)
             End If
         End If
     End Sub
@@ -209,43 +181,43 @@
     Sub RemoveRow(iRowIndex As Integer)
         Dim cmd As OleDb.OleDbCommand
         Dim rw As DataGridViewRow
-        rw = DGVTimeCardMaster.Rows(iRowIndex)
+        rw = DGVProjectJobs.Rows(iRowIndex)
         If rw.Cells("recordId").FormattedValue = "" Then
-            DGVTimeCardMaster.Rows.RemoveAt(iRowIndex)
+            DGVProjectJobs.Rows.RemoveAt(iRowIndex)
         Else
             If dbConnection.GetConnection() Then
                 cmd = dbConnection.Connection.CreateCommand()
-                cmd.CommandText = "DELETE FROM ProjectTimeCardMaster WHERE RecordId = " & rw.Cells("recordId").FormattedValue
+                cmd.CommandText = "DELETE FROM ProjectJobs WHERE RecordId = " & rw.Cells("recordId").FormattedValue
                 cmd.ExecuteNonQuery()
                 cmd.Dispose()
                 dbConnection.Connection.Close()
-                DGVTimeCardMaster.Rows.RemoveAt(iRowIndex)
+                DGVProjectJobs.Rows.RemoveAt(iRowIndex)
             End If
         End If
     End Sub
 
-    Private Sub DGVTimeCardMaster_CellEndEdit(sender As Object, e As DataGridViewCellEventArgs) Handles DGVTimeCardMaster.CellEndEdit
+    Private Sub DGVProjectJobs_CellEndEdit(sender As Object, e As DataGridViewCellEventArgs) Handles DGVProjectJobs.CellEndEdit
         Dim cmd As OleDb.OleDbCommand
         Dim sSQL As String
         Dim rw As DataGridViewRow
-        rw = DGVTimeCardMaster.Rows(e.RowIndex)
+        rw = DGVProjectJobs.Rows(e.RowIndex)
         If rw.Cells("recordId").FormattedValue = "" Then
-            sSQL = "INSERT INTO ProjectTimeCardMaster(JobId, TimeCardNumber, TimeCardMonth, TimeCardYear) VALUES("
+            sSQL = "INSERT INTO ProjectJobs(ProjectId, JobId, JobDesc, JobRate) VALUES("
             sSQL = sSQL & cboProjects.SelectedItem.recordId
-            If rw.Cells("timeCardNumber").FormattedValue = "" Then
+            If rw.Cells("jobId").FormattedValue = "" Then
                 sSQL = sSQL & ",NULL"
             Else
-                sSQL = sSQL & "," & rw.Cells("timeCardNumber").FormattedValue
+                sSQL = sSQL & ",'" & rw.Cells("jobId").FormattedValue & "'"
             End If
-            If rw.Cells("timeCardMonth").FormattedValue = "" Then
+            If rw.Cells("jobDesc").FormattedValue = "" Then
                 sSQL = sSQL & ",NULL"
             Else
-                sSQL = sSQL & "," & rw.Cells("timeCardMonth").FormattedValue
+                sSQL = sSQL & ",'" & rw.Cells("jobDesc").FormattedValue & "'"
             End If
-            If rw.Cells("timeCardYear").FormattedValue = "" Then
+            If rw.Cells("jobRate").FormattedValue = "" Then
                 sSQL = sSQL & ",NULL"
             Else
-                sSQL = sSQL & "," & rw.Cells("timeCardYear").FormattedValue
+                sSQL = sSQL & "," & rw.Cells("jobRate").FormattedValue
             End If
             sSQL = sSQL & ");"
             If dbConnection.GetConnection() Then
@@ -258,26 +230,26 @@
                 dbConnection.Connection.Close()
             End If
         Else
-            sSQL = "UPDATE ProjectTimeCardMaster SET "
-            sSQL = sSQL & "timeCardNumber = "
-            If rw.Cells("timeCardNumber").FormattedValue = "" Then
+            sSQL = "UPDATE ProjectJobs SET "
+            sSQL = sSQL & "JobId = "
+            If rw.Cells("jobId").FormattedValue = "" Then
                 sSQL = sSQL & "NULL"
             Else
-                sSQL = sSQL & rw.Cells("timeCardNumber").FormattedValue
+                sSQL = sSQL & "'" & rw.Cells("jobId").FormattedValue & "'"
             End If
-            sSQL = sSQL & ",timeCardMonth = "
-            If rw.Cells("timeCardMonth").FormattedValue = "" Then
+            sSQL = sSQL & ",JobDesc = "
+            If rw.Cells("jobDesc").FormattedValue = "" Then
                 sSQL = sSQL & "NULL"
             Else
-                sSQL = sSQL & rw.Cells("timeCardMonth").FormattedValue
+                sSQL = sSQL & "'" & rw.Cells("jobDesc").FormattedValue & "'"
             End If
-            sSQL = sSQL & ",timeCardYear = "
-            If rw.Cells("timeCardYear").FormattedValue = "" Then
+            sSQL = sSQL & ",jobRate = "
+            If rw.Cells("jobRate").FormattedValue = "" Then
                 sSQL = sSQL & "NULL"
             Else
-                sSQL = sSQL & rw.Cells("timeCardYear").FormattedValue
+                sSQL = sSQL & rw.Cells("jobRate").FormattedValue
             End If
-            sSQL = sSQL & " WHERE recordId = " & rw.Cells("recordId").FormattedValue
+            sSQL = sSQL & " WHERE RecordId = " & rw.Cells("recordId").FormattedValue
             If dbConnection.GetConnection() Then
                 cmd = dbConnection.Connection.CreateCommand()
                 cmd.CommandText = sSQL
@@ -288,41 +260,16 @@
         End If
     End Sub
 
-    Private Sub DGVTimeCardMaster_CellValidating(sender As Object, e As DataGridViewCellValidatingEventArgs) Handles DGVTimeCardMaster.CellValidating
+    Private Sub DGVProjectJobs_CellValidating(sender As Object, e As DataGridViewCellValidatingEventArgs) Handles DGVProjectJobs.CellValidating
         Dim bRetVal As Boolean = False
-        Dim iMonth, iYear As Integer
-        Dim rw As DataGridViewRow
-        Dim currentRow As DataGridViewRow = DGVTimeCardMaster.Rows(e.RowIndex)
+        Dim dRate As Double
+        Dim currentRow As DataGridViewRow = DGVProjectJobs.Rows(e.RowIndex)
         If e.FormattedValue IsNot Nothing Then
             If e.FormattedValue <> "" Then
-                If e.RowIndex >= 0 And e.ColumnIndex = DGVTimeCardMaster.Columns("TimeCardMonth").Index Then
-                    If Integer.TryParse(e.FormattedValue, iMonth) Then
-                        If iMonth > 12 Or iMonth < 0 Then
-                            bRetVal = True
-                            MsgBox("Enter a valid month!")
-                        Else
-                            For Each rw In DGVTimeCardMaster.Rows
-                                If rw.Cells("TimeCardMonth").Value = iMonth And rw.Index <> e.RowIndex And rw.Cells("TimeCardYear").FormattedValue = currentRow.Cells("TimeCardYear").FormattedValue Then
-                                    MsgBox("Duplicate month and year combination!")
-                                    bRetVal = True
-                                End If
-                            Next
-                        End If
-                    Else
+                If e.RowIndex >= 0 And e.ColumnIndex = DGVProjectJobs.Columns("JobRate").Index Then
+                    If Not Double.TryParse(e.FormattedValue, dRate) Then
                         bRetVal = True
-                        MsgBox("Enter a valid month!")
-                    End If
-                ElseIf e.RowIndex >= 0 And e.ColumnIndex = DGVTimeCardMaster.Columns("timeCardYear").Index Then
-                    If Integer.TryParse(e.FormattedValue, iYear) Then
-                        For Each rw In DGVTimeCardMaster.Rows
-                            If rw.Cells("TimeCardYear").Value = iYear And rw.Index <> e.RowIndex And rw.Cells("TimeCardMonth").FormattedValue = currentRow.Cells("TimeCardMonth").FormattedValue Then
-                                MsgBox("Duplicate month and year combination!")
-                                bRetVal = True
-                            End If
-                        Next
-                    Else
-                        bRetVal = True
-                        MsgBox("Enter a valid year!")
+                        MsgBox("Enter a valid rate value!")
                     End If
                 End If
             End If
@@ -330,9 +277,9 @@
         e.Cancel = bRetVal
     End Sub
 
-    Private Sub DGVTimeCardMaster_KeyDown(sender As Object, e As KeyEventArgs) Handles DGVTimeCardMaster.KeyDown
+    Private Sub DGVProjectJobs_KeyDown(sender As Object, e As KeyEventArgs) Handles DGVProjectJobs.KeyDown
         If e.KeyCode = Asc(vbCr) Then
-            With DGVTimeCardMaster
+            With DGVProjectJobs
                 If .CurrentCell.ColumnIndex < .ColumnCount - 2 Then
                     .CurrentCell = .Rows.Item(.CurrentCell.RowIndex).Cells.Item(.CurrentCell.ColumnIndex + 1)
                 ElseIf .CurrentCell.ColumnIndex = .ColumnCount - 1 Then
@@ -346,12 +293,6 @@
                 End If
                 e.Handled = True
             End With
-        End If
-    End Sub
-
-    Private Sub cboProjJobs_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cboProjJobs.SelectedIndexChanged
-        If cboProjJobs.SelectedIndex >= 0 Then
-            LoadProjectTimeCards(cboProjJobs.SelectedItem)
         End If
     End Sub
 End Class

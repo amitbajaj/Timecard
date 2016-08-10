@@ -198,15 +198,48 @@
     End Sub
 
     Private Sub cboProjects_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cboProjects.SelectedIndexChanged
+        cboTimeCards.Items.Clear()
         DGVTimeCardDetails.Rows.Clear()
         lblTotalCost.Text = ""
         lblRegHrs.Text = ""
         lblOT1.Text = ""
         lblOT2.Text = ""
         If cboProjects.SelectedIndex >= 0 Then
-            LoadCustomerProjectTimeCards(cboProjects.SelectedItem)
+            LoadProjectJobs(cboProjects.SelectedItem)
         End If
     End Sub
+
+    Private Sub LoadProjectJobs(oProj As TimeCardSupport.ProjectDetails)
+        Dim cmd As OleDb.OleDbCommand
+        Dim dr As OleDb.OleDbDataReader
+        Dim sSQL As String
+        Dim oProjJob As TimeCardSupport.ProjectJobDetails
+        cboTimeCards.Items.Clear()
+        cboProjJobs.Items.Clear()
+        cboProjJobs.DisplayMember = "DisplayName"
+        If dbConnection.GetConnection() Then
+            sSQL = "SELECT RecordId, JobId, JobDesc, JobRate FROM ProjectJobs WHERE projectId = " & oProj.recordId
+            cmd = dbConnection.Connection.CreateCommand()
+            cmd.CommandText = sSQL
+            dr = cmd.ExecuteReader()
+            While dr.Read()
+                oProjJob = New TimeCardSupport.ProjectJobDetails()
+                With oProjJob
+                    .recordId = dr.GetInt32(0)
+                    .JobId = dr.GetString(1)
+                    .JobDescription = dr.GetString(2)
+                    .JobRate = dr.GetDouble(3)
+                End With
+                cboProjJobs.Items.Add(oProjJob)
+            End While
+            dr.Close()
+            cmd.Dispose()
+            dbConnection.Connection.Close()
+        Else
+            MsgBox("Error connecting to database!" & dbConnection.LastError)
+        End If
+    End Sub
+
 
     Private Sub LoadCustomerProjectTimeCards(oProj As TimeCardSupport.ProjectDetails)
         Dim cmd As OleDb.OleDbCommand
@@ -600,4 +633,14 @@
         UpdateGridTotal(TimeCardSupport.GridTotal(DGVTimeCardDetails))
     End Sub
 
+    Private Sub cboProjJobs_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cboProjJobs.SelectedIndexChanged
+        DGVTimeCardDetails.Rows.Clear()
+        lblTotalCost.Text = ""
+        lblRegHrs.Text = ""
+        lblOT1.Text = ""
+        lblOT2.Text = ""
+        If cboProjJobs.SelectedIndex >= 0 Then
+            LoadCustomerProjectTimeCards(cboProjJobs.SelectedItem)
+        End If
+    End Sub
 End Class

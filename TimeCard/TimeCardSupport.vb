@@ -107,6 +107,55 @@
         End Function
     End Class
 
+    Public Class ProjectJobDetails
+        Private _recordId As Integer
+        Private _jobId As String
+        Private _jobDesc As String
+        Private _jobRate As Double
+
+        Public ReadOnly Property DisplayName As String
+            Get
+                Return _jobId & " # " & _jobDesc
+            End Get
+        End Property
+
+        Public Property recordId As Integer
+            Get
+                Return _recordId
+            End Get
+            Set(value As Integer)
+                _recordId = value
+            End Set
+        End Property
+
+        Public Property JobId As String
+            Get
+                Return _jobId
+            End Get
+            Set(value As String)
+                _jobId = value
+            End Set
+        End Property
+
+        Public Property JobDescription As String
+            Get
+                Return _jobDesc
+            End Get
+            Set(value As String)
+                _jobDesc = value
+            End Set
+        End Property
+
+        Public Property JobRate As Double
+            Get
+                Return _jobRate
+            End Get
+            Set(value As Double)
+                _jobRate = value
+            End Set
+        End Property
+    End Class
+
     Public Class ProjectDetails
         Private _recordId As Integer
         Private _projectId As String

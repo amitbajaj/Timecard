@@ -32,6 +32,7 @@ Partial Class frmTimeCardMainForm
         Me.CustomerMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.CustomerToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.CustomerProjectStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ProjectJobsStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ProjectTimeCardToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ProjectTimeCardDetailsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.StatusStrip = New System.Windows.Forms.StatusStrip()
@@ -77,7 +78,7 @@ Partial Class frmTimeCardMainForm
         '
         'CustomerMenuItem
         '
-        Me.CustomerMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.CustomerToolStripMenuItem, Me.CustomerProjectStripMenuItem, Me.ProjectTimeCardToolStripMenuItem, Me.ProjectTimeCardDetailsToolStripMenuItem})
+        Me.CustomerMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.CustomerToolStripMenuItem, Me.CustomerProjectStripMenuItem, Me.ProjectJobsStripMenuItem, Me.ProjectTimeCardToolStripMenuItem, Me.ProjectTimeCardDetailsToolStripMenuItem})
         Me.CustomerMenuItem.Name = "CustomerMenuItem"
         Me.CustomerMenuItem.Size = New System.Drawing.Size(76, 20)
         Me.CustomerMenuItem.Text = "Customers"
@@ -93,6 +94,12 @@ Partial Class frmTimeCardMainForm
         Me.CustomerProjectStripMenuItem.Name = "CustomerProjectStripMenuItem"
         Me.CustomerProjectStripMenuItem.Size = New System.Drawing.Size(204, 22)
         Me.CustomerProjectStripMenuItem.Text = "Customer &Project"
+        '
+        'ProjectJobsStripMenuItem
+        '
+        Me.ProjectJobsStripMenuItem.Name = "ProjectJobsStripMenuItem"
+        Me.ProjectJobsStripMenuItem.Size = New System.Drawing.Size(204, 22)
+        Me.ProjectJobsStripMenuItem.Text = "Project Jobs"
         '
         'ProjectTimeCardToolStripMenuItem
         '
@@ -153,4 +160,5 @@ Partial Class frmTimeCardMainForm
     Friend WithEvents CustomerToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents ProjectTimeCardToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents ProjectTimeCardDetailsToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ProjectJobsStripMenuItem As ToolStripMenuItem
 End Class

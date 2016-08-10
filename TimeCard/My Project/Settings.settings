@@ -3,7 +3,7 @@
   <Profiles />
   <Settings>
     <Setting Name="DBFile" Type="System.String" Scope="User">
-      <Value Profile="(Default)">C:\Users\mamta_000\Documents\Visual%20Studio%202015\Projects\TimeCard\TimeCard\TimeCard.mdb</Value>
+      <Value Profile="(Default)">TimeCard.mdb</Value>
     </Setting>
     <Setting Name="NumberFormat" Type="System.String" Scope="User">
       <Value Profile="(Default)">0.000</Value>
