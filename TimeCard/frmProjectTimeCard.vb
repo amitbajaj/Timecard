@@ -159,11 +159,6 @@
     End Sub
 
     Private Sub cboCustomers_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cboCustomers.SelectedIndexChanged
-        DGVTimeCardDetails.Rows.Clear()
-        lblTotalCost.Text = ""
-        lblRegHrs.Text = ""
-        lblOT1.Text = ""
-        lblOT2.Text = ""
         If cboCustomers.SelectedIndex >= 0 Then
             LoadCustomerProjects(cboCustomers.SelectedItem)
         End If
@@ -172,14 +167,30 @@
     Private Sub LoadCustomerProjects(oCust As TimeCardSupport.CustomerDetails)
         Dim cmd As OleDb.OleDbCommand
         Dim dr As OleDb.OleDbDataReader
+        Dim oParam As OleDb.OleDbParameter
         Dim sSQL As String
         Dim oProj As TimeCardSupport.ProjectDetails
+        DGVTimeCardDetails.Rows.Clear()
+        lblTotalCost.Text = ""
+        lblRegHrs.Text = ""
+        lblOT1.Text = ""
+        lblOT2.Text = ""
+        cboTimeCards.Items.Clear()
+        cboJobs.Items.Clear()
+        cboPhases.Items.Clear()
         cboProjects.Items.Clear()
         cboProjects.DisplayMember = "DisplayName"
         If dbConnection.GetConnection() Then
-            sSQL = "SELECT RecordId, ProjectId, ProjectDesc, ProjectRate FROM CustomerProjects WHERE CustomerId = " & oCust.recordId
+            sSQL = "SELECT RecordId, ProjectId, ProjectDesc, ProjectRate FROM CustomerProjects WHERE ParentId = @ParentId"
             cmd = dbConnection.Connection.CreateCommand()
             cmd.CommandText = sSQL
+            oParam = cmd.CreateParameter
+            With oParam
+                .ParameterName = "@ParentId"
+                .OleDbType = OleDb.OleDbType.Integer
+                .Value = oCust.recordId
+            End With
+            cmd.Parameters.Add(oParam)
             dr = cmd.ExecuteReader()
             While dr.Read()
                 oProj = New TimeCardSupport.ProjectDetails()
@@ -198,39 +209,46 @@
     End Sub
 
     Private Sub cboProjects_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cboProjects.SelectedIndexChanged
-        cboTimeCards.Items.Clear()
+        If cboProjects.SelectedIndex >= 0 Then
+            LoadProjectPhases(cboProjects.SelectedItem)
+        End If
+    End Sub
+
+    Private Sub LoadProjectPhases(oProj As TimeCardSupport.ProjectDetails)
+        Dim cmd As OleDb.OleDbCommand
+        Dim dr As OleDb.OleDbDataReader
+        Dim oParam As OleDb.OleDbParameter
+        Dim sSQL As String
+        Dim oProjPhase As TimeCardSupport.ProjectPhaseDetails
         DGVTimeCardDetails.Rows.Clear()
         lblTotalCost.Text = ""
         lblRegHrs.Text = ""
         lblOT1.Text = ""
         lblOT2.Text = ""
-        If cboProjects.SelectedIndex >= 0 Then
-            LoadProjectJobs(cboProjects.SelectedItem)
-        End If
-    End Sub
-
-    Private Sub LoadProjectJobs(oProj As TimeCardSupport.ProjectDetails)
-        Dim cmd As OleDb.OleDbCommand
-        Dim dr As OleDb.OleDbDataReader
-        Dim sSQL As String
-        Dim oProjJob As TimeCardSupport.ProjectJobDetails
         cboTimeCards.Items.Clear()
-        cboProjJobs.Items.Clear()
-        cboProjJobs.DisplayMember = "DisplayName"
+        cboJobs.Items.Clear()
+        cboPhases.Items.Clear()
+        cboPhases.DisplayMember = "DisplayName"
         If dbConnection.GetConnection() Then
-            sSQL = "SELECT RecordId, JobId, JobDesc, JobRate FROM ProjectJobs WHERE projectId = " & oProj.recordId
+            sSQL = "SELECT RecordId, PhaseId, PhaseDesc FROM ProjectPhases WHERE ParentId = @ParentId"
             cmd = dbConnection.Connection.CreateCommand()
+            oParam = cmd.CreateParameter()
+            With oParam
+                .ParameterName = "@ParentId"
+                .OleDbType = OleDb.OleDbType.Integer
+                .Value = oProj.recordId
+            End With
+            cmd.Parameters.Add(oParam)
             cmd.CommandText = sSQL
             dr = cmd.ExecuteReader()
             While dr.Read()
-                oProjJob = New TimeCardSupport.ProjectJobDetails()
-                With oProjJob
-                    .recordId = dr.GetInt32(0)
-                    .JobId = dr.GetString(1)
-                    .JobDescription = dr.GetString(2)
-                    .JobRate = dr.GetDouble(3)
+                oProjPhase = New TimeCardSupport.ProjectPhaseDetails()
+                With oProjPhase
+                    .RecordId = dr.GetInt32(0)
+                    .PhaseId = dr.GetString(1)
+                    .PhaseDescription = dr.GetString(2)
                 End With
-                cboProjJobs.Items.Add(oProjJob)
+                cboPhases.Items.Add(oProjPhase)
             End While
             dr.Close()
             cmd.Dispose()
@@ -241,25 +259,82 @@
     End Sub
 
 
-    Private Sub LoadCustomerProjectTimeCards(oProj As TimeCardSupport.ProjectDetails)
+    Private Sub LoadPhaseJobs(oPhase As TimeCardSupport.ProjectPhaseDetails)
         Dim cmd As OleDb.OleDbCommand
         Dim dr As OleDb.OleDbDataReader
+        Dim oParam As OleDb.OleDbParameter
+        Dim sSQL As String
+        Dim oProjJob As TimeCardSupport.ProjectJobDetails
+        DGVTimeCardDetails.Rows.Clear()
+        lblTotalCost.Text = ""
+        lblRegHrs.Text = ""
+        lblOT1.Text = ""
+        lblOT2.Text = ""
+        cboTimeCards.Items.Clear()
+        cboJobs.Items.Clear()
+        cboJobs.DisplayMember = "DisplayName"
+        If dbConnection.GetConnection() Then
+            sSQL = "SELECT RecordId, JobId, JobDesc, JobRate FROM ProjectPhaseJobs WHERE ParentId = @ParentId"
+            cmd = dbConnection.Connection.CreateCommand()
+            cmd.CommandText = sSQL
+            oParam = cmd.CreateParameter()
+            With oParam
+                .ParameterName = "@ParentId"
+                .OleDbType = OleDb.OleDbType.Integer
+                .Value = oPhase.RecordId
+            End With
+            cmd.Parameters.Add(oParam)
+            dr = cmd.ExecuteReader()
+            While dr.Read()
+                oProjJob = New TimeCardSupport.ProjectJobDetails()
+                With oProjJob
+                    .recordId = dr.GetInt32(0)
+                    .JobId = dr.GetString(1)
+                    .JobDescription = dr.GetString(2)
+                    .JobRate = dr.GetDouble(3)
+                End With
+                cboJobs.Items.Add(oProjJob)
+            End While
+            dr.Close()
+            cmd.Dispose()
+            dbConnection.Connection.Close()
+        Else
+            MsgBox("Error connecting to database!" & dbConnection.LastError)
+        End If
+    End Sub
+
+
+    Private Sub LoadCustomerProjectTimeCards(oJob As TimeCardSupport.ProjectJobDetails)
+        Dim cmd As OleDb.OleDbCommand
+        Dim dr As OleDb.OleDbDataReader
+        Dim oParam As OleDb.OleDbParameter
         Dim sSQL As String
         Dim tcmTimeCard As TimeCardSupport.TimeCardMasterDetails
+        DGVTimeCardDetails.Rows.Clear()
+        lblTotalCost.Text = ""
+        lblRegHrs.Text = ""
+        lblOT1.Text = ""
+        lblOT2.Text = ""
         cboTimeCards.Items.Clear()
         cboTimeCards.DisplayMember = "DisplayName"
         If dbConnection.GetConnection() Then
-            sSQL = "SELECT TimeCardId, ProjectId, TimeCardNumber, TimeCardMonth, TimeCardYear FROM ProjectTimeCardMaster WHERE projectId = " & oProj.recordId
+            sSQL = "SELECT RecordId, TimeCardNumber, TimeCardMonth, TimeCardYear FROM ProjectTimeCardMaster WHERE ParentId = @ParentId"
             cmd = dbConnection.Connection.CreateCommand()
             cmd.CommandText = sSQL
+            oParam = cmd.CreateParameter()
+            With oParam
+                .ParameterName = "@ParentId"
+                .OleDbType = OleDb.OleDbType.Integer
+                .Value = oJob.recordId
+            End With
+            cmd.Parameters.Add(oParam)
             dr = cmd.ExecuteReader()
             While dr.Read()
                 tcmTimeCard = New TimeCardSupport.TimeCardMasterDetails()
                 tcmTimeCard.RecordId = dr.GetInt32(0)
-                tcmTimeCard.UserId = dr.GetInt32(1)
-                tcmTimeCard.TimeCardNumber = dr.GetInt32(2)
-                tcmTimeCard.TimeCardMonth = dr.GetInt16(3)
-                tcmTimeCard.TimeCardYear = dr.GetInt16(4)
+                tcmTimeCard.TimeCardNumber = dr.GetInt32(1)
+                tcmTimeCard.TimeCardMonth = dr.GetInt16(2)
+                tcmTimeCard.TimeCardYear = dr.GetInt16(3)
                 cboTimeCards.Items.Add(tcmTimeCard)
             End While
             dr.Close()
@@ -271,11 +346,6 @@
     End Sub
 
     Private Sub cboTimeCards_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cboTimeCards.SelectedIndexChanged
-        DGVTimeCardDetails.Rows.Clear()
-        lblTotalCost.Text = ""
-        lblRegHrs.Text = ""
-        lblOT1.Text = ""
-        lblOT2.Text = ""
         If cboTimeCards.SelectedIndex >= 0 Then
             LoadTimeCardDetails(cboTimeCards.SelectedItem)
         End If
@@ -284,18 +354,31 @@
     Private Sub LoadTimeCardDetails(oTimeCard As TimeCardSupport.TimeCardMasterDetails)
         Dim cmd As OleDb.OleDbCommand
         Dim dr As OleDb.OleDbDataReader
+        Dim oParam As OleDb.OleDbParameter
         Dim rw As DataGridViewRow
         Dim dReg, dOT1, dOT2, dTotalCost As Double
         Dim oGridTotal As New TimeCardSupport.GridTotals
         Dim oTime As New TimeCardSupport.TimeField
         Dim iFieldCount As Integer
+        DGVTimeCardDetails.Rows.Clear()
+        lblTotalCost.Text = ""
+        lblRegHrs.Text = ""
+        lblOT1.Text = ""
+        lblOT2.Text = ""
         dReg = 0
         dOT1 = 0
         dOT2 = 0
         dTotalCost = 0
         If dbConnection.GetConnection() Then
             cmd = dbConnection.Connection.CreateCommand()
-            cmd.CommandText = "SELECT TimeCardDataId, TimeCardDay, IsHoliday, IsAbsent, InTime, OutTime, RegHrs, OT1Hrs, OT2Hrs, TotalCost FROM ProjectTimeCardDetailData WHERE TimeCardId = " & oTimeCard.RecordId
+            cmd.CommandText = "SELECT RecordId, TimeCardDay, IsHoliday, IsAbsent, InTime, OutTime, RegHrs, OT1Hrs, OT2Hrs, TotalCost FROM ProjectTimeCardDetailData WHERE ParentId = @ParentId"
+            oParam = cmd.CreateParameter()
+            With oParam
+                .ParameterName = "@ParentId"
+                .OleDbType = OleDb.OleDbType.Integer
+                .Value = oTimeCard.RecordId
+            End With
+            cmd.Parameters.Add(oParam)
             dr = cmd.ExecuteReader()
             While dr.Read()
                 iFieldCount = 1
@@ -423,172 +506,168 @@
 
     Private Sub SaveData(iRow As Integer)
         Dim cmd As OleDb.OleDbCommand
+        Dim oParam As OleDb.OleDbParameter
         Dim sSQL As String
         Dim rw As DataGridViewRow
         Dim tInTime, tOutTime As Date
         Dim bNewRow As Boolean
-        Dim bInTime, bOutTime, bHoliday As Boolean
+        Dim bInTime, bOutTime, bHoliday, bAbsent As Boolean
         Dim oTime As New TimeCardSupport.TimeField
         rw = DGVTimeCardDetails.Rows(iRow)
         bInTime = False
         bOutTime = False
         bHoliday = False
-        If rw.Cells("recordId").Value Is Nothing Then
+        bAbsent = False
+        If rw.Cells("recordId").FormattedValue = "" Then
             bNewRow = True
-            sSQL = "INSERT INTO ProjectTimeCardDetailData(TimeCardId, TimeCardDay, IsHoliday, IsAbsent, InTime, OutTime, RegHrs, OT1Hrs, OT2Hrs, TotalCost) VALUES("
-            sSQL = sSQL & cboTimeCards.SelectedItem.recordId
-            sSQL = sSQL & ", "
-            If rw.Cells("logDay").Value Is Nothing Then
-                sSQL = sSQL & "NULL"
-            Else
-                sSQL = sSQL & rw.Cells("logDay").Value
-            End If
-            sSQL = sSQL & ", "
-            If rw.Cells("isHoliday").Value Is Nothing Then
-                sSQL = sSQL & "false"
-            Else
-                sSQL = sSQL & rw.Cells("isHoliday").Value.ToString()
-                bHoliday = rw.Cells("isHoliday").Value
-            End If
-            sSQL = sSQL & ", "
-            If rw.Cells("isAbsent").Value Is Nothing Then
-                sSQL = sSQL & "false"
-            Else
-                sSQL = sSQL & rw.Cells("isAbsent").Value.ToString()
-                bHoliday = rw.Cells("isAbsent").Value
-            End If
-
-            sSQL = sSQL & ", "
-            If Date.TryParse(rw.Cells("inTime").Value, tInTime) Then
-                sSQL = sSQL & "'" & tInTime.TimeOfDay.ToString() & "'"
-                bInTime = True
-            Else
-                sSQL = sSQL & "NULL"
-            End If
-            sSQL = sSQL & ","
-            If Date.TryParse(rw.Cells("outTime").Value, tOutTime) Then
-                sSQL = sSQL & "'" & tOutTime.TimeOfDay.ToString() & "'"
-                bOutTime = True
-            Else
-                sSQL = sSQL & "NULL"
-            End If
-            If bInTime And bOutTime Then
-                TimeCardSupport.CalculateCost(cboProjects.SelectedItem.ProjectRate, rw, iDecimals, sNumberFormat, tInTime, tOutTime, bHoliday)
-                UpdateGridTotal(TimeCardSupport.GridTotal(DGVTimeCardDetails))
-            End If
-
-            sSQL = sSQL & ", "
-            If rw.Cells("regularHrs").Value Is Nothing Then
-                sSQL = sSQL & "NULL"
-            Else
-                oTime.SetTime(rw.Cells("regularHrs").Value)
-                sSQL = sSQL & oTime.GetTime()
-            End If
-            sSQL = sSQL & ", "
-            If rw.Cells("OT1").Value Is Nothing Then
-                sSQL = sSQL & "NULL"
-            Else
-                oTime.SetTime(rw.Cells("OT1").Value)
-                sSQL = sSQL & oTime.GetTime()
-            End If
-            sSQL = sSQL & ", "
-            If rw.Cells("OT2").Value Is Nothing Then
-                sSQL = sSQL & "NULL"
-            Else
-                oTime.SetTime(rw.Cells("OT2").Value)
-                sSQL = sSQL & oTime.GetTime()
-            End If
-            sSQL = sSQL & ", "
-            If rw.Cells("totalCost").Value Is Nothing Then
-                sSQL = sSQL & "NULL"
-            Else
-                sSQL = sSQL & rw.Cells("totalCost").Value
-            End If
-            sSQL = sSQL & ")"
+            sSQL = "INSERT INTO ProjectTimeCardDetailData(ParentId, TimeCardDay, IsHoliday, IsAbsent, InTime, OutTime, RegHrs, OT1Hrs, OT2Hrs, TotalCost) VALUES"
+            sSQL = sSQL & "(@ParentId, @TimeCardDay, @IsHoliday, @IsAbsent, @InTime, @OutTime, @RegHrs, @OT1Hrs, @OT2Hrs, @TotalCost)"
         Else
-            sSQL = "UPDATE ProjectTimeCardDetailData SET "
-            sSQL = sSQL & "TimeCardDay = "
-            If rw.Cells("logDay").Value Is Nothing Then
-                sSQL = sSQL & "NULL"
-            Else
-                sSQL = sSQL & rw.Cells("logDay").Value
-            End If
-            sSQL = sSQL & ", isHoliday = "
-            If rw.Cells("isHoliday").Value Is Nothing Then
-                sSQL = sSQL & "false"
-            Else
-                sSQL = sSQL & rw.Cells("isHoliday").Value.ToString()
-                bHoliday = rw.Cells("isHoliday").Value
-            End If
-            sSQL = sSQL & ", isAbsent = "
-            If rw.Cells("isAbsent").Value Is Nothing Then
-                sSQL = sSQL & "false"
-            Else
-                sSQL = sSQL & rw.Cells("isAbsent").Value.ToString()
-                bHoliday = rw.Cells("isAbsent").Value
-            End If
-            sSQL = sSQL & ", inTime = "
-            If rw.Cells("inTime").Value IsNot Nothing Then
-                If Date.TryParse(rw.Cells("inTime").Value.ToString(), tInTime) Then
-                    sSQL = sSQL & "'" & tInTime.TimeOfDay.ToString() & "'"
-                    bInTime = True
-                Else
-                    sSQL = sSQL & "NULL"
-                End If
-            Else
-                sSQL = sSQL & "NULL"
-            End If
-            sSQL = sSQL & ", outTime = "
-            If rw.Cells("outTime").Value IsNot Nothing Then
-                If Date.TryParse(rw.Cells("outTime").Value.ToString(), tOutTime) Then
-                    sSQL = sSQL & "'" & tOutTime.TimeOfDay.ToString() & "'"
-                    bOutTime = True
-                Else
-                    sSQL = sSQL & "NULL"
-                End If
-            Else
-                sSQL = sSQL & "NULL"
-            End If
-            If bInTime And bOutTime Then
-                TimeCardSupport.CalculateCost(cboProjects.SelectedItem.ProjectRate, rw, iDecimals, sNumberFormat, tInTime, tOutTime, bHoliday)
-                UpdateGridTotal(TimeCardSupport.GridTotal(DGVTimeCardDetails))
-            End If
-            sSQL = sSQL & ", RegHrs = "
-            If rw.Cells("regularHrs").Value Is Nothing Then
-                sSQL = sSQL & "NULL"
-            Else
-                oTime.SetTime(rw.Cells("regularHrs").Value)
-                sSQL = sSQL & oTime.GetTime()
-            End If
-            sSQL = sSQL & ", OT1Hrs = "
-            If rw.Cells("OT1").Value Is Nothing Then
-                sSQL = sSQL & "NULL"
-            Else
-                oTime.SetTime(rw.Cells("OT1").Value)
-                sSQL = sSQL & oTime.GetTime()
-            End If
-            sSQL = sSQL & ", OT2Hrs = "
-            If rw.Cells("OT2").Value Is Nothing Then
-                sSQL = sSQL & "NULL"
-            Else
-                oTime.SetTime(rw.Cells("OT2").Value)
-                sSQL = sSQL & oTime.GetTime()
-            End If
-            sSQL = sSQL & ", TotalCost = "
-            If rw.Cells("totalCost").Value Is Nothing Then
-                sSQL = sSQL & "NULL"
-            Else
-                sSQL = sSQL & rw.Cells("totalCost").Value
-            End If
-            sSQL = sSQL & " WHERE TimeCardDataId = " & rw.Cells("recordId").Value
+            sSQL = "UPDATE ProjectTimeCardDetailData SET ParentId = @ParentId, TimeCardDay = @TimeCardDay, IsHoliday = @IsHoliday, IsAbsent = @IsAbsent, InTime = @InTime, OutTime = @OutTime, RegHrs = @RegHrs, OT1Hrs = @OT1Hrs, OT2Hrs = @OT2Hrs, TotalCost = @TotalCost WHERE RecordId = @RecordId"
         End If
         If dbConnection.GetConnection() Then
             cmd = dbConnection.Connection.CreateCommand()
             cmd.CommandText = sSQL
-            cmd.ExecuteNonQuery()
+            oParam = cmd.CreateParameter()
+            With oParam
+                .ParameterName = "@ParentId"
+                .OleDbType = OleDb.OleDbType.Integer
+                .Value = cboTimeCards.SelectedItem.RecordId
+            End With
+            cmd.Parameters.Add(oParam)
+
+            oParam = cmd.CreateParameter()
+            With oParam
+                .ParameterName = "@TimeCardDay"
+                .OleDbType = OleDb.OleDbType.SmallInt
+                If rw.Cells("logDay").Value Is Nothing Then
+                    .Value = DBNull.Value
+                Else
+                    .Value = rw.Cells("logDay").Value
+                End If
+            End With
+            cmd.Parameters.Add(oParam)
+
+            oParam = cmd.CreateParameter()
+            With oParam
+                .ParameterName = "@IsHoliday"
+                .OleDbType = OleDb.OleDbType.Boolean
+                If rw.Cells("isHoliday").Value Is Nothing Then
+                    .Value = False
+                Else
+                    .Value = rw.Cells("isHoliday").Value
+                    bHoliday = rw.Cells("isHoliday").Value
+                End If
+            End With
+            cmd.Parameters.Add(oParam)
+
+            oParam = cmd.CreateParameter()
+            With oParam
+                .ParameterName = "@IsAbsent"
+                .OleDbType = OleDb.OleDbType.Boolean
+                If rw.Cells("isAbsent").Value Is Nothing Then
+                    .Value = False
+                Else
+                    .Value = rw.Cells("isAbsent").Value
+                    bAbsent = rw.Cells("isAbsent").Value
+                End If
+            End With
+            cmd.Parameters.Add(oParam)
+
+            oParam = cmd.CreateParameter()
+            With oParam
+                .ParameterName = "@InTime"
+                .OleDbType = OleDb.OleDbType.Date
+                If Date.TryParse(rw.Cells("inTime").FormattedValue, tInTime) Then
+                    .Value = tInTime.TimeOfDay.ToString()
+                    bInTime = True
+                Else
+                    .Value = DBNull.Value
+                End If
+            End With
+            cmd.Parameters.Add(oParam)
+
+            oParam = cmd.CreateParameter()
+            With oParam
+                .ParameterName = "@OutTime"
+                .OleDbType = OleDb.OleDbType.Date
+                If Date.TryParse(rw.Cells("outTime").FormattedValue, tOutTime) Then
+                    .Value = tOutTime.TimeOfDay.ToString()
+                    bOutTime = True
+                Else
+                    .Value = DBNull.Value
+                End If
+            End With
+            cmd.Parameters.Add(oParam)
+
+            If bInTime And bOutTime Then
+                TimeCardSupport.CalculateCost(cboProjects.SelectedItem.ProjectRate, rw, iDecimals, sNumberFormat, tInTime, tOutTime, bHoliday, bAbsent)
+                UpdateGridTotal(TimeCardSupport.GridTotal(DGVTimeCardDetails))
+            End If
+            oParam = cmd.CreateParameter()
+            With oParam
+                .ParameterName = "@RegHrs"
+                .OleDbType = OleDb.OleDbType.Double
+                If rw.Cells("regularHrs").FormattedValue = "" Then
+                    .Value = DBNull.Value
+                Else
+                    oTime.SetTime(rw.Cells("regularHrs").Value)
+                    .Value = oTime.GetTime()
+                End If
+            End With
+            cmd.Parameters.Add(oParam)
+
+            oParam = cmd.CreateParameter()
+            With oParam
+                .ParameterName = "@OT1Hrs"
+                .OleDbType = OleDb.OleDbType.Double
+                If rw.Cells("OT1").FormattedValue = "" Then
+                    .Value = DBNull.Value
+                Else
+                    oTime.SetTime(rw.Cells("OT1").Value)
+                    .Value = oTime.GetTime()
+                End If
+            End With
+            cmd.Parameters.Add(oParam)
+
+            oParam = cmd.CreateParameter()
+            With oParam
+                .ParameterName = "@OT2Hrs"
+                .OleDbType = OleDb.OleDbType.Double
+                If rw.Cells("OT2").FormattedValue = "" Then
+                    .Value = DBNull.Value
+                Else
+                    oTime.SetTime(rw.Cells("OT2").Value)
+                    .Value = oTime.GetTime()
+                End If
+            End With
+            cmd.Parameters.Add(oParam)
+
+            oParam = cmd.CreateParameter()
+            With oParam
+                .ParameterName = "@TotalHrs"
+                .OleDbType = OleDb.OleDbType.Double
+                If rw.Cells("totalCost").FormattedValue = "" Then
+                    .Value = DBNull.Value
+                Else
+                    oTime.SetTime(rw.Cells("totalCost").Value)
+                    .Value = oTime.GetTime()
+                End If
+            End With
+            cmd.Parameters.Add(oParam)
             If bNewRow Then
+                cmd.ExecuteNonQuery()
                 cmd.CommandText = "SELECT @@IDENTITY"
                 rw.Cells("recordId").Value = cmd.ExecuteScalar()
+            Else
+                oParam = cmd.CreateParameter()
+                With oParam
+                    .ParameterName = "@RecordId"
+                    .OleDbType = OleDb.OleDbType.Integer
+                    .Value = rw.Cells("RecordId").FormattedValue
+                End With
+                cmd.Parameters.Add(oParam)
+                cmd.ExecuteNonQuery()
             End If
             cmd.Dispose()
             dbConnection.Connection.Close()
@@ -609,6 +688,7 @@
 
     Private Sub RemoveRow(iRowIndex As Integer)
         Dim cmd As OleDb.OleDbCommand
+        Dim oParam As OleDb.OleDbParameter
         Dim sSQL As String
         Dim sRecordId As String
         If DGVTimeCardDetails.Rows.Item(iRowIndex).Cells.Item("recordId").Value IsNot Nothing Then
@@ -618,9 +698,15 @@
         End If
         If sRecordId <> "" Then
             If dbConnection.GetConnection() Then
-                sSQL = "DELETE FROM ProjectTimeCardDetailData WHERE TimeCardDataId = " & DGVTimeCardDetails.Rows.Item(iRowIndex).Cells.Item("recordId").Value.ToString()
+                sSQL = "DELETE FROM ProjectTimeCardDetailData WHERE TimeCardDataId = @RecordId"
                 cmd = dbConnection.Connection.CreateCommand()
                 cmd.CommandText = sSQL
+                oParam = cmd.CreateParameter()
+                With oParam
+                    .ParameterName = "@RecordId"
+                    .OleDbType = OleDb.OleDbType.Integer
+                    .Value = sRecordId
+                End With
                 Try
                     cmd.ExecuteNonQuery()
                     DGVTimeCardDetails.Rows.RemoveAt(iRowIndex)
@@ -633,14 +719,15 @@
         UpdateGridTotal(TimeCardSupport.GridTotal(DGVTimeCardDetails))
     End Sub
 
-    Private Sub cboProjJobs_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cboProjJobs.SelectedIndexChanged
-        DGVTimeCardDetails.Rows.Clear()
-        lblTotalCost.Text = ""
-        lblRegHrs.Text = ""
-        lblOT1.Text = ""
-        lblOT2.Text = ""
-        If cboProjJobs.SelectedIndex >= 0 Then
-            LoadCustomerProjectTimeCards(cboProjJobs.SelectedItem)
+    Private Sub cboProjJobs_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cboJobs.SelectedIndexChanged
+        If cboJobs.SelectedIndex >= 0 Then
+            LoadCustomerProjectTimeCards(cboJobs.SelectedItem)
+        End If
+    End Sub
+
+    Private Sub cboPhases_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cboPhases.SelectedIndexChanged
+        If cboPhases.SelectedIndex >= 0 Then
+            LoadPhaseJobs(cboPhases.SelectedItem)
         End If
     End Sub
 End Class

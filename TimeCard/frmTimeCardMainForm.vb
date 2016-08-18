@@ -177,4 +177,25 @@ Public Class frmTimeCardMainForm
             frmProjJobs.Show()
         End If
     End Sub
+
+    Private Sub ProjectPhasesStripMenuItem_Click(sender As Object, e As EventArgs) Handles ProjectPhasesStripMenuItem.Click
+        Dim frmProjPhases As frmProjectPhases
+        Dim iChilds As Integer
+        Dim bFound As Boolean
+        bFound = False
+        For iChilds = 0 To MdiChildren.Count - 1
+            If MdiChildren(iChilds).Name = "frmProjectPhases" Then
+                bFound = True
+                Exit For
+            End If
+        Next
+        If bFound Then
+            frmProjPhases = MdiChildren(iChilds)
+            frmProjPhases.Activate()
+        Else
+            frmProjPhases = New frmProjectPhases
+            frmProjPhases.MdiParent = Me
+            frmProjPhases.Show()
+        End If
+    End Sub
 End Class

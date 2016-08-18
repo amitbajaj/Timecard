@@ -126,78 +126,86 @@ Public Class frmUserMaster
 
     Private Sub DGVUserMaster_CellEndEdit(sender As Object, e As DataGridViewCellEventArgs) Handles DGVUserMaster.CellEndEdit
         Dim cmd As OleDb.OleDbCommand
+        Dim oParam As OleDb.OleDbParameter
         Dim sSQL As String
         Dim rw As DataGridViewRow
         rw = DGVUserMaster.Rows(e.RowIndex)
         If rw.Cells("recordId").FormattedValue = "" Then
-            sSQL = "INSERT INTO UserMaster (userNumber, userName, trade, basic) VALUES ("
-            If rw.Cells("userNumber").Value IsNot Nothing Then
-                sSQL = sSQL & rw.Cells("userNumber").Value
-            Else
-                sSQL = sSQL & "NULL"
-            End If
-            sSQL = sSQL & ","
-            If rw.Cells("userName").Value IsNot Nothing Then
-                sSQL = sSQL & "'" & rw.Cells("userName").Value.ToString().Replace("'", "''") & "'"
-            Else
-                sSQL = sSQL & "NULL"
-            End If
-            sSQL = sSQL & ","
+            sSQL = "INSERT INTO UserMaster (userNumber, userName, trade, basic) VALUES "
+            sSQL = sSQL & "(@userNumber, @userName, @trade, @basic);"
+        Else
+            sSQL = "UPDATE UserMaster SET UserNumber = @userNumber, userName = @userName, trade = @trade, basic = @basic WHERE RecordId = @RecordId"
+        End If
+        If dbConnection.GetConnection() Then
+            cmd = dbConnection.Connection.CreateCommand()
+            cmd.CommandText = sSQL
 
-            If rw.Cells("trade").Value IsNot Nothing Then
-                sSQL = sSQL & "'" & rw.Cells("trade").Value.ToString().Replace("'", "''") & "'"
-            Else
-                sSQL = sSQL & "NULL"
-            End If
-            sSQL = sSQL & ","
-            If rw.Cells("basic").Value IsNot Nothing Then
-                sSQL = sSQL & rw.Cells("basic").Value
-            Else
-                sSQL = sSQL & "NULL"
-            End If
-            sSQL = sSQL & ")"
-            If dbConnection.GetConnection() Then
-                cmd = dbConnection.Connection.CreateCommand()
-                cmd.CommandText = sSQL
+            oParam = cmd.CreateParameter()
+            With oParam
+                .ParameterName = "@userNumber"
+                .OleDbType = OleDb.OleDbType.SmallInt
+                If rw.Cells("userNumber").FormattedValue = "" Then
+                    .Value = DBNull.Value
+                Else
+                    .Value = rw.Cells("userNumber").FormattedValue
+                End If
+            End With
+            cmd.Parameters.Add(oParam)
+
+            oParam = cmd.CreateParameter()
+            With oParam
+                .ParameterName = "@userName"
+                .OleDbType = OleDb.OleDbType.WChar
+                If rw.Cells("userName").FormattedValue = "" Then
+                    .Value = DBNull.Value
+                Else
+                    .Value = rw.Cells("userName").FormattedValue
+                End If
+            End With
+            cmd.Parameters.Add(oParam)
+
+            oParam = cmd.CreateParameter()
+            With oParam
+                .ParameterName = "@trade"
+                .OleDbType = OleDb.OleDbType.WChar
+                If rw.Cells("trade").FormattedValue = "" Then
+                    .Value = DBNull.Value
+                Else
+                    .Value = rw.Cells("trade").FormattedValue
+                End If
+            End With
+            cmd.Parameters.Add(oParam)
+
+            oParam = cmd.CreateParameter()
+            With oParam
+                .ParameterName = "@basic"
+                .OleDbType = OleDb.OleDbType.Double
+                If rw.Cells("basic").FormattedValue = "" Then
+                    .Value = DBNull.Value
+                Else
+                    .Value = rw.Cells("basic").FormattedValue
+                End If
+            End With
+            cmd.Parameters.Add(oParam)
+
+            If rw.Cells("recordId").FormattedValue = "" Then
+
                 cmd.ExecuteNonQuery()
                 cmd.CommandText = "SELECT @@IDENTITY"
                 rw.Cells("recordId").Value = cmd.ExecuteScalar()
-                cmd.Dispose()
-                dbConnection.Connection.Close()
-            End If
-        Else
-            sSQL = "UPDATE UserMaster SET "
-            If rw.Cells("userNumber").Value IsNot Nothing Then
-                sSQL = sSQL & " userNumber = " & rw.Cells("userNumber").Value
             Else
-                sSQL = sSQL & " userNumber = NULL"
-            End If
-
-            If rw.Cells("userName").Value IsNot Nothing Then
-                sSQL = sSQL & ", userName = '" & rw.Cells("userName").Value.ToString().Replace("'", "''") & "'"
-            Else
-                sSQL = sSQL & ", userName = NULL"
-            End If
-
-            If rw.Cells("trade").Value IsNot Nothing Then
-                sSQL = sSQL & ", trade = '" & rw.Cells("trade").Value.ToString().Replace("'", "''") & "'"
-            Else
-                sSQL = sSQL & ", trade = NULL"
-            End If
-
-            If rw.Cells("basic").Value IsNot Nothing Then
-                sSQL = sSQL & ", basic = " & rw.Cells("basic").Value
-            Else
-                sSQL = sSQL & ", basic = NULL"
-            End If
-            sSQL = sSQL & " WHERE recordId = " & rw.Cells("recordId").Value
-            If dbConnection.GetConnection() Then
-                cmd = dbConnection.Connection.CreateCommand()
-                cmd.CommandText = sSQL
+                oParam = cmd.CreateParameter()
+                With oParam
+                    .ParameterName = "@RecordId"
+                    .OleDbType = OleDb.OleDbType.Integer
+                    .Value = rw.Cells("recordId").FormattedValue
+                End With
+                cmd.Parameters.Add(oParam)
                 cmd.ExecuteNonQuery()
-                cmd.Dispose()
-                dbConnection.Connection.Close()
+
             End If
+            cmd.Dispose()
+            dbConnection.Connection.Close()
         End If
     End Sub
 
@@ -215,13 +223,21 @@ Public Class frmUserMaster
         Dim rw As DataGridViewRow
         Dim sSQL As String
         Dim cmd As OleDb.OleDbCommand
+        Dim oParam As OleDb.OleDbParameter
         rw = DGVUserMaster.Rows(iRowIndex)
         If dbConnection.GetConnection() Then
             Try
                 cmd = dbConnection.Connection.CreateCommand()
                 If rw.Cells("recordId").Value IsNot Nothing Then
-                    sSQL = "DELETE FROM UserMaster WHERE recordId = " & rw.Cells("recordId").Value
+                    sSQL = "DELETE FROM UserMaster WHERE recordId = @RecordId"
                     cmd.CommandText = sSQL
+                    oParam = cmd.CreateParameter()
+                    With oParam
+                        .ParameterName = "@RecordId"
+                        .OleDbType = OleDb.OleDbType.Integer
+                        .Value = rw.Cells("recordId").Value
+                    End With
+                    cmd.Parameters.Add(oParam)
                     cmd.ExecuteNonQuery()
                 End If
                 DGVUserMaster.Rows.Remove(rw)

@@ -12,6 +12,9 @@ Partial Class frmProjectJobs
         Finally
             MyBase.Dispose(disposing)
         End Try
+        If dbConnection IsNot Nothing Then
+            dbConnection.Dispose()
+        End If
     End Sub
 
     'Required by the Windows Form Designer
@@ -25,6 +28,7 @@ Partial Class frmProjectJobs
         Me.DGVProjectJobs = New System.Windows.Forms.DataGridView()
         Me.cboCustomers = New System.Windows.Forms.ComboBox()
         Me.cboProjects = New System.Windows.Forms.ComboBox()
+        Me.cboPhases = New System.Windows.Forms.ComboBox()
         CType(Me.DGVProjectJobs, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
@@ -45,7 +49,7 @@ Partial Class frmProjectJobs
         Me.cboCustomers.FormattingEnabled = True
         Me.cboCustomers.Location = New System.Drawing.Point(12, 8)
         Me.cboCustomers.Name = "cboCustomers"
-        Me.cboCustomers.Size = New System.Drawing.Size(288, 21)
+        Me.cboCustomers.Size = New System.Drawing.Size(198, 21)
         Me.cboCustomers.TabIndex = 2
         '
         'cboProjects
@@ -53,16 +57,27 @@ Partial Class frmProjectJobs
         Me.cboProjects.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboProjects.FlatStyle = System.Windows.Forms.FlatStyle.System
         Me.cboProjects.FormattingEnabled = True
-        Me.cboProjects.Location = New System.Drawing.Point(306, 8)
+        Me.cboProjects.Location = New System.Drawing.Point(216, 8)
         Me.cboProjects.Name = "cboProjects"
-        Me.cboProjects.Size = New System.Drawing.Size(328, 21)
+        Me.cboProjects.Size = New System.Drawing.Size(227, 21)
         Me.cboProjects.TabIndex = 4
+        '
+        'cboPhases
+        '
+        Me.cboPhases.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cboPhases.FlatStyle = System.Windows.Forms.FlatStyle.System
+        Me.cboPhases.FormattingEnabled = True
+        Me.cboPhases.Location = New System.Drawing.Point(449, 8)
+        Me.cboPhases.Name = "cboPhases"
+        Me.cboPhases.Size = New System.Drawing.Size(185, 21)
+        Me.cboPhases.TabIndex = 5
         '
         'frmProjectJobs
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(647, 313)
+        Me.Controls.Add(Me.cboPhases)
         Me.Controls.Add(Me.cboProjects)
         Me.Controls.Add(Me.DGVProjectJobs)
         Me.Controls.Add(Me.cboCustomers)
@@ -76,4 +91,5 @@ Partial Class frmProjectJobs
     Friend WithEvents DGVProjectJobs As DataGridView
     Friend WithEvents cboCustomers As ComboBox
     Friend WithEvents cboProjects As ComboBox
+    Friend WithEvents cboPhases As ComboBox
 End Class

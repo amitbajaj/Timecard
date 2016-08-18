@@ -12,6 +12,7 @@ Partial Class frmTimeCardDetails
         Finally
             MyBase.Dispose(disposing)
         End Try
+        dbConnection.Dispose()
     End Sub
 
     'Required by the Windows Form Designer
@@ -99,7 +100,7 @@ Partial Class frmTimeCardDetails
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(849, 336)
+        Me.ClientSize = New System.Drawing.Size(892, 336)
         Me.Controls.Add(Me.lblOT2)
         Me.Controls.Add(Me.lblOT1)
         Me.Controls.Add(Me.lblRegHrs)

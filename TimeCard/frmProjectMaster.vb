@@ -1,11 +1,11 @@
 ﻿Public Class frmProjectMaster
     Private dbConnection As TimeCardDataAccess
-    Private iDecimals As Integer = My.Settings.Item("NumberOfDecimals")
-    Private sNumberFormat As String = My.Settings.Item("NumberFormat")
+    Private iDecimals As Integer = TimeCardSupport.NumberOfDecimals
+    Private sNumberFormat As String = TimeCardSupport.NumberFormat
 
     Private Sub frmProjectMaster_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         dbConnection = New TimeCardDataAccess()
-        dbConnection.DatabaseFile = My.Settings.Item("DBFile")
+        dbConnection.DatabaseFile = TimeCardSupport.DatabaseFile
         InitializeGrid()
         LoadCustomers()
     End Sub
@@ -116,11 +116,19 @@
         Dim iNewRow As Integer
         Dim cmd As OleDb.OleDbCommand
         Dim dr As OleDb.OleDbDataReader
+        Dim oParam As OleDb.OleDbParameter
         Dim sSQL As String
         If dbConnection.GetConnection() Then
-            sSQL = "SELECT RecordId, ProjectId, ProjectDesc, ProjectRate FROM CustomerProjects WHERE CustomerId = " & iRecordId
+            sSQL = "SELECT RecordId, ProjectId, ProjectDesc, ProjectRate FROM CustomerProjects WHERE ParentId = @RecId"
             cmd = dbConnection.Connection.CreateCommand()
             cmd.CommandText = sSQL
+            oParam = cmd.CreateParameter()
+            With oParam
+                .ParameterName = "@RecId"
+                .OleDbType = OleDb.OleDbType.Integer
+                .Value = iRecordId
+            End With
+            cmd.Parameters.Add(oParam)
             dr = cmd.ExecuteReader()
             DGVProjectMaster.Rows.Clear()
             While dr.Read()
@@ -154,6 +162,7 @@
 
     Private Sub RemoveRow(iRowIndex As Integer)
         Dim rw As DataGridViewRow
+        Dim oParam As OleDb.OleDbParameter
         Dim sSQL As String
         Dim cmd As OleDb.OleDbCommand
         Try
@@ -161,8 +170,15 @@
             If rw.Cells("recordId").FormattedValue <> "" Then
                 If dbConnection.GetConnection() Then
                     cmd = dbConnection.Connection.CreateCommand()
-                    sSQL = "DELETE FROM CustomerProjects WHERE recordId = " & rw.Cells("recordId").Value
+                    sSQL = "DELETE FROM CustomerProjects WHERE recordId = @RecordId"
                     cmd.CommandText = sSQL
+                    oParam = cmd.CreateParameter()
+                    With oParam
+                        .ParameterName = "@RecordId"
+                        .OleDbType = OleDb.OleDbType.Integer
+                        .Value = rw.Cells("recordId").Value
+                    End With
+                    cmd.Parameters.Add(oParam)
                     cmd.ExecuteNonQuery()
                     DGVProjectMaster.Rows.Remove(rw)
                     cmd.Dispose()
@@ -181,71 +197,81 @@
 
     Private Sub DGVProjectMaster_CellEndEdit(sender As Object, e As DataGridViewCellEventArgs) Handles DGVProjectMaster.CellEndEdit
         Dim cmd As OleDb.OleDbCommand
+        Dim oParam As OleDb.OleDbParameter
         Dim sSQL As String
         Dim rw As DataGridViewRow
         rw = DGVProjectMaster.Rows(e.RowIndex)
         If rw.Cells("RecordId").FormattedValue = "" Then
-            sSQL = "INSERT INTO CustomerProjects(customerId, ProjectId, ProjectDesc, ProjectRate) VALUES("
-            sSQL = sSQL & cboCustomers.SelectedItem.RecordId
-            If rw.Cells("ProjectNumber").Value IsNot Nothing Then
-                sSQL = sSQL & ", '" & rw.Cells("ProjectNumber").Value.ToString().Replace("'", "''") & "'"
-            Else
-                sSQL = sSQL & ",NULL"
-            End If
+            sSQL = "INSERT INTO CustomerProjects(ParentId, ProjectId, ProjectDesc, ProjectRate) VALUES"
+            sSQL = sSQL & "(@ParentId, @ProjectId, @ProjectDesc, @ProjectRate);"
+        Else
+            sSQL = "UPDATE CustomerProjects SET ParentId = @ParentId, ProjectId = @ProjectId, ProjectDesc = @ProjectDesc, ProjectRate = @ProjectRate WHERE RecordId = @RecordId"
+        End If
+        If dbConnection.GetConnection() Then
+            cmd = dbConnection.Connection.CreateCommand()
+            cmd.CommandText = sSQL
+            oParam = cmd.CreateParameter()
+            With oParam
+                .ParameterName = "@ParentId"
+                .OleDbType = OleDb.OleDbType.Integer
+                .Value = cboCustomers.SelectedItem.RecordId
+            End With
+            cmd.Parameters.Add(oParam)
 
-            If rw.Cells("ProjectDesc").Value IsNot Nothing Then
-                sSQL = sSQL & ", '" & rw.Cells("ProjectDesc").Value.ToString().Replace("'", "''") & "'"
-            Else
-                sSQL = sSQL & ", NULL"
-            End If
+            oParam = cmd.CreateParameter()
+            With oParam
+                .ParameterName = "@ProjectId"
+                .OleDbType = OleDb.OleDbType.WChar
+                If rw.Cells("ProjectNumber").FormattedValue = "" Then
+                    .Value = DBNull.Value
+                Else
+                    .Value = rw.Cells("ProjectNumber").Value
+                End If
+            End With
+            cmd.Parameters.Add(oParam)
 
-            If rw.Cells("ProjectRate").Value IsNot Nothing Then
-                sSQL = sSQL & ", " & rw.Cells("ProjectRate").Value
-            Else
-                sSQL = sSQL & ", NULL"
-            End If
-            sSQL = sSQL & ");"
-            If dbConnection.GetConnection() Then
-                cmd = dbConnection.Connection.CreateCommand()
-                cmd.CommandText = sSQL
+            oParam = cmd.CreateParameter()
+            With oParam
+                .ParameterName = "@ProjectDesc"
+                .OleDbType = OleDb.OleDbType.WChar
+                If rw.Cells("ProjectDesc").FormattedValue = "" Then
+                    .Value = DBNull.Value
+                Else
+                    .Value = rw.Cells("ProjectDesc").Value
+                End If
+            End With
+            cmd.Parameters.Add(oParam)
+
+            oParam = cmd.CreateParameter()
+            With oParam
+                .ParameterName = "@ProjectRate"
+                .OleDbType = OleDb.OleDbType.Double
+                If rw.Cells("ProjectDesc").FormattedValue = "" Then
+                    .Value = DBNull.Value
+                Else
+                    .Value = rw.Cells("ProjectRate").Value
+                End If
+            End With
+            cmd.Parameters.Add(oParam)
+
+
+            If rw.Cells("RecordId").FormattedValue = "" Then
                 cmd.ExecuteNonQuery()
                 cmd.CommandText = "SELECT @@IDENTITY"
                 rw.Cells("recordId").Value = cmd.ExecuteScalar()
-                cmd.Dispose()
-                dbConnection.Connection.Close()
-            End If
-
-        Else
-            sSQL = "UPDATE CustomerProjects SET "
-            If rw.Cells("ProjectNumber").Value IsNot Nothing Then
-                sSQL = sSQL & " ProjectId = '" & rw.Cells("ProjectNumber").Value.ToString().Replace("'", "''") & "'"
             Else
-                sSQL = sSQL & " ProjectId = NULL"
-            End If
-
-            If rw.Cells("ProjectDesc").Value IsNot Nothing Then
-                sSQL = sSQL & ", ProjectDesc = '" & rw.Cells("ProjectDesc").Value.ToString().Replace("'", "''") & "'"
-            Else
-                sSQL = sSQL & ", ProjectDesc = NULL"
-            End If
-
-            If rw.Cells("ProjectRate").Value IsNot Nothing Then
-                sSQL = sSQL & ", ProjectRate = " & rw.Cells("ProjectRate").Value
-            Else
-                sSQL = sSQL & ", ProjectRate = NULL"
-            End If
-
-            sSQL = sSQL & " WHERE recordId = " & rw.Cells("recordId").Value
-            If dbConnection.GetConnection() Then
-                cmd = dbConnection.Connection.CreateCommand()
-                cmd.CommandText = sSQL
+                oParam = cmd.CreateParameter()
+                With oParam
+                    .ParameterName = "@ParentId"
+                    .OleDbType = OleDb.OleDbType.Integer
+                    .Value = rw.Cells("RecordId").FormattedValue
+                End With
+                cmd.Parameters.Add(oParam)
                 cmd.ExecuteNonQuery()
-                cmd.Dispose()
-                dbConnection.Connection.Close()
             End If
-
+            cmd.Dispose()
+            dbConnection.Connection.Close()
         End If
-
     End Sub
 
     Private Sub DGVProjectMaster_CellValidating(sender As Object, e As DataGridViewCellValidatingEventArgs) Handles DGVProjectMaster.CellValidating
@@ -283,5 +309,18 @@
             End With
         End If
 
+    End Sub
+
+    Private Sub DGVProjectMaster_CellContentClick(sender As Object, e As DataGridViewCellEventArgs) Handles DGVProjectMaster.CellContentClick
+        Dim iNewRow As Integer
+        If e.RowIndex >= 0 Then
+            If e.ColumnIndex = DGVProjectMaster.Columns("addNextRow").Index Then
+                iNewRow = DGVProjectMaster.Rows.Add()
+                DGVProjectMaster.CurrentCell = DGVProjectMaster.Rows(iNewRow).Cells(1)
+            ElseIf e.ColumnIndex = DGVProjectMaster.Columns("delCurRow").Index Then
+                RemoveRow(e.RowIndex)
+                DGVProjectMaster.CurrentCell = DGVProjectMaster.CurrentRow.Cells(1)
+            End If
+        End If
     End Sub
 End Class

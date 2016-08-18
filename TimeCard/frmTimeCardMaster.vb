@@ -115,11 +115,19 @@
         Dim iNewRow As Integer
         Dim cmd As OleDb.OleDbCommand
         Dim dr As OleDb.OleDbDataReader
+        Dim oParam As OleDb.OleDbParameter
         Dim sSQL As String
         If dbConnection.GetConnection() Then
-            sSQL = "SELECT * FROM TimeCardMaster WHERE UserId = " & iRecordId
+            sSQL = "SELECT RecordId, TimeCardNumber, TimeCardMonth, TimeCardYear FROM TimeCardMaster WHERE UserId = @UserId"
             cmd = dbConnection.Connection.CreateCommand()
             cmd.CommandText = sSQL
+            oParam = cmd.CreateParameter()
+            With oParam
+                .ParameterName = "@UserId"
+                .OleDbType = OleDb.OleDbType.Integer
+                .Value = iRecordId
+            End With
+            cmd.Parameters.Add(oParam)
             dr = cmd.ExecuteReader()
             DGVTimeCardMaster.Rows.Clear()
             While dr.Read()
@@ -154,13 +162,21 @@
     Private Sub btnAdd_Click(sender As Object, e As EventArgs)
         Dim iNewItem As Integer
         Dim cmd As OleDb.OleDbCommand
+        Dim oParam As OleDb.OleDbParameter
         Dim sSQL As String
         If cboUsers.SelectedIndex >= 0 Then
             iNewItem = DGVTimeCardMaster.Rows.Add()
             If dbConnection.GetConnection() Then
-                sSQL = "INSERT INTO TimeCardMaster(UserId) VALUES (" & cboUsers.SelectedItem.recordId & ");"
+                sSQL = "INSERT INTO TimeCardMaster(UserId) VALUES (@UserId);"
                 cmd = dbConnection.Connection.CreateCommand()
                 cmd.CommandText = sSQL
+                oParam = cmd.CreateParameter()
+                With oParam
+                    .ParameterName = "@UserId"
+                    .OleDbType = OleDb.OleDbType.Integer
+                    .Value = cboUsers.SelectedItem.recordId
+                End With
+                cmd.Parameters.Add(oParam)
                 cmd.ExecuteNonQuery()
                 cmd.Dispose()
                 dbConnection.Connection.Close()
@@ -171,63 +187,81 @@
 
     Private Sub DGVTimeCardMaster_CellEndEdit(sender As Object, e As DataGridViewCellEventArgs) Handles DGVTimeCardMaster.CellEndEdit
         Dim cmd As OleDb.OleDbCommand
+        Dim oParam As OleDb.OleDbParameter
         Dim sSQL As String
         Dim rw As DataGridViewRow
         rw = DGVTimeCardMaster.Rows(e.RowIndex)
         If rw.Cells("recordId").FormattedValue = "" Then
-            sSQL = "INSERT INTO TimeCardMaster (UserId, timeCardNumber, timeCardMonth, timeCardYear) VALUES("
-            sSQL = sSQL & cboUsers.SelectedItem.UserId
-            If rw.Cells("timeCardNumber").Value IsNot Nothing Then
-                sSQL = sSQL & "," & rw.Cells("timeCardNumber").Value
-            Else
-                sSQL = sSQL & " NULL"
-            End If
-            If rw.Cells("timeCardMonth").Value IsNot Nothing Then
-                sSQL = sSQL & "," & rw.Cells("timeCardMonth").Value
-            Else
-                sSQL = sSQL & ",NULL"
-            End If
-            If rw.Cells("timeCardYear").Value IsNot Nothing Then
-                sSQL = sSQL & "," & rw.Cells("timeCardYear").Value
-            Else
-                sSQL = sSQL & ",NULL"
-            End If
-            sSQL = sSQL & ")"
-            If dbConnection.GetConnection() Then
-                cmd = dbConnection.Connection.CreateCommand()
-                cmd.CommandText = sSQL
+            sSQL = "INSERT INTO TimeCardMaster (UserId, timeCardNumber, timeCardMonth, timeCardYear) VALUES "
+            sSQL = sSQL & "(@UserId, @timeCardNumber, @timeCardMonth, @timeCardYear)"
+        Else
+            sSQL = "UPDATE TimeCardMaster SET UserId = @UserId, timeCardNumber = @timeCardNumber, "
+            sSQL = sSQL & "timeCardMonth = @timeCardMonth, timeCardYear = @timeCardYear WHERE RecordId = @RecordId"
+        End If
+        If dbConnection.GetConnection() Then
+            cmd = dbConnection.Connection.CreateCommand()
+            cmd.CommandText = sSQL
+
+            oParam = cmd.CreateParameter()
+            With oParam
+                .ParameterName = "@UserId"
+                .OleDbType = OleDb.OleDbType.Integer
+                .Value = cboUsers.SelectedItem.UserId
+            End With
+            cmd.Parameters.Add(oParam)
+
+            oParam = cmd.CreateParameter()
+            With oParam
+                .ParameterName = "@timeCardNumber"
+                .OleDbType = OleDb.OleDbType.Integer
+                If rw.Cells("timeCardNumber").FormattedValue = "" Then
+                    .Value = DBNull.Value
+                Else
+                    .Value = rw.Cells("timeCardNumber").FormattedValue
+                End If
+            End With
+            cmd.Parameters.Add(oParam)
+
+            oParam = cmd.CreateParameter()
+            With oParam
+                .ParameterName = "@timeCardMonth"
+                .OleDbType = OleDb.OleDbType.SmallInt
+                If rw.Cells("timeCardMonth").FormattedValue = "" Then
+                    .Value = DBNull.Value
+                Else
+                    .Value = rw.Cells("timeCardMonth").FormattedValue
+                End If
+            End With
+            cmd.Parameters.Add(oParam)
+
+            oParam = cmd.CreateParameter()
+            With oParam
+                .ParameterName = "@timeCardYear"
+                .OleDbType = OleDb.OleDbType.SmallInt
+                If rw.Cells("timeCardYear").FormattedValue = "" Then
+                    .Value = DBNull.Value
+                Else
+                    .Value = rw.Cells("timeCardYear").FormattedValue
+                End If
+            End With
+            cmd.Parameters.Add(oParam)
+
+            If rw.Cells("recordId").FormattedValue = "" Then
                 cmd.ExecuteNonQuery()
                 cmd.CommandText = "SELECT @@IDENTITY"
                 rw.Cells("recordId").Value = cmd.ExecuteScalar()
-                cmd.Dispose()
-                dbConnection.Connection.Close()
-            End If
-        Else
-            sSQL = "UPDATE TimeCardMaster SET "
-            If rw.Cells("timeCardNumber").Value IsNot Nothing Then
-                sSQL = sSQL & " timeCardNumber = " & rw.Cells("timeCardNumber").Value
             Else
-                sSQL = sSQL & " timeCardNumber = NULL"
-            End If
-            If rw.Cells("timeCardMonth").Value IsNot Nothing Then
-                sSQL = sSQL & ", timeCardMonth = " & rw.Cells("timeCardMonth").Value
-            Else
-                sSQL = sSQL & ", timeCardMonth = NULL"
-            End If
-            If rw.Cells("timeCardYear").Value IsNot Nothing Then
-                sSQL = sSQL & ", timeCardYear = " & rw.Cells("timeCardYear").Value
-            Else
-                sSQL = sSQL & ", timeCardYear = NULL"
-            End If
-
-            sSQL = sSQL & " WHERE timeCardId = " & rw.Cells("recordId").Value
-            If dbConnection.GetConnection() Then
-                cmd = dbConnection.Connection.CreateCommand()
-                cmd.CommandText = sSQL
+                oParam = cmd.CreateParameter()
+                With oParam
+                    .ParameterName = "@RecordId"
+                    .OleDbType = OleDb.OleDbType.Integer
+                    .Value = rw.Cells("recordId").FormattedValue
+                End With
+                cmd.Parameters.Add(oParam)
                 cmd.ExecuteNonQuery()
-                cmd.Dispose()
-                dbConnection.Connection.Close()
             End If
+            cmd.Dispose()
+            dbConnection.Connection.Close()
         End If
     End Sub
 
@@ -235,14 +269,22 @@
         Dim rw As DataGridViewRow
         Dim sSQL As String
         Dim cmd As OleDb.OleDbCommand
+        Dim oParam As OleDb.OleDbParameter
         If DGVTimeCardMaster.SelectedRows.Count > 0 Then
             If dbConnection.GetConnection() Then
                 Try
                     cmd = dbConnection.Connection.CreateCommand()
                     For Each rw In DGVTimeCardMaster.SelectedRows
                         If rw.Cells("recordId").Value IsNot Nothing Then
-                            sSQL = "DELETE FROM TimeCardMaster WHERE TimeCardId = " & rw.Cells("recordId").Value
+                            sSQL = "DELETE FROM TimeCardMaster WHERE RecordId = @RecordId"
                             cmd.CommandText = sSQL
+                            oParam = cmd.CreateParameter()
+                            With oParam
+                                .ParameterName = "@RecordId"
+                                .OleDbType = OleDb.OleDbType.Integer
+                                .Value = rw.Cells("recordId").FormattedValue
+                            End With
+                            cmd.Parameters.Add(oParam)
                             cmd.ExecuteNonQuery()
                             'Debug.Print(sSQL)
                         Else
@@ -343,13 +385,21 @@
         Dim rw As DataGridViewRow
         Dim sSQL As String
         Dim cmd As OleDb.OleDbCommand
+        Dim oParam As OleDb.OleDbParameter
         rw = DGVTimeCardMaster.Rows(iRowIndex)
         If dbConnection.GetConnection() Then
             Try
                 cmd = dbConnection.Connection.CreateCommand()
                 If rw.Cells("recordId").Value IsNot Nothing Then
-                    sSQL = "DELETE FROM TimeCardMaster WHERE TimeCardId = " & rw.Cells("recordId").Value
+                    sSQL = "DELETE FROM TimeCardMaster WHERE RecordId = @RecordId"
                     cmd.CommandText = sSQL
+                    oParam = cmd.CreateParameter()
+                    With oParam
+                        .ParameterName = "@RecordId"
+                        .OleDbType = OleDb.OleDbType.Integer
+                        .Value = rw.Cells("recordId").FormattedValue
+                    End With
+                    cmd.Parameters.Add(oParam)
                     cmd.ExecuteNonQuery()
                 End If
                 DGVTimeCardMaster.Rows.Remove(rw)

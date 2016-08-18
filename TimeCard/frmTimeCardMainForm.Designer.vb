@@ -38,6 +38,7 @@ Partial Class frmTimeCardMainForm
         Me.StatusStrip = New System.Windows.Forms.StatusStrip()
         Me.ToolStripStatusLabel = New System.Windows.Forms.ToolStripStatusLabel()
         Me.ToolTip = New System.Windows.Forms.ToolTip(Me.components)
+        Me.ProjectPhasesStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.MenuStrip.SuspendLayout()
         Me.StatusStrip.SuspendLayout()
         Me.SuspendLayout()
@@ -78,7 +79,7 @@ Partial Class frmTimeCardMainForm
         '
         'CustomerMenuItem
         '
-        Me.CustomerMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.CustomerToolStripMenuItem, Me.CustomerProjectStripMenuItem, Me.ProjectJobsStripMenuItem, Me.ProjectTimeCardToolStripMenuItem, Me.ProjectTimeCardDetailsToolStripMenuItem})
+        Me.CustomerMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.CustomerToolStripMenuItem, Me.CustomerProjectStripMenuItem, Me.ProjectPhasesStripMenuItem, Me.ProjectJobsStripMenuItem, Me.ProjectTimeCardToolStripMenuItem, Me.ProjectTimeCardDetailsToolStripMenuItem})
         Me.CustomerMenuItem.Name = "CustomerMenuItem"
         Me.CustomerMenuItem.Size = New System.Drawing.Size(76, 20)
         Me.CustomerMenuItem.Text = "Customers"
@@ -128,6 +129,12 @@ Partial Class frmTimeCardMainForm
         Me.ToolStripStatusLabel.Size = New System.Drawing.Size(39, 17)
         Me.ToolStripStatusLabel.Text = "Status"
         '
+        'ProjectPhasesStripMenuItem
+        '
+        Me.ProjectPhasesStripMenuItem.Name = "ProjectPhasesStripMenuItem"
+        Me.ProjectPhasesStripMenuItem.Size = New System.Drawing.Size(204, 22)
+        Me.ProjectPhasesStripMenuItem.Text = "Project Phases"
+        '
         'frmTimeCardMainForm
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -161,4 +168,5 @@ Partial Class frmTimeCardMainForm
     Friend WithEvents ProjectTimeCardToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents ProjectTimeCardDetailsToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents ProjectJobsStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ProjectPhasesStripMenuItem As ToolStripMenuItem
 End Class

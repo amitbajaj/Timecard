@@ -12,6 +12,7 @@ Partial Class frmTimeCardMaster
         Finally
             MyBase.Dispose(disposing)
         End Try
+        dbConnection.Dispose()
     End Sub
 
     'Required by the Windows Form Designer

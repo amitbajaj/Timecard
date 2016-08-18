@@ -12,6 +12,9 @@ Partial Class frmCustomerMaster
         Finally
             MyBase.Dispose(disposing)
         End Try
+        If dbConnection IsNot Nothing Then
+            dbConnection.Dispose()
+        End If
     End Sub
 
     'Required by the Windows Form Designer

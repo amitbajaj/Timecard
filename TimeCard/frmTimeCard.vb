@@ -30,6 +30,7 @@ Public Class frmTimeCard
 
     Private Sub RemoveRow(iRowIndex As Integer)
         Dim cmd As OleDb.OleDbCommand
+        Dim oParam As OleDb.OleDbParameter
         Dim sSQL As String
         Dim sRecordId As String
         If DataGridView1.Rows.Item(iRowIndex).Cells.Item("recordId").Value IsNot Nothing Then
@@ -39,9 +40,15 @@ Public Class frmTimeCard
         End If
         If sRecordId <> "" Then
             If OpenConn() Then
-                sSQL = "DELETE FROM TimeCardData WHERE RecordId = " & DataGridView1.Rows.Item(iRowIndex).Cells.Item("recordId").Value.ToString()
+                sSQL = "DELETE FROM TimeCardData WHERE RecordId = @RecordId"
                 cmd = conn.CreateCommand()
                 cmd.CommandText = sSQL
+                oParam = cmd.CreateParameter()
+                With oParam
+                    .ParameterName = "@RecordId"
+                    .OleDbType = OleDb.OleDbType.Integer
+                    .Value = sRecordId
+                End With
                 Try
                     cmd.ExecuteNonQuery()
                     DataGridView1.Rows.RemoveAt(iRowIndex)

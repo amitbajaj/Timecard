@@ -29,10 +29,15 @@ Public Class frmCustomerMaster
 
     Private Function DeleteRecord(iRecordId As Integer) As Boolean
         Dim cmd As OleDb.OleDbCommand
+        Dim cmdParam As OleDb.OleDbParameter
         Try
             If dbConnection.GetConnection() Then
                 cmd = dbConnection.Connection.CreateCommand()
-                cmd.CommandText = "DELETE FROM CustomerMaster WHERE RecordId = " & iRecordId.ToString & ";"
+                cmd.CommandText = "DELETE FROM CustomerMaster WHERE RecordId = @RecId"
+                cmdParam = cmd.CreateParameter()
+                cmdParam.ParameterName = "@RecId"
+                cmdParam.DbType = DbType.Int32
+                cmdParam.Value = iRecordId
                 cmd.ExecuteNonQuery()
                 cmd.Dispose()
                 dbConnection.Connection.Close()
@@ -47,6 +52,7 @@ Public Class frmCustomerMaster
 
     Private Sub CreateRecord(rw As DataGridViewRow)
         Dim cmd As OleDb.OleDbCommand
+        Dim oParam As OleDb.OleDbParameter
         Dim sCustomerId, sCustomerName As String
         If rw.Cells("CustomerId").Value Is Nothing Then
             sCustomerId = ""
@@ -61,7 +67,27 @@ Public Class frmCustomerMaster
         Try
             If dbConnection.GetConnection() Then
                 cmd = dbConnection.Connection.CreateCommand()
-                cmd.CommandText = "INSERT INTO CustomerMaster(CustomerId, CustomerName) VALUES('" & sCustomerId & "','" & sCustomerName & "');"
+                cmd.CommandText = "INSERT INTO CustomerMaster(CustomerId, CustomerName) VALUES(@CustId,@CustName);"
+                oParam = cmd.CreateParameter()
+                With oParam
+                    .ParameterName = "@CustId"
+                    .OleDbType = OleDb.OleDbType.VarChar
+                    .Direction = ParameterDirection.Input
+                    .Value = sCustomerId
+                End With
+                cmd.Parameters.Add(oParam)
+                oParam = Nothing
+
+                oParam = cmd.CreateParameter()
+                With oParam
+                    .ParameterName = "@CustName"
+                    .OleDbType = OleDb.OleDbType.VarChar
+                    .Direction = ParameterDirection.Input
+                    .Value = sCustomerName
+                End With
+                cmd.Parameters.Add(oParam)
+                oParam = Nothing
+
                 cmd.ExecuteNonQuery()
                 cmd.CommandText = "SELECT @@Identity"
                 rw.Cells("RecordId").Value = cmd.ExecuteScalar().ToString()
@@ -74,10 +100,41 @@ Public Class frmCustomerMaster
 
     Private Sub UpdateRecord(iRecordId As Integer, sCustomerId As String, sCustomerName As String)
         Dim cmd As OleDb.OleDbCommand
+        Dim oParam As OleDb.OleDbParameter
         Try
             If dbConnection.GetConnection() Then
                 cmd = dbConnection.Connection.CreateCommand()
-                cmd.CommandText = "UPDATE CustomerMaster SET CustomerId = '" & sCustomerId.ToString.Replace("'", "''") & "', CustomerName='" & sCustomerName.ToString.Replace("'", "''") & "' WHERE RecordId = " & iRecordId.ToString()
+                cmd.CommandText = "UPDATE CustomerMaster SET CustomerId = @CustId, CustomerName = @CustName WHERE RecordId = @RecId"
+                oParam = cmd.CreateParameter()
+                With oParam
+                    .ParameterName = "@CustId"
+                    .OleDbType = OleDb.OleDbType.VarChar
+                    .Direction = ParameterDirection.Input
+                    .Value = sCustomerId
+                End With
+                cmd.Parameters.Add(oParam)
+                oParam = Nothing
+
+                oParam = cmd.CreateParameter()
+                With oParam
+                    .ParameterName = "@CustName"
+                    .OleDbType = OleDb.OleDbType.VarChar
+                    .Direction = ParameterDirection.Input
+                    .Value = sCustomerName
+                End With
+                cmd.Parameters.Add(oParam)
+                oParam = Nothing
+
+                oParam = cmd.CreateParameter()
+                With oParam
+                    .ParameterName = "@RecId"
+                    .OleDbType = OleDb.OleDbType.Integer
+                    .Direction = ParameterDirection.Input
+                    .Value = iRecordId
+                End With
+                cmd.Parameters.Add(oParam)
+                oParam = Nothing
+
                 cmd.ExecuteNonQuery()
                 cmd.Dispose()
                 dbConnection.Connection.Close()
@@ -200,4 +257,10 @@ Public Class frmCustomerMaster
             End With
         End If
     End Sub
+
+    Private Sub frmCustomerMaster_Disposed(sender As Object, e As EventArgs) Handles Me.Disposed
+        dbConnection.Dispose()
+        dbConnection = Nothing
+    End Sub
+
 End Class

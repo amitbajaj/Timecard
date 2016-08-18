@@ -104,14 +104,20 @@
     Sub LoadCustomerProjects(oCust As TimeCardSupport.CustomerDetails)
         Dim cmd As OleDb.OleDbCommand
         Dim dr As OleDb.OleDbDataReader
+        Dim oPr As OleDb.OleDbParameter
         Dim oProj As TimeCardSupport.ProjectDetails
-        cboProjJobs.Items.Clear()
+        cboJobs.Items.Clear()
         DGVTimeCardMaster.Rows.Clear()
         cboProjects.Items.Clear()
         cboProjects.DisplayMember = "DisplayName"
         If dbConnection.GetConnection() Then
             cmd = dbConnection.Connection.CreateCommand()
-            cmd.CommandText = "SELECT RecordId, ProjectId, ProjectDesc, ProjectRate FROM CustomerProjects WHERE CustomerId = " & oCust.recordId
+            oPr = cmd.CreateParameter()
+            oPr.ParameterName = "@ParentId"
+            oPr.OleDbType = OleDb.OleDbType.Integer
+            oPr.Value = oCust.recordId
+            cmd.Parameters.Add(oPr)
+            cmd.CommandText = "SELECT RecordId, ProjectId, ProjectDesc, ProjectRate FROM CustomerProjects WHERE ParentId = @ParentId"
             dr = cmd.ExecuteReader()
             While dr.Read()
                 oProj = New TimeCardSupport.ProjectDetails
@@ -129,20 +135,57 @@
 
     Private Sub cboProjects_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cboProjects.SelectedIndexChanged
         If cboProjects.SelectedIndex >= 0 Then
-            LoadProjectJobs(cboProjects.SelectedItem)
+            LoadProjectPhases(cboProjects.SelectedItem)
         End If
     End Sub
 
-    Sub LoadProjectJobs(oProj As TimeCardSupport.ProjectDetails)
+    Sub LoadProjectPhases(oProj As TimeCardSupport.ProjectDetails)
         Dim cmd As OleDb.OleDbCommand
         Dim dr As OleDb.OleDbDataReader
-        Dim oProjJob As TimeCardSupport.ProjectJobDetails
+        Dim oPr As OleDb.OleDbParameter
+        Dim oProjPhase As TimeCardSupport.ProjectPhaseDetails
         DGVTimeCardMaster.Rows.Clear()
-        cboProjJobs.Items.Clear()
-        cboProjJobs.DisplayMember = "DisplayName"
+        cboJobs.Items.Clear()
+        cboPhases.Items.Clear()
+        cboPhases.DisplayMember = "DisplayName"
         If dbConnection.GetConnection() Then
             cmd = dbConnection.Connection.CreateCommand()
-            cmd.CommandText = "SELECT RecordId, JobId, JobDesc, JobRate FROM ProjectJobs WHERE ProjectId = " & oProj.recordId
+            oPr = cmd.CreateParameter()
+            oPr.ParameterName = "@ParentId"
+            oPr.OleDbType = OleDb.OleDbType.Integer
+            oPr.Value = oProj.recordId
+            cmd.Parameters.Add(oPr)
+            cmd.CommandText = "SELECT RecordId, PhaseId, PhaseDesc FROM ProjectPhases WHERE ParentId = @ParentId"
+            dr = cmd.ExecuteReader()
+            While dr.Read()
+                oProjPhase = New TimeCardSupport.ProjectPhaseDetails
+                oProjPhase.RecordId = dr.GetInt32(0)
+                oProjPhase.PhaseId = dr.GetString(1)
+                oProjPhase.PhaseDescription = dr.GetString(2)
+                cboPhases.Items.Add(oProjPhase)
+            End While
+            dr.Close()
+            cmd.Dispose()
+            dbConnection.Connection.Close()
+        End If
+    End Sub
+
+    Sub LoadPhaseJobs(oPhase As TimeCardSupport.ProjectPhaseDetails)
+        Dim cmd As OleDb.OleDbCommand
+        Dim dr As OleDb.OleDbDataReader
+        Dim oPr As OleDb.OleDbParameter
+        Dim oProjJob As TimeCardSupport.ProjectJobDetails
+        DGVTimeCardMaster.Rows.Clear()
+        cboJobs.Items.Clear()
+        cboJobs.DisplayMember = "DisplayName"
+        If dbConnection.GetConnection() Then
+            cmd = dbConnection.Connection.CreateCommand()
+            oPr = cmd.CreateParameter()
+            oPr.ParameterName = "@ParentId"
+            oPr.OleDbType = OleDb.OleDbType.Integer
+            oPr.Value = oPhase.RecordId
+            cmd.Parameters.Add(oPr)
+            cmd.CommandText = "SELECT RecordId, JobId, JobDesc, JobRate FROM ProjectPhaseJobs WHERE ParentId = @ParentId"
             dr = cmd.ExecuteReader()
             While dr.Read()
                 oProjJob = New TimeCardSupport.ProjectJobDetails
@@ -150,7 +193,7 @@
                 oProjJob.JobId = dr.GetString(1)
                 oProjJob.JobDescription = dr.GetString(2)
                 oProjJob.JobRate = dr.GetDouble(3)
-                cboProjJobs.Items.Add(oProjJob)
+                cboJobs.Items.Add(oProjJob)
             End While
             dr.Close()
             cmd.Dispose()
@@ -162,11 +205,17 @@
     Sub LoadProjectTimeCards(oProjJob As TimeCardSupport.ProjectJobDetails)
         Dim cmd As OleDb.OleDbCommand
         Dim dr As OleDb.OleDbDataReader
+        Dim oPr As OleDb.OleDbParameter
         Dim rw As DataGridViewRow
         DGVTimeCardMaster.Rows.Clear()
         If dbConnection.GetConnection() Then
             cmd = dbConnection.Connection.CreateCommand()
-            cmd.CommandText = "SELECT RecordId, TimeCardNumber, TimeCardMonth, TimeCardYear FROM ProjectTimeCardMaster WHERE JobId = " & oProjJob.recordId
+            oPr = cmd.CreateParameter()
+            oPr.ParameterName = "@ParentId"
+            oPr.OleDbType = OleDb.OleDbType.Integer
+            oPr.Value = oProjJob.recordId
+            cmd.Parameters.Add(oPr)
+            cmd.CommandText = "SELECT RecordId, TimeCardNumber, TimeCardMonth, TimeCardYear FROM ProjectTimeCardMaster WHERE ParentId = @ParentId"
             dr = cmd.ExecuteReader()
             While dr.Read()
                 rw = DGVTimeCardMaster.Rows(DGVTimeCardMaster.Rows.Add())
@@ -201,13 +250,14 @@
             If e.ColumnIndex = DGVTimeCardMaster.Columns("addNewRow").Index Then
                 DGVTimeCardMaster.Rows.Add()
             ElseIf e.ColumnIndex = DGVTimeCardMaster.Columns("delCurRow").Index Then
-                removeRow(e.RowIndex)
+                RemoveRow(e.RowIndex)
             End If
         End If
     End Sub
 
     Sub RemoveRow(iRowIndex As Integer)
         Dim cmd As OleDb.OleDbCommand
+        Dim oPr As OleDb.OleDbParameter
         Dim rw As DataGridViewRow
         rw = DGVTimeCardMaster.Rows(iRowIndex)
         If rw.Cells("recordId").FormattedValue = "" Then
@@ -215,7 +265,11 @@
         Else
             If dbConnection.GetConnection() Then
                 cmd = dbConnection.Connection.CreateCommand()
-                cmd.CommandText = "DELETE FROM ProjectTimeCardMaster WHERE RecordId = " & rw.Cells("recordId").FormattedValue
+                oPr = cmd.CreateParameter()
+                oPr.ParameterName = "@RecordId"
+                oPr.OleDbType = OleDb.OleDbType.Integer
+                oPr.Value = rw.Cells("recordId").FormattedValue
+                cmd.CommandText = "DELETE FROM ProjectTimeCardMaster WHERE RecordId = @RecordId"
                 cmd.ExecuteNonQuery()
                 cmd.Dispose()
                 dbConnection.Connection.Close()
@@ -226,65 +280,79 @@
 
     Private Sub DGVTimeCardMaster_CellEndEdit(sender As Object, e As DataGridViewCellEventArgs) Handles DGVTimeCardMaster.CellEndEdit
         Dim cmd As OleDb.OleDbCommand
+        Dim oParam As OleDb.OleDbParameter
         Dim sSQL As String
         Dim rw As DataGridViewRow
         rw = DGVTimeCardMaster.Rows(e.RowIndex)
         If rw.Cells("recordId").FormattedValue = "" Then
-            sSQL = "INSERT INTO ProjectTimeCardMaster(JobId, TimeCardNumber, TimeCardMonth, TimeCardYear) VALUES("
-            sSQL = sSQL & cboProjects.SelectedItem.recordId
-            If rw.Cells("timeCardNumber").FormattedValue = "" Then
-                sSQL = sSQL & ",NULL"
-            Else
-                sSQL = sSQL & "," & rw.Cells("timeCardNumber").FormattedValue
-            End If
-            If rw.Cells("timeCardMonth").FormattedValue = "" Then
-                sSQL = sSQL & ",NULL"
-            Else
-                sSQL = sSQL & "," & rw.Cells("timeCardMonth").FormattedValue
-            End If
-            If rw.Cells("timeCardYear").FormattedValue = "" Then
-                sSQL = sSQL & ",NULL"
-            Else
-                sSQL = sSQL & "," & rw.Cells("timeCardYear").FormattedValue
-            End If
-            sSQL = sSQL & ");"
-            If dbConnection.GetConnection() Then
-                cmd = dbConnection.Connection.CreateCommand()
-                cmd.CommandText = sSQL
+            sSQL = "INSERT INTO ProjectTimeCardMaster(ParentId, TimeCardNumber, TimeCardMonth, TimeCardYear) VALUES(@ParentId, @TimeCardNumber, @TimeCardMonth, @TimeCardYear);"
+        Else
+            sSQL = "UPDATE ProjectTimeCardMaster SET ParentId = @ParentId, TimeCardNumber = @TimeCardNumber, TimeCardMonth = @TimeCardMonth, TimeCardYear = @TimeCardYear WHERE RecordId = @RecordId;"
+        End If
+        If dbConnection.GetConnection() Then
+            cmd = dbConnection.Connection.CreateCommand()
+            cmd.CommandText = sSQL
+            oParam = cmd.CreateParameter()
+            With oParam
+                .ParameterName = "@ParentId"
+                .OleDbType = OleDb.OleDbType.Integer
+                .Value = cboJobs.SelectedItem.RecordId
+            End With
+            cmd.Parameters.Add(oParam)
+
+            oParam = cmd.CreateParameter()
+            With oParam
+                .ParameterName = "@TimeCardNumber"
+                .OleDbType = OleDb.OleDbType.Integer
+                If rw.Cells("timeCardNumber").FormattedValue = "" Then
+                    .Value = DBNull.Value
+                Else
+                    .Value = rw.Cells("timeCardNumber").FormattedValue
+                End If
+            End With
+            cmd.Parameters.Add(oParam)
+
+            oParam = cmd.CreateParameter()
+            With oParam
+                .ParameterName = "@TimeCardMonth"
+                .OleDbType = OleDb.OleDbType.Integer
+                If rw.Cells("timeCardMonth").FormattedValue = "" Then
+                    .Value = DBNull.Value
+                Else
+                    .Value = rw.Cells("timeCardMonth").FormattedValue
+                End If
+            End With
+            cmd.Parameters.Add(oParam)
+
+            oParam = cmd.CreateParameter()
+            With oParam
+                .ParameterName = "@TimeCardYear"
+                .OleDbType = OleDb.OleDbType.Integer
+                If rw.Cells("timeCardYear").FormattedValue = "" Then
+                    .Value = DBNull.Value
+                Else
+                    .Value = rw.Cells("timeCardYear").FormattedValue
+                End If
+            End With
+            cmd.Parameters.Add(oParam)
+
+            cmd.CommandText = sSQL
+            If rw.Cells("recordId").FormattedValue = "" Then
                 cmd.ExecuteNonQuery()
                 cmd.CommandText = "SELECT @@Identity"
                 rw.Cells("recordId").Value = cmd.ExecuteScalar()
-                cmd.Dispose()
-                dbConnection.Connection.Close()
-            End If
-        Else
-            sSQL = "UPDATE ProjectTimeCardMaster SET "
-            sSQL = sSQL & "timeCardNumber = "
-            If rw.Cells("timeCardNumber").FormattedValue = "" Then
-                sSQL = sSQL & "NULL"
             Else
-                sSQL = sSQL & rw.Cells("timeCardNumber").FormattedValue
-            End If
-            sSQL = sSQL & ",timeCardMonth = "
-            If rw.Cells("timeCardMonth").FormattedValue = "" Then
-                sSQL = sSQL & "NULL"
-            Else
-                sSQL = sSQL & rw.Cells("timeCardMonth").FormattedValue
-            End If
-            sSQL = sSQL & ",timeCardYear = "
-            If rw.Cells("timeCardYear").FormattedValue = "" Then
-                sSQL = sSQL & "NULL"
-            Else
-                sSQL = sSQL & rw.Cells("timeCardYear").FormattedValue
-            End If
-            sSQL = sSQL & " WHERE recordId = " & rw.Cells("recordId").FormattedValue
-            If dbConnection.GetConnection() Then
-                cmd = dbConnection.Connection.CreateCommand()
-                cmd.CommandText = sSQL
+                oParam = cmd.CreateParameter()
+                With oParam
+                    .ParameterName = "@RecordId"
+                    .OleDbType = OleDb.OleDbType.Integer
+                    .Value = rw.Cells("recordId").FormattedValue
+                End With
+                cmd.Parameters.Add(oParam)
                 cmd.ExecuteNonQuery()
-                cmd.Dispose()
-                dbConnection.Connection.Close()
             End If
+            cmd.Dispose()
+            dbConnection.Connection.Close()
         End If
     End Sub
 
@@ -349,9 +417,15 @@
         End If
     End Sub
 
-    Private Sub cboProjJobs_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cboProjJobs.SelectedIndexChanged
-        If cboProjJobs.SelectedIndex >= 0 Then
-            LoadProjectTimeCards(cboProjJobs.SelectedItem)
+    Private Sub cboProjJobs_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cboJobs.SelectedIndexChanged
+        If cboJobs.SelectedIndex >= 0 Then
+            LoadProjectTimeCards(cboJobs.SelectedItem)
+        End If
+    End Sub
+
+    Private Sub cboPhases_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cboPhases.SelectedIndexChanged
+        If cboPhases.SelectedIndex >= 0 Then
+            LoadPhaseJobs(cboPhases.SelectedItem)
         End If
     End Sub
 End Class

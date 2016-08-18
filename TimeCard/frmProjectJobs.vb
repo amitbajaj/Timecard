@@ -2,7 +2,7 @@
     Private dbConnection As TimeCardDataAccess
     Private Sub frmProjectJobs_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         dbConnection = New TimeCardDataAccess()
-        dbConnection.DatabaseFile = My.Settings.Item("DBFile")
+        dbConnection.DatabaseFile = dbConnection.DefaultDatabaseFile
         InitializeGrid()
         LoadCustomers()
     End Sub
@@ -96,6 +96,8 @@
 
     Private Sub cboCustomers_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cboCustomers.SelectedIndexChanged
         DGVProjectJobs.Rows.Clear()
+        cboProjects.Items.Clear()
+        cboPhases.Items.Clear()
         If cboCustomers.SelectedIndex >= 0 Then
             LoadCustomerProjects(cboCustomers.SelectedItem)
         End If
@@ -104,12 +106,23 @@
     Sub LoadCustomerProjects(oCust As TimeCardSupport.CustomerDetails)
         Dim cmd As OleDb.OleDbCommand
         Dim dr As OleDb.OleDbDataReader
+        Dim oParam As OleDb.OleDbParameter
         Dim oProj As TimeCardSupport.ProjectDetails
         cboProjects.Items.Clear()
         cboProjects.DisplayMember = "DisplayName"
         If dbConnection.GetConnection() Then
             cmd = dbConnection.Connection.CreateCommand()
-            cmd.CommandText = "SELECT RecordId, ProjectId, ProjectDesc, ProjectRate FROM CustomerProjects WHERE CustomerId = " & oCust.recordId
+            cmd.CommandText = "SELECT RecordId, ProjectId, ProjectDesc, ProjectRate FROM CustomerProjects WHERE ParentId = ?"
+            oParam = cmd.CreateParameter()
+            With oParam
+                .ParameterName = "ParentId"
+                .OleDbType = OleDb.OleDbType.Numeric
+                .Value = oCust.recordId
+            End With
+            cmd.Parameters.Add(oParam)
+            oParam = Nothing
+
+
             dr = cmd.ExecuteReader()
             While dr.Read()
                 oProj = New TimeCardSupport.ProjectDetails
@@ -126,19 +139,70 @@
     End Sub
 
     Private Sub cboProjects_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cboProjects.SelectedIndexChanged
+        DGVProjectJobs.Rows.Clear()
+        cboPhases.Items.Clear()
         If cboProjects.SelectedIndex >= 0 Then
-            LoadProjectJobs(cboProjects.SelectedItem)
+            LoadProjectPhases(cboProjects.SelectedItem)
         End If
     End Sub
 
-    Sub LoadProjectJobs(oProj As TimeCardSupport.ProjectDetails)
+    Sub LoadProjectPhases(oProj As TimeCardSupport.ProjectDetails)
         Dim cmd As OleDb.OleDbCommand
         Dim dr As OleDb.OleDbDataReader
+        Dim oParam As OleDb.OleDbParameter
+        Dim oProjPhase As TimeCardSupport.ProjectPhaseDetails
+        If dbConnection.GetConnection() Then
+            cmd = dbConnection.Connection.CreateCommand()
+            oParam = cmd.CreateParameter()
+            With oParam
+                .ParameterName = "@ParentId"
+                .OleDbType = OleDb.OleDbType.Integer
+                .Value = oProj.recordId
+            End With
+            cmd.Parameters.Add(oParam)
+            cmd.CommandText = "SELECT RecordId, PhaseId, PhaseDesc FROM ProjectPhases WHERE ParentId = @ParentId"
+            dr = cmd.ExecuteReader()
+            cboPhases.DisplayMember = "DisplayName"
+            While dr.Read()
+                oProjPhase = New TimeCardSupport.ProjectPhaseDetails
+                oProjPhase.RecordId = dr.GetInt32(0)
+                If dr.IsDBNull(1) Then
+                    oProjPhase.PhaseId = "-"
+                Else
+                    oProjPhase.PhaseId = dr.GetString(1)
+                End If
+
+                If dr.IsDBNull(2) Then
+                    oProjPhase.PhaseDescription = "-"
+                Else
+                    oProjPhase.PhaseDescription = dr.GetString(2)
+                End If
+                cboPhases.Items.Add(oProjPhase)
+            End While
+            dr.Close()
+            cmd.Dispose()
+            dbConnection.Connection.Close()
+        End If
+    End Sub
+
+    Sub LoadProjectPhaseJobs(oProj As TimeCardSupport.ProjectPhaseDetails)
+        Dim cmd As OleDb.OleDbCommand
+        Dim dr As OleDb.OleDbDataReader
+        Dim oParam As OleDb.OleDbParameter
         Dim rw As DataGridViewRow
         DGVProjectJobs.Rows.Clear()
         If dbConnection.GetConnection() Then
             cmd = dbConnection.Connection.CreateCommand()
-            cmd.CommandText = "SELECT RecordId, JobId, JobDesc, JobRate FROM ProjectJobs WHERE ProjectId = " & oProj.recordId
+            cmd.CommandText = "SELECT RecordId, JobId, JobDesc, JobRate FROM ProjectPhaseJobs WHERE ParentId = ?"
+            oParam = cmd.CreateParameter()
+            With oParam
+                .ParameterName = "ParentId"
+                .OleDbType = OleDb.OleDbType.Numeric
+                .Value = oProj.RecordId
+            End With
+            cmd.Parameters.Add(oParam)
+            oParam = Nothing
+
             dr = cmd.ExecuteReader()
             While dr.Read()
                 rw = DGVProjectJobs.Rows(DGVProjectJobs.Rows.Add())
@@ -181,13 +245,24 @@
     Sub RemoveRow(iRowIndex As Integer)
         Dim cmd As OleDb.OleDbCommand
         Dim rw As DataGridViewRow
+        Dim oParam As OleDb.OleDbParameter
         rw = DGVProjectJobs.Rows(iRowIndex)
         If rw.Cells("recordId").FormattedValue = "" Then
             DGVProjectJobs.Rows.RemoveAt(iRowIndex)
         Else
             If dbConnection.GetConnection() Then
                 cmd = dbConnection.Connection.CreateCommand()
-                cmd.CommandText = "DELETE FROM ProjectJobs WHERE RecordId = " & rw.Cells("recordId").FormattedValue
+                cmd.CommandText = "DELETE FROM ProjectPhaseJobs WHERE RecordId = ?"
+                oParam = cmd.CreateParameter()
+                With oParam
+                    .ParameterName = "RecId"
+                    .OleDbType = OleDb.OleDbType.VarChar
+                    .Value = rw.Cells("recordId").FormattedValue
+                End With
+                cmd.Parameters.Add(oParam)
+                oParam = Nothing
+
+
                 cmd.ExecuteNonQuery()
                 cmd.Dispose()
                 dbConnection.Connection.Close()
@@ -198,65 +273,92 @@
 
     Private Sub DGVProjectJobs_CellEndEdit(sender As Object, e As DataGridViewCellEventArgs) Handles DGVProjectJobs.CellEndEdit
         Dim cmd As OleDb.OleDbCommand
+        Dim oParam As OleDb.OleDbParameter
         Dim sSQL As String
         Dim rw As DataGridViewRow
+        Dim bNewRec As Boolean
         rw = DGVProjectJobs.Rows(e.RowIndex)
         If rw.Cells("recordId").FormattedValue = "" Then
-            sSQL = "INSERT INTO ProjectJobs(ProjectId, JobId, JobDesc, JobRate) VALUES("
-            sSQL = sSQL & cboProjects.SelectedItem.recordId
-            If rw.Cells("jobId").FormattedValue = "" Then
-                sSQL = sSQL & ",NULL"
-            Else
-                sSQL = sSQL & ",'" & rw.Cells("jobId").FormattedValue & "'"
-            End If
-            If rw.Cells("jobDesc").FormattedValue = "" Then
-                sSQL = sSQL & ",NULL"
-            Else
-                sSQL = sSQL & ",'" & rw.Cells("jobDesc").FormattedValue & "'"
-            End If
-            If rw.Cells("jobRate").FormattedValue = "" Then
-                sSQL = sSQL & ",NULL"
-            Else
-                sSQL = sSQL & "," & rw.Cells("jobRate").FormattedValue
-            End If
-            sSQL = sSQL & ");"
-            If dbConnection.GetConnection() Then
-                cmd = dbConnection.Connection.CreateCommand()
-                cmd.CommandText = sSQL
+            bNewRec = True
+        Else
+            bNewRec = False
+        End If
+        If bNewRec Then
+            sSQL = "INSERT INTO ProjectPhaseJobs(ParentId, JobId, JobDesc, JobRate) VALUES(@ParentId,@JobId,@JobDesc,@JobRate)"
+        Else
+            sSQL = "UPDATE ProjectPhaseJobs SET ParentId = @ParentId, JobId = @JobId, JobDesc = @JobDesc, JobRate = @JobRate WHERE RecordId = @RecId"
+        End If
+        If dbConnection.GetConnection() Then
+            cmd = dbConnection.Connection.CreateCommand()
+            cmd.CommandText = sSQL
+
+            oParam = cmd.CreateParameter()
+            With oParam
+                .ParameterName = "@ParentId"
+                .OleDbType = OleDb.OleDbType.Numeric
+                .Value = cboProjects.SelectedItem.recordId
+            End With
+            cmd.Parameters.Add(oParam)
+            oParam = Nothing
+
+            oParam = cmd.CreateParameter()
+            With oParam
+                .ParameterName = "@JobId"
+                .OleDbType = OleDb.OleDbType.VarChar
+                If rw.Cells("jobId").FormattedValue = "" Then
+                    .Value = DBNull.Value
+                Else
+                    .Value = rw.Cells("jobId").FormattedValue
+                End If
+
+            End With
+            cmd.Parameters.Add(oParam)
+            oParam = Nothing
+
+            oParam = cmd.CreateParameter()
+            With oParam
+                .ParameterName = "@JobDesc"
+                .OleDbType = OleDb.OleDbType.VarChar
+                If rw.Cells("jobDesc").FormattedValue = "" Then
+                    .Value = DBNull.Value
+                Else
+                    .Value = rw.Cells("jobDesc").FormattedValue
+                End If
+
+            End With
+            cmd.Parameters.Add(oParam)
+            oParam = Nothing
+
+            oParam = cmd.CreateParameter()
+            With oParam
+                .ParameterName = "@JobRate"
+                .OleDbType = OleDb.OleDbType.Double
+                If rw.Cells("jobRate").FormattedValue = "" Then
+                    .Value = DBNull.Value
+                Else
+                    .Value = rw.Cells("jobRate").FormattedValue
+                End If
+
+            End With
+            cmd.Parameters.Add(oParam)
+            oParam = Nothing
+            If bNewRec Then
                 cmd.ExecuteNonQuery()
                 cmd.CommandText = "SELECT @@Identity"
                 rw.Cells("recordId").Value = cmd.ExecuteScalar()
-                cmd.Dispose()
-                dbConnection.Connection.Close()
-            End If
-        Else
-            sSQL = "UPDATE ProjectJobs SET "
-            sSQL = sSQL & "JobId = "
-            If rw.Cells("jobId").FormattedValue = "" Then
-                sSQL = sSQL & "NULL"
             Else
-                sSQL = sSQL & "'" & rw.Cells("jobId").FormattedValue & "'"
-            End If
-            sSQL = sSQL & ",JobDesc = "
-            If rw.Cells("jobDesc").FormattedValue = "" Then
-                sSQL = sSQL & "NULL"
-            Else
-                sSQL = sSQL & "'" & rw.Cells("jobDesc").FormattedValue & "'"
-            End If
-            sSQL = sSQL & ",jobRate = "
-            If rw.Cells("jobRate").FormattedValue = "" Then
-                sSQL = sSQL & "NULL"
-            Else
-                sSQL = sSQL & rw.Cells("jobRate").FormattedValue
-            End If
-            sSQL = sSQL & " WHERE RecordId = " & rw.Cells("recordId").FormattedValue
-            If dbConnection.GetConnection() Then
-                cmd = dbConnection.Connection.CreateCommand()
-                cmd.CommandText = sSQL
+                oParam = cmd.CreateParameter()
+                With oParam
+                    .ParameterName = "@RecordId"
+                    .OleDbType = OleDb.OleDbType.Double
+                    .Value = rw.Cells("recordId").FormattedValue
+                End With
+                cmd.Parameters.Add(oParam)
+                oParam = Nothing
                 cmd.ExecuteNonQuery()
-                cmd.Dispose()
-                dbConnection.Connection.Close()
             End If
+            cmd.Dispose()
+            dbConnection.Connection.Close()
         End If
     End Sub
 
@@ -293,6 +395,13 @@
                 End If
                 e.Handled = True
             End With
+        End If
+    End Sub
+
+    Private Sub cboPhases_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cboPhases.SelectedIndexChanged
+        DGVProjectJobs.Rows.Clear()
+        If cboPhases.SelectedIndex >= 0 Then
+            LoadProjectPhaseJobs(cboPhases.SelectedItem)
         End If
     End Sub
 End Class

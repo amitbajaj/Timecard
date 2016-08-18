@@ -1,5 +1,9 @@
 ﻿Public Class TimeCardSupport
 
+    Public Shared NumberOfDecimals As Integer = My.Settings.NumberOfDecimals
+    Public Shared NumberFormat As String = My.Settings.NumberFormat
+    Public Shared DatabaseFile As String = My.Settings.DBFile
+
     Public Class GridTotals
         Private _RegHrs As Double
         Private _OT1Hrs As Double
@@ -105,6 +109,46 @@
             End If
             Return sHrs & ":" & sMin
         End Function
+    End Class
+
+    Public Class ProjectPhaseDetails
+        Private _recordId As Integer
+        Private _phaseId As String
+        Private _phaseDesc As String
+
+        Public ReadOnly Property DisplayName As String
+            Get
+                Return _phaseId & " # " & _phaseDesc
+            End Get
+        End Property
+
+        Public Property RecordId As Integer
+            Get
+                Return _recordId
+            End Get
+            Set(value As Integer)
+                _recordId = value
+            End Set
+        End Property
+
+        Public Property PhaseId As String
+            Get
+                Return _phaseId
+            End Get
+            Set(value As String)
+                _phaseId = value
+            End Set
+        End Property
+
+        Public Property PhaseDescription As String
+            Get
+                Return _phaseDesc
+            End Get
+            Set(value As String)
+                _phaseDesc = value
+            End Set
+        End Property
+
     End Class
 
     Public Class ProjectJobDetails
@@ -246,7 +290,6 @@
 
     End Class
 
-
     Public Class UserDetails
         Private _recordId As Integer
         Private _userId As Integer
@@ -302,7 +345,6 @@
             End Set
         End Property
     End Class
-
 
     Public Class TimeCardMasterDetails
         Private _recordId As Integer
@@ -385,6 +427,7 @@
         End Property
 
     End Class
+
     Private Class MonthClass
         Private _monthNumber As Short
         Private _monthName As String
@@ -412,6 +455,7 @@
             End Get
         End Property
     End Class
+
     Public Shared Function ValidateCell(cboTimeCards As ComboBox, DGVTimeCardDetails As DataGridView, iColumnIndex As Integer, iRowIndex As Integer, sValue As String) As Boolean
         Dim dDate As Date
         Dim iDay As Integer
@@ -455,6 +499,7 @@
             ValidateCell = True
         End If
     End Function
+
     Private Shared Function ValidateDate(iDay As Integer, iMonth As Integer, iYear As Integer) As Boolean
         Dim days_in_month(13) As Integer
         ValidateDate = True
@@ -468,6 +513,7 @@
             ValidateDate = False
         End If
     End Function
+
     Private Shared Function isLeapYear(iYear As Integer) As Boolean
         If iYear Mod 4 <> 0 Then
             isLeapYear = False
@@ -480,21 +526,23 @@
         End If
     End Function
 
-    Public Shared Sub CalculateCost(dBasic As Double, rw As DataGridViewRow, iDecimals As Integer, sNumberFormat As String, inTime As Date, outTime As Date, isHoliday As Boolean)
+    Public Shared Sub CalculateCost(dBasic As Double, rw As DataGridViewRow, iDecimals As Integer, sNumberFormat As String, inTime As Date, outTime As Date, isHoliday As Boolean, isAbsent As Boolean)
         Dim dReg, dOT1, dOT2, dTotal As Double
         Dim oTime As TimeCardSupport.TimeField
         dReg = 0
         dOT1 = 0
         dOT2 = 0
         dBasic = (dBasic / 30) / 8
-        dReg = outTime.Subtract(inTime).TotalHours
-        If isHoliday Then
-            dOT2 = dReg
-            dReg = 0
-            dOT1 = 0
-        ElseIf dReg > 8 Then
-            dOT1 = dReg - 8
-            dReg = 8
+        If Not isAbsent Then
+            dReg = outTime.Subtract(inTime).TotalHours
+            If isHoliday Then
+                dOT2 = dReg
+                dReg = 0
+                dOT1 = 0
+            ElseIf dReg > 8 Then
+                dOT1 = dReg - 8
+                dReg = 8
+            End If
         End If
         dTotal = (dReg * dBasic) + (dOT1 * dBasic * 1.25) + (dOT2 * dBasic * 1.5)
         oTime = New TimeField
@@ -511,22 +559,34 @@
         Dim oGridTotal As New GridTotals
         Dim rCalc As DataGridViewRow
         Dim dReg, dOT1, dOT2, dTotal As Double
+        Dim oTime As New TimeField
+        dReg = 0
+        dOT1 = 0
+        dOT2 = 0
+        dTotal = 0
         For Each rCalc In DGVTimeCardDetails.Rows
 
-            If rCalc.Cells("regularHrs").Value IsNot Nothing Then
-                If Not Double.TryParse(rCalc.Cells("regularHrs").Value, dReg) Then
-                    dReg = 0
-                End If
+            If rCalc.Cells("regularHrs").FormattedValue = "" Then
+                dReg = 0
+            Else
+                oTime.SetTime(0)
+                oTime.SetTime(rCalc.Cells("regularHrs").FormattedValue)
+                dReg = oTime.GetTime()
             End If
-            If rCalc.Cells("OT1").Value IsNot Nothing Then
-                If Not Double.TryParse(rCalc.Cells("OT1").Value, dOT1) Then
-                    dOT1 = 0
-                End If
+            If rCalc.Cells("OT1").FormattedValue = "" Then
+                dOT1 = 0
+            Else
+                oTime.SetTime(0)
+                oTime.SetTime(rCalc.Cells("OT1").FormattedValue)
+                dOT1 = oTime.GetTime()
             End If
-            If rCalc.Cells("OT2").Value IsNot Nothing Then
-                If Not Double.TryParse(rCalc.Cells("OT2").Value, dOT2) Then
-                    dOT2 = 0
-                End If
+
+            If rCalc.Cells("OT2").FormattedValue = "" Then
+                dOT2 = 0
+            Else
+                oTime.SetTime(0)
+                oTime.SetTime(rCalc.Cells("OT2").FormattedValue)
+                dOT2 = oTime.GetTime()
             End If
 
             If rCalc.Cells("totalCost").Value IsNot Nothing Then
@@ -548,4 +608,5 @@
         iHrs = CInt(dValue Mod 8)
         Return iDays & " days, " & iHrs & " hours"
     End Function
+
 End Class

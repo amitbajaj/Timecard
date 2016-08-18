@@ -12,6 +12,9 @@ Partial Class frmProjectTimeCard
         Finally
             MyBase.Dispose(disposing)
         End Try
+        If dbConnection IsNot Nothing Then
+            dbConnection.Dispose()
+        End If
     End Sub
 
     'Required by the Windows Form Designer
@@ -30,7 +33,8 @@ Partial Class frmProjectTimeCard
         Me.lblRegHrs = New System.Windows.Forms.Label()
         Me.lblOT1 = New System.Windows.Forms.Label()
         Me.lblOT2 = New System.Windows.Forms.Label()
-        Me.cboProjJobs = New System.Windows.Forms.ComboBox()
+        Me.cboJobs = New System.Windows.Forms.ComboBox()
+        Me.cboPhases = New System.Windows.Forms.ComboBox()
         CType(Me.DGVTimeCardDetails, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
@@ -58,7 +62,7 @@ Partial Class frmProjectTimeCard
         Me.cboCustomers.FormattingEnabled = True
         Me.cboCustomers.Location = New System.Drawing.Point(12, 9)
         Me.cboCustomers.Name = "cboCustomers"
-        Me.cboCustomers.Size = New System.Drawing.Size(196, 21)
+        Me.cboCustomers.Size = New System.Drawing.Size(163, 21)
         Me.cboCustomers.TabIndex = 6
         '
         'DGVTimeCardDetails
@@ -75,9 +79,9 @@ Partial Class frmProjectTimeCard
         Me.cboProjects.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboProjects.FlatStyle = System.Windows.Forms.FlatStyle.System
         Me.cboProjects.FormattingEnabled = True
-        Me.cboProjects.Location = New System.Drawing.Point(214, 9)
+        Me.cboProjects.Location = New System.Drawing.Point(181, 9)
         Me.cboProjects.Name = "cboProjects"
-        Me.cboProjects.Size = New System.Drawing.Size(206, 21)
+        Me.cboProjects.Size = New System.Drawing.Size(163, 21)
         Me.cboProjects.TabIndex = 9
         '
         'lblRegHrs
@@ -107,22 +111,33 @@ Partial Class frmProjectTimeCard
         Me.lblOT2.TabIndex = 12
         Me.lblOT2.Text = "lblOT2"
         '
-        'cboProjJobs
+        'cboJobs
         '
-        Me.cboProjJobs.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboProjJobs.FlatStyle = System.Windows.Forms.FlatStyle.System
-        Me.cboProjJobs.FormattingEnabled = True
-        Me.cboProjJobs.Location = New System.Drawing.Point(426, 9)
-        Me.cboProjJobs.Name = "cboProjJobs"
-        Me.cboProjJobs.Size = New System.Drawing.Size(233, 21)
-        Me.cboProjJobs.TabIndex = 13
+        Me.cboJobs.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cboJobs.FlatStyle = System.Windows.Forms.FlatStyle.System
+        Me.cboJobs.FormattingEnabled = True
+        Me.cboJobs.Location = New System.Drawing.Point(507, 9)
+        Me.cboJobs.Name = "cboJobs"
+        Me.cboJobs.Size = New System.Drawing.Size(152, 21)
+        Me.cboJobs.TabIndex = 13
+        '
+        'cboPhases
+        '
+        Me.cboPhases.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cboPhases.FlatStyle = System.Windows.Forms.FlatStyle.System
+        Me.cboPhases.FormattingEnabled = True
+        Me.cboPhases.Location = New System.Drawing.Point(350, 9)
+        Me.cboPhases.Name = "cboPhases"
+        Me.cboPhases.Size = New System.Drawing.Size(151, 21)
+        Me.cboPhases.TabIndex = 14
         '
         'frmProjectTimeCard
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(846, 315)
-        Me.Controls.Add(Me.cboProjJobs)
+        Me.Controls.Add(Me.cboPhases)
+        Me.Controls.Add(Me.cboJobs)
         Me.Controls.Add(Me.lblOT2)
         Me.Controls.Add(Me.lblOT1)
         Me.Controls.Add(Me.lblRegHrs)
@@ -148,5 +163,6 @@ Partial Class frmProjectTimeCard
     Friend WithEvents lblRegHrs As Label
     Friend WithEvents lblOT1 As Label
     Friend WithEvents lblOT2 As Label
-    Friend WithEvents cboProjJobs As ComboBox
+    Friend WithEvents cboJobs As ComboBox
+    Friend WithEvents cboPhases As ComboBox
 End Class

@@ -12,6 +12,9 @@ Partial Class frmProjectTimeCardMaster
         Finally
             MyBase.Dispose(disposing)
         End Try
+        If dbConnection IsNot Nothing Then
+            dbConnection.Dispose()
+        End If
     End Sub
 
     'Required by the Windows Form Designer
@@ -25,7 +28,8 @@ Partial Class frmProjectTimeCardMaster
         Me.DGVTimeCardMaster = New System.Windows.Forms.DataGridView()
         Me.cboCustomers = New System.Windows.Forms.ComboBox()
         Me.cboProjects = New System.Windows.Forms.ComboBox()
-        Me.cboProjJobs = New System.Windows.Forms.ComboBox()
+        Me.cboJobs = New System.Windows.Forms.ComboBox()
+        Me.cboPhases = New System.Windows.Forms.ComboBox()
         CType(Me.DGVTimeCardMaster, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
@@ -46,7 +50,7 @@ Partial Class frmProjectTimeCardMaster
         Me.cboCustomers.FormattingEnabled = True
         Me.cboCustomers.Location = New System.Drawing.Point(12, 8)
         Me.cboCustomers.Name = "cboCustomers"
-        Me.cboCustomers.Size = New System.Drawing.Size(218, 21)
+        Me.cboCustomers.Size = New System.Drawing.Size(141, 21)
         Me.cboCustomers.TabIndex = 2
         '
         'cboProjects
@@ -54,27 +58,38 @@ Partial Class frmProjectTimeCardMaster
         Me.cboProjects.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboProjects.FlatStyle = System.Windows.Forms.FlatStyle.System
         Me.cboProjects.FormattingEnabled = True
-        Me.cboProjects.Location = New System.Drawing.Point(236, 8)
+        Me.cboProjects.Location = New System.Drawing.Point(159, 8)
         Me.cboProjects.Name = "cboProjects"
-        Me.cboProjects.Size = New System.Drawing.Size(174, 21)
+        Me.cboProjects.Size = New System.Drawing.Size(163, 21)
         Me.cboProjects.TabIndex = 4
         '
-        'cboProjJobs
+        'cboJobs
         '
-        Me.cboProjJobs.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboProjJobs.FlatStyle = System.Windows.Forms.FlatStyle.System
-        Me.cboProjJobs.FormattingEnabled = True
-        Me.cboProjJobs.Location = New System.Drawing.Point(416, 8)
-        Me.cboProjJobs.Name = "cboProjJobs"
-        Me.cboProjJobs.Size = New System.Drawing.Size(218, 21)
-        Me.cboProjJobs.TabIndex = 5
+        Me.cboJobs.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cboJobs.FlatStyle = System.Windows.Forms.FlatStyle.System
+        Me.cboJobs.FormattingEnabled = True
+        Me.cboJobs.Location = New System.Drawing.Point(484, 8)
+        Me.cboJobs.Name = "cboJobs"
+        Me.cboJobs.Size = New System.Drawing.Size(150, 21)
+        Me.cboJobs.TabIndex = 5
+        '
+        'cboPhases
+        '
+        Me.cboPhases.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cboPhases.FlatStyle = System.Windows.Forms.FlatStyle.System
+        Me.cboPhases.FormattingEnabled = True
+        Me.cboPhases.Location = New System.Drawing.Point(328, 8)
+        Me.cboPhases.Name = "cboPhases"
+        Me.cboPhases.Size = New System.Drawing.Size(150, 21)
+        Me.cboPhases.TabIndex = 6
         '
         'frmProjectTimeCardMaster
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(647, 313)
-        Me.Controls.Add(Me.cboProjJobs)
+        Me.Controls.Add(Me.cboPhases)
+        Me.Controls.Add(Me.cboJobs)
         Me.Controls.Add(Me.cboProjects)
         Me.Controls.Add(Me.DGVTimeCardMaster)
         Me.Controls.Add(Me.cboCustomers)
@@ -88,5 +103,6 @@ Partial Class frmProjectTimeCardMaster
     Friend WithEvents DGVTimeCardMaster As DataGridView
     Friend WithEvents cboCustomers As ComboBox
     Friend WithEvents cboProjects As ComboBox
-    Friend WithEvents cboProjJobs As ComboBox
+    Friend WithEvents cboJobs As ComboBox
+    Friend WithEvents cboPhases As ComboBox
 End Class

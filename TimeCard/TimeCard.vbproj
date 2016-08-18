@@ -13,6 +13,21 @@
     <MyType>WindowsForms</MyType>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <TargetFrameworkProfile />
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -45,6 +60,9 @@
   </PropertyGroup>
   <PropertyGroup>
     <OptionInfer>On</OptionInfer>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignManifests>false</SignManifests>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="CrystalDecisions.CrystalReports.Engine, Version=13.0.2000.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=MSIL" />
@@ -82,6 +100,12 @@
     <Compile Include="frmProjectMaster.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="frmProjectPhases.Designer.vb">
+      <DependentUpon>frmProjectPhases.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmProjectPhases.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="frmProjectTimeCard.Designer.vb">
       <DependentUpon>frmProjectTimeCard.vb</DependentUpon>
     </Compile>
@@ -99,6 +123,12 @@
     </Compile>
     <Compile Include="frmProjectTimeCardMaster.vb">
       <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MyDataGrid.Designer.vb">
+      <DependentUpon>MyDataGrid.vb</DependentUpon>
+    </Compile>
+    <Compile Include="MyDataGrid.vb">
+      <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="TimeCardSupport.vb" />
     <Compile Include="frmCustomerMaster.Designer.vb">
@@ -201,6 +231,9 @@
     <EmbeddedResource Include="frmProjectJobs.resx">
       <DependentUpon>frmProjectJobs.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="frmProjectPhases.resx">
+      <DependentUpon>frmProjectPhases.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="frmProjectTimeCardMaster.resx">
       <DependentUpon>frmProjectTimeCardMaster.vb</DependentUpon>
     </EmbeddedResource>
@@ -231,6 +264,9 @@
     <EmbeddedResource Include="frmProjectTimeCard.resx">
       <DependentUpon>frmProjectTimeCard.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="MyDataGrid.resx">
+      <DependentUpon>MyDataGrid.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="rptTimeCard.rpt">
       <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
       <LastGenOutput>rptTimeCard.vb</LastGenOutput>
@@ -258,6 +294,13 @@
     <Content Include="TimeCard.mdb">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
