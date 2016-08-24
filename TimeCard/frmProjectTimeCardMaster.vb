@@ -74,7 +74,7 @@
         cboCustomers.DisplayMember = "displayName"
         If dbConnection.GetConnection() Then
             cmd = dbConnection.Connection.CreateCommand()
-            cmd.CommandText = "SELECT recordId, CustomerId, CustomerName FROM CustomerMaster"
+            cmd.CommandText = "SELECT recordId, CustomerId, CustomerName FROM customerMaster"
             dr = cmd.ExecuteReader()
             While dr.Read()
                 oCust = New TimeCardSupport.CustomerDetails
@@ -117,7 +117,7 @@
             oPr.OleDbType = OleDb.OleDbType.Integer
             oPr.Value = oCust.recordId
             cmd.Parameters.Add(oPr)
-            cmd.CommandText = "SELECT RecordId, ProjectId, ProjectDesc, ProjectRate FROM CustomerProjects WHERE ParentId = @ParentId"
+            cmd.CommandText = "SELECT RecordId, ProjectId, ProjectDesc, ProjectRate FROM customerProjects WHERE ParentId = @ParentId"
             dr = cmd.ExecuteReader()
             While dr.Read()
                 oProj = New TimeCardSupport.ProjectDetails
@@ -155,7 +155,7 @@
             oPr.OleDbType = OleDb.OleDbType.Integer
             oPr.Value = oProj.recordId
             cmd.Parameters.Add(oPr)
-            cmd.CommandText = "SELECT RecordId, PhaseId, PhaseDesc FROM ProjectPhases WHERE ParentId = @ParentId"
+            cmd.CommandText = "SELECT RecordId, PhaseId, PhaseDesc FROM customerProjectPhases WHERE ParentId = @ParentId"
             dr = cmd.ExecuteReader()
             While dr.Read()
                 oProjPhase = New TimeCardSupport.ProjectPhaseDetails
@@ -185,7 +185,7 @@
             oPr.OleDbType = OleDb.OleDbType.Integer
             oPr.Value = oPhase.RecordId
             cmd.Parameters.Add(oPr)
-            cmd.CommandText = "SELECT RecordId, JobId, JobDesc, JobRate FROM ProjectPhaseJobs WHERE ParentId = @ParentId"
+            cmd.CommandText = "SELECT RecordId, JobId, JobDesc, JobRate FROM customerProjPhaseJobs WHERE ParentId = @ParentId"
             dr = cmd.ExecuteReader()
             While dr.Read()
                 oProjJob = New TimeCardSupport.ProjectJobDetails
@@ -215,7 +215,7 @@
             oPr.OleDbType = OleDb.OleDbType.Integer
             oPr.Value = oProjJob.recordId
             cmd.Parameters.Add(oPr)
-            cmd.CommandText = "SELECT RecordId, TimeCardNumber, TimeCardMonth, TimeCardYear FROM ProjectTimeCardMaster WHERE ParentId = @ParentId"
+            cmd.CommandText = "SELECT RecordId, TimeCardNumber, TimeCardMonth, TimeCardYear FROM customerProjPhaseJobTimeCard WHERE ParentId = @ParentId"
             dr = cmd.ExecuteReader()
             While dr.Read()
                 rw = DGVTimeCardMaster.Rows(DGVTimeCardMaster.Rows.Add())
@@ -269,7 +269,8 @@
                 oPr.ParameterName = "@RecordId"
                 oPr.OleDbType = OleDb.OleDbType.Integer
                 oPr.Value = rw.Cells("recordId").FormattedValue
-                cmd.CommandText = "DELETE FROM ProjectTimeCardMaster WHERE RecordId = @RecordId"
+                cmd.Parameters.Add(oPr)
+                cmd.CommandText = "DELETE FROM customerProjPhaseJobTimeCard WHERE RecordId = @RecordId"
                 cmd.ExecuteNonQuery()
                 cmd.Dispose()
                 dbConnection.Connection.Close()
@@ -285,9 +286,9 @@
         Dim rw As DataGridViewRow
         rw = DGVTimeCardMaster.Rows(e.RowIndex)
         If rw.Cells("recordId").FormattedValue = "" Then
-            sSQL = "INSERT INTO ProjectTimeCardMaster(ParentId, TimeCardNumber, TimeCardMonth, TimeCardYear) VALUES(@ParentId, @TimeCardNumber, @TimeCardMonth, @TimeCardYear);"
+            sSQL = "INSERT INTO customerProjPhaseJobTimeCard(ParentId, TimeCardNumber, TimeCardMonth, TimeCardYear) VALUES(@ParentId, @TimeCardNumber, @TimeCardMonth, @TimeCardYear);"
         Else
-            sSQL = "UPDATE ProjectTimeCardMaster SET ParentId = @ParentId, TimeCardNumber = @TimeCardNumber, TimeCardMonth = @TimeCardMonth, TimeCardYear = @TimeCardYear WHERE RecordId = @RecordId;"
+            sSQL = "UPDATE customerProjPhaseJobTimeCard SET ParentId = @ParentId, TimeCardNumber = @TimeCardNumber, TimeCardMonth = @TimeCardMonth, TimeCardYear = @TimeCardYear WHERE RecordId = @RecordId;"
         End If
         If dbConnection.GetConnection() Then
             cmd = dbConnection.Connection.CreateCommand()

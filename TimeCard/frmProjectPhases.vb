@@ -20,7 +20,7 @@
         cboCustomers.DisplayMember = "displayName"
         If dbConnection.GetConnection() Then
             cmd = dbConnection.Connection.CreateCommand()
-            cmd.CommandText = "SELECT recordId, CustomerId, CustomerName FROM CustomerMaster"
+            cmd.CommandText = "SELECT recordId, CustomerId, CustomerName FROM customerMaster"
             dr = cmd.ExecuteReader()
             While dr.Read()
                 oCust = New TimeCardSupport.CustomerDetails
@@ -51,7 +51,7 @@
         cboProjects.DisplayMember = "DisplayName"
         If dbConnection.GetConnection() Then
             cmd = dbConnection.Connection.CreateCommand()
-            cmd.CommandText = "SELECT RecordId, ProjectId, ProjectDesc, ProjectRate FROM CustomerProjects WHERE ParentId = ?"
+            cmd.CommandText = "SELECT RecordId, ProjectId, ProjectDesc, ProjectRate FROM customerProjects WHERE ParentId = ?"
             oParam = cmd.CreateParameter()
             With oParam
                 .ParameterName = "ParentId"
@@ -101,7 +101,7 @@
                 .Value = oProj.recordId
             End With
             cmd.Parameters.Add(oParam)
-            cmd.CommandText = "SELECT RecordId, PhaseId, PhaseDesc FROM ProjectPhases WHERE ParentId = @ParentId"
+            cmd.CommandText = "SELECT RecordId, PhaseId, PhaseDesc FROM customerProjectPhases WHERE ParentId = @ParentId"
             dr = cmd.ExecuteReader()
             While dr.Read()
                 With DGVPhases.DGVData
@@ -152,7 +152,7 @@
                 End With
                 cmd.Parameters.Add(oParam)
                 oParam = Nothing
-                cmd.CommandText = "DELETE FROM ProjectPhases WHERE RecordId = @recordId"
+                cmd.CommandText = "DELETE FROM customerProjectPhases WHERE RecordId = @recordId"
                 cmd.ExecuteNonQuery()
                 cmd.Dispose()
                 dbConnection.Connection.Close()
@@ -178,10 +178,10 @@
         Dim iRowIndex As Integer
         iRowIndex = e.RowIndex
         If DGVPhases.DGVData.Rows(iRowIndex).Cells("recordId").FormattedValue = "" Then
-            sSQL = "INSERT INTO ProjectPhases(ParentId, PhaseId, PhaseDesc) VALUES(@ParentId, @PhaseId, @PhaseDesc);"
+            sSQL = "INSERT INTO customerProjectPhases(ParentId, PhaseId, PhaseDesc) VALUES(@ParentId, @PhaseId, @PhaseDesc);"
             bNewRec = True
         Else
-            sSQL = "UPDATE ProjectPhases SET PhaseId = @PhaseId, PhaseDesc = @PhaseDesc WHERE RecordId = @RecordId;"
+            sSQL = "UPDATE customerProjectPhases SET PhaseId = @PhaseId, PhaseDesc = @PhaseDesc WHERE RecordId = @RecordId;"
             bNewRec = False
         End If
 

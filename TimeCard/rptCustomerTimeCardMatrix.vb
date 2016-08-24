@@ -18,7 +18,7 @@ Imports System
 Imports System.ComponentModel
 
 
-Public Class rptTimeCard
+Public Class rptCustomerTimeCardMatrix
     Inherits ReportClass
     
     Public Sub New()
@@ -27,7 +27,7 @@ Public Class rptTimeCard
     
     Public Overrides Property ResourceName() As String
         Get
-            Return "rptTimeCard.rpt"
+            Return "rptCustomerTimeCardMatrix.rpt"
         End Get
         Set
             'Do nothing
@@ -45,7 +45,7 @@ Public Class rptTimeCard
     
     Public Overrides Property FullResourceName() As String
         Get
-            Return "TimeCard.rptTimeCard.rpt"
+            Return "TimeCard.rptCustomerTimeCardMatrix.rpt"
         End Get
         Set
             'Do nothing
@@ -70,7 +70,7 @@ Public Class rptTimeCard
     
     <Browsable(false),  _
      DesignerSerializationVisibilityAttribute(System.ComponentModel.DesignerSerializationVisibility.Hidden)>  _
-    Public ReadOnly Property GroupHeaderSection1() As CrystalDecisions.CrystalReports.Engine.Section
+    Public ReadOnly Property Section3() As CrystalDecisions.CrystalReports.Engine.Section
         Get
             Return Me.ReportDefinition.Sections(2)
         End Get
@@ -78,7 +78,7 @@ Public Class rptTimeCard
     
     <Browsable(false),  _
      DesignerSerializationVisibilityAttribute(System.ComponentModel.DesignerSerializationVisibility.Hidden)>  _
-    Public ReadOnly Property GroupHeaderSection2() As CrystalDecisions.CrystalReports.Engine.Section
+    Public ReadOnly Property Section4() As CrystalDecisions.CrystalReports.Engine.Section
         Get
             Return Me.ReportDefinition.Sections(3)
         End Get
@@ -86,47 +86,15 @@ Public Class rptTimeCard
     
     <Browsable(false),  _
      DesignerSerializationVisibilityAttribute(System.ComponentModel.DesignerSerializationVisibility.Hidden)>  _
-    Public ReadOnly Property Section3() As CrystalDecisions.CrystalReports.Engine.Section
-        Get
-            Return Me.ReportDefinition.Sections(4)
-        End Get
-    End Property
-    
-    <Browsable(false),  _
-     DesignerSerializationVisibilityAttribute(System.ComponentModel.DesignerSerializationVisibility.Hidden)>  _
-    Public ReadOnly Property GroupFooterSection2() As CrystalDecisions.CrystalReports.Engine.Section
-        Get
-            Return Me.ReportDefinition.Sections(5)
-        End Get
-    End Property
-    
-    <Browsable(false),  _
-     DesignerSerializationVisibilityAttribute(System.ComponentModel.DesignerSerializationVisibility.Hidden)>  _
-    Public ReadOnly Property GroupFooterSection1() As CrystalDecisions.CrystalReports.Engine.Section
-        Get
-            Return Me.ReportDefinition.Sections(6)
-        End Get
-    End Property
-    
-    <Browsable(false),  _
-     DesignerSerializationVisibilityAttribute(System.ComponentModel.DesignerSerializationVisibility.Hidden)>  _
-    Public ReadOnly Property Section4() As CrystalDecisions.CrystalReports.Engine.Section
-        Get
-            Return Me.ReportDefinition.Sections(7)
-        End Get
-    End Property
-    
-    <Browsable(false),  _
-     DesignerSerializationVisibilityAttribute(System.ComponentModel.DesignerSerializationVisibility.Hidden)>  _
     Public ReadOnly Property Section5() As CrystalDecisions.CrystalReports.Engine.Section
         Get
-            Return Me.ReportDefinition.Sections(8)
+            Return Me.ReportDefinition.Sections(4)
         End Get
     End Property
 End Class
 
 <System.Drawing.ToolboxBitmapAttribute(GetType(CrystalDecisions.[Shared].ExportOptions), "report.bmp")>  _
-Public Class CachedrptTimeCard
+Public Class CachedrptCustomerTimeCardMatrix
     Inherits Component
     Implements ICachedReport
     
@@ -168,7 +136,7 @@ Public Class CachedrptTimeCard
     End Property
     
     Public Overridable Function CreateReport() As CrystalDecisions.CrystalReports.Engine.ReportDocument Implements CrystalDecisions.ReportSource.ICachedReport.CreateReport
-        Dim rpt As rptTimeCard = New rptTimeCard()
+        Dim rpt As rptCustomerTimeCardMatrix = New rptCustomerTimeCardMatrix()
         rpt.Site = Me.Site
         Return rpt
     End Function

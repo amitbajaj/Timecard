@@ -17,7 +17,7 @@ Public Class frmCustomerMaster
             If e.ColumnIndex = DGVCustomers.Columns("AddRow").Index Then
                 DGVCustomers.Rows.Add()
             ElseIf e.ColumnIndex = DGVCustomers.Columns("DeleteRow").Index Then
-                If DeleteRecord(DGVCustomers.Rows(e.RowIndex).Cells("RecordId").Value) Then
+                If DeleteRecord(DGVCustomers.Rows(e.RowIndex).Cells("RecordId").FormattedValue) Then
                     DGVCustomers.Rows.RemoveAt(e.RowIndex)
                     If DGVCustomers.Rows.Count = 0 Then
                         DGVCustomers.Rows.Add()
@@ -27,27 +27,32 @@ Public Class frmCustomerMaster
         End If
     End Sub
 
-    Private Function DeleteRecord(iRecordId As Integer) As Boolean
+    Private Function DeleteRecord(iRecordId As String) As Boolean
         Dim cmd As OleDb.OleDbCommand
         Dim cmdParam As OleDb.OleDbParameter
-        Try
-            If dbConnection.GetConnection() Then
-                cmd = dbConnection.Connection.CreateCommand()
-                cmd.CommandText = "DELETE FROM CustomerMaster WHERE RecordId = @RecId"
-                cmdParam = cmd.CreateParameter()
-                cmdParam.ParameterName = "@RecId"
-                cmdParam.DbType = DbType.Int32
-                cmdParam.Value = iRecordId
-                cmd.ExecuteNonQuery()
-                cmd.Dispose()
-                dbConnection.Connection.Close()
-                DeleteRecord = True
-            Else
+        If iRecordId = "" Then
+            DeleteRecord = True
+        Else
+            Try
+                If dbConnection.GetConnection() Then
+                    cmd = dbConnection.Connection.CreateCommand()
+                    cmd.CommandText = "DELETE FROM customerMaster WHERE RecordId = @RecId"
+                    cmdParam = cmd.CreateParameter()
+                    cmdParam.ParameterName = "@RecId"
+                    cmdParam.DbType = DbType.Int32
+                    cmdParam.Value = iRecordId
+                    cmd.Parameters.Add(cmdParam)
+                    cmd.ExecuteNonQuery()
+                    cmd.Dispose()
+                    dbConnection.Connection.Close()
+                    DeleteRecord = True
+                Else
+                    DeleteRecord = False
+                End If
+            Catch
                 DeleteRecord = False
-            End If
-        Catch
-            DeleteRecord = False
-        End Try
+            End Try
+        End If
     End Function
 
     Private Sub CreateRecord(rw As DataGridViewRow)
@@ -67,7 +72,7 @@ Public Class frmCustomerMaster
         Try
             If dbConnection.GetConnection() Then
                 cmd = dbConnection.Connection.CreateCommand()
-                cmd.CommandText = "INSERT INTO CustomerMaster(CustomerId, CustomerName) VALUES(@CustId,@CustName);"
+                cmd.CommandText = "INSERT INTO customerMaster(CustomerId, CustomerName) VALUES(@CustId,@CustName);"
                 oParam = cmd.CreateParameter()
                 With oParam
                     .ParameterName = "@CustId"
@@ -104,7 +109,7 @@ Public Class frmCustomerMaster
         Try
             If dbConnection.GetConnection() Then
                 cmd = dbConnection.Connection.CreateCommand()
-                cmd.CommandText = "UPDATE CustomerMaster SET CustomerId = @CustId, CustomerName = @CustName WHERE RecordId = @RecId"
+                cmd.CommandText = "UPDATE customerMaster SET CustomerId = @CustId, CustomerName = @CustName WHERE RecordId = @RecId"
                 oParam = cmd.CreateParameter()
                 With oParam
                     .ParameterName = "@CustId"
@@ -216,7 +221,7 @@ Public Class frmCustomerMaster
         Dim iNewRow As Integer
         If dbConnection.GetConnection() Then
             cmd = dbConnection.Connection.CreateCommand()
-            cmd.CommandText = "SELECT RecordId, CustomerId, CustomerName FROM CustomerMaster"
+            cmd.CommandText = "SELECT RecordId, CustomerId, CustomerName FROM customerMaster"
             dr = cmd.ExecuteReader()
             DGVCustomers.Rows.Clear()
             While dr.Read()

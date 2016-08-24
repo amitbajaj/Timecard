@@ -74,7 +74,7 @@
         cboCustomers.DisplayMember = "displayName"
         If dbConnection.GetConnection() Then
             cmd = dbConnection.Connection.CreateCommand()
-            cmd.CommandText = "SELECT recordId, CustomerId, CustomerName FROM CustomerMaster"
+            cmd.CommandText = "SELECT recordId, CustomerId, CustomerName FROM customerMaster"
             dr = cmd.ExecuteReader()
             While dr.Read()
                 oCust = New TimeCardSupport.CustomerDetails
@@ -112,7 +112,7 @@
         cboProjects.DisplayMember = "DisplayName"
         If dbConnection.GetConnection() Then
             cmd = dbConnection.Connection.CreateCommand()
-            cmd.CommandText = "SELECT RecordId, ProjectId, ProjectDesc, ProjectRate FROM CustomerProjects WHERE ParentId = ?"
+            cmd.CommandText = "SELECT RecordId, ProjectId, ProjectDesc, ProjectRate FROM customerProjects WHERE ParentId = ?"
             oParam = cmd.CreateParameter()
             With oParam
                 .ParameterName = "ParentId"
@@ -160,7 +160,7 @@
                 .Value = oProj.recordId
             End With
             cmd.Parameters.Add(oParam)
-            cmd.CommandText = "SELECT RecordId, PhaseId, PhaseDesc FROM ProjectPhases WHERE ParentId = @ParentId"
+            cmd.CommandText = "SELECT RecordId, PhaseId, PhaseDesc FROM customerProjectPhases WHERE ParentId = @ParentId"
             dr = cmd.ExecuteReader()
             cboPhases.DisplayMember = "DisplayName"
             While dr.Read()
@@ -193,7 +193,7 @@
         DGVProjectJobs.Rows.Clear()
         If dbConnection.GetConnection() Then
             cmd = dbConnection.Connection.CreateCommand()
-            cmd.CommandText = "SELECT RecordId, JobId, JobDesc, JobRate FROM ProjectPhaseJobs WHERE ParentId = ?"
+            cmd.CommandText = "SELECT RecordId, JobId, JobDesc, JobRate FROM customerProjPhaseJobs WHERE ParentId = ?"
             oParam = cmd.CreateParameter()
             With oParam
                 .ParameterName = "ParentId"
@@ -252,10 +252,10 @@
         Else
             If dbConnection.GetConnection() Then
                 cmd = dbConnection.Connection.CreateCommand()
-                cmd.CommandText = "DELETE FROM ProjectPhaseJobs WHERE RecordId = ?"
+                cmd.CommandText = "DELETE FROM customerProjPhaseJobs WHERE RecordId = @RecordId"
                 oParam = cmd.CreateParameter()
                 With oParam
-                    .ParameterName = "RecId"
+                    .ParameterName = "@RecordId"
                     .OleDbType = OleDb.OleDbType.VarChar
                     .Value = rw.Cells("recordId").FormattedValue
                 End With
@@ -284,9 +284,9 @@
             bNewRec = False
         End If
         If bNewRec Then
-            sSQL = "INSERT INTO ProjectPhaseJobs(ParentId, JobId, JobDesc, JobRate) VALUES(@ParentId,@JobId,@JobDesc,@JobRate)"
+            sSQL = "INSERT INTO customerProjPhaseJobs(ParentId, JobId, JobDesc, JobRate) VALUES(@ParentId,@JobId,@JobDesc,@JobRate)"
         Else
-            sSQL = "UPDATE ProjectPhaseJobs SET ParentId = @ParentId, JobId = @JobId, JobDesc = @JobDesc, JobRate = @JobRate WHERE RecordId = @RecId"
+            sSQL = "UPDATE customerProjPhaseJobs SET ParentId = @ParentId, JobId = @JobId, JobDesc = @JobDesc, JobRate = @JobRate WHERE RecordId = @RecId"
         End If
         If dbConnection.GetConnection() Then
             cmd = dbConnection.Connection.CreateCommand()
@@ -296,7 +296,7 @@
             With oParam
                 .ParameterName = "@ParentId"
                 .OleDbType = OleDb.OleDbType.Numeric
-                .Value = cboProjects.SelectedItem.recordId
+                .Value = cboPhases.SelectedItem.recordId
             End With
             cmd.Parameters.Add(oParam)
             oParam = Nothing

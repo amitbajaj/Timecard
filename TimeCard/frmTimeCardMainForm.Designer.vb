@@ -32,20 +32,24 @@ Partial Class frmTimeCardMainForm
         Me.CustomerMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.CustomerToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.CustomerProjectStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ProjectPhasesStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ProjectJobsStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ProjectTimeCardToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ProjectTimeCardDetailsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ReportsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.UserReportToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.CustomerReportToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.StatusStrip = New System.Windows.Forms.StatusStrip()
         Me.ToolStripStatusLabel = New System.Windows.Forms.ToolStripStatusLabel()
         Me.ToolTip = New System.Windows.Forms.ToolTip(Me.components)
-        Me.ProjectPhasesStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.CustomerReportMatrixToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.MenuStrip.SuspendLayout()
         Me.StatusStrip.SuspendLayout()
         Me.SuspendLayout()
         '
         'MenuStrip
         '
-        Me.MenuStrip.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.UserMenuItem, Me.CustomerMenuItem})
+        Me.MenuStrip.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.UserMenuItem, Me.CustomerMenuItem, Me.ReportsToolStripMenuItem})
         Me.MenuStrip.Location = New System.Drawing.Point(0, 0)
         Me.MenuStrip.Name = "MenuStrip"
         Me.MenuStrip.Size = New System.Drawing.Size(766, 24)
@@ -96,6 +100,12 @@ Partial Class frmTimeCardMainForm
         Me.CustomerProjectStripMenuItem.Size = New System.Drawing.Size(204, 22)
         Me.CustomerProjectStripMenuItem.Text = "Customer &Project"
         '
+        'ProjectPhasesStripMenuItem
+        '
+        Me.ProjectPhasesStripMenuItem.Name = "ProjectPhasesStripMenuItem"
+        Me.ProjectPhasesStripMenuItem.Size = New System.Drawing.Size(204, 22)
+        Me.ProjectPhasesStripMenuItem.Text = "Project Phases"
+        '
         'ProjectJobsStripMenuItem
         '
         Me.ProjectJobsStripMenuItem.Name = "ProjectJobsStripMenuItem"
@@ -114,6 +124,25 @@ Partial Class frmTimeCardMainForm
         Me.ProjectTimeCardDetailsToolStripMenuItem.Size = New System.Drawing.Size(204, 22)
         Me.ProjectTimeCardDetailsToolStripMenuItem.Text = "Project TimeCard Details"
         '
+        'ReportsToolStripMenuItem
+        '
+        Me.ReportsToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.UserReportToolStripMenuItem, Me.CustomerReportToolStripMenuItem, Me.CustomerReportMatrixToolStripMenuItem})
+        Me.ReportsToolStripMenuItem.Name = "ReportsToolStripMenuItem"
+        Me.ReportsToolStripMenuItem.Size = New System.Drawing.Size(59, 20)
+        Me.ReportsToolStripMenuItem.Text = "Reports"
+        '
+        'UserReportToolStripMenuItem
+        '
+        Me.UserReportToolStripMenuItem.Name = "UserReportToolStripMenuItem"
+        Me.UserReportToolStripMenuItem.Size = New System.Drawing.Size(208, 22)
+        Me.UserReportToolStripMenuItem.Text = "User Report"
+        '
+        'CustomerReportToolStripMenuItem
+        '
+        Me.CustomerReportToolStripMenuItem.Name = "CustomerReportToolStripMenuItem"
+        Me.CustomerReportToolStripMenuItem.Size = New System.Drawing.Size(208, 22)
+        Me.CustomerReportToolStripMenuItem.Text = "Customer Report"
+        '
         'StatusStrip
         '
         Me.StatusStrip.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripStatusLabel})
@@ -129,11 +158,11 @@ Partial Class frmTimeCardMainForm
         Me.ToolStripStatusLabel.Size = New System.Drawing.Size(39, 17)
         Me.ToolStripStatusLabel.Text = "Status"
         '
-        'ProjectPhasesStripMenuItem
+        'CustomerReportMatrixToolStripMenuItem
         '
-        Me.ProjectPhasesStripMenuItem.Name = "ProjectPhasesStripMenuItem"
-        Me.ProjectPhasesStripMenuItem.Size = New System.Drawing.Size(204, 22)
-        Me.ProjectPhasesStripMenuItem.Text = "Project Phases"
+        Me.CustomerReportMatrixToolStripMenuItem.Name = "CustomerReportMatrixToolStripMenuItem"
+        Me.CustomerReportMatrixToolStripMenuItem.Size = New System.Drawing.Size(208, 22)
+        Me.CustomerReportMatrixToolStripMenuItem.Text = "Customer Report (Matrix)"
         '
         'frmTimeCardMainForm
         '
@@ -169,4 +198,8 @@ Partial Class frmTimeCardMainForm
     Friend WithEvents ProjectTimeCardDetailsToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents ProjectJobsStripMenuItem As ToolStripMenuItem
     Friend WithEvents ProjectPhasesStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ReportsToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents UserReportToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents CustomerReportToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents CustomerReportMatrixToolStripMenuItem As ToolStripMenuItem
 End Class

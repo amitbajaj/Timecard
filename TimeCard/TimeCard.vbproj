@@ -70,11 +70,21 @@
     <Reference Include="CrystalDecisions.Shared, Version=13.0.2000.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=MSIL" />
     <Reference Include="CrystalDecisions.Windows.Forms, Version=13.0.2000.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=MSIL" />
     <Reference Include="FlashControlV71, Version=1.0.3187.32366, Culture=neutral, PublicKeyToken=692fbea5521e1304" />
+    <Reference Include="Microsoft.ReportViewer.Common, Version=12.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91" />
+    <Reference Include="Microsoft.ReportViewer.WinForms, Version=12.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL" />
+    <Reference Include="MySql.Data, Version=6.4.4.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\..\tools\mysql-connector-net-6.9.9-noinstall\v4.0\MySql.Data.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Deployment" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Web" />
+    <Reference Include="System.Web.Services, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\..\Windows\Microsoft.NET\Framework\v2.0.50727\System.Web.Services.dll</HintPath>
+    </Reference>
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
@@ -124,29 +134,41 @@
     <Compile Include="frmProjectTimeCardMaster.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="frmTimeCardMatrixReport.Designer.vb">
+      <DependentUpon>frmTimeCardMatrixReport.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmTimeCardMatrixReport.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmTimeCardReport.Designer.vb">
+      <DependentUpon>frmTimeCardReport.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmTimeCardReport.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="MyDataGrid.Designer.vb">
       <DependentUpon>MyDataGrid.vb</DependentUpon>
     </Compile>
     <Compile Include="MyDataGrid.vb">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="rptCustomerTimeCardMatrix.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>rptCustomerTimeCardMatrix.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="rptCustomerTimeCard.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>rptCustomerTimeCard.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="TimeCardSupport.vb" />
     <Compile Include="frmCustomerMaster.Designer.vb">
       <DependentUpon>frmCustomerMaster.vb</DependentUpon>
     </Compile>
     <Compile Include="frmCustomerMaster.vb">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="frmParametersv2.Designer.vb">
-      <DependentUpon>frmParametersv2.vb</DependentUpon>
-    </Compile>
-    <Compile Include="frmParametersv2.vb">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="frmParameters.Designer.vb">
-      <DependentUpon>frmParameters.vb</DependentUpon>
-    </Compile>
-    <Compile Include="frmParameters.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="frmReport.Designer.vb">
@@ -165,19 +187,6 @@
       <DependentUpon>frmTimeCardMaster.vb</DependentUpon>
     </Compile>
     <Compile Include="frmTimeCardMaster.vb">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="frmTimeCardv2.Designer.vb">
-      <DependentUpon>frmTimeCardv2.vb</DependentUpon>
-    </Compile>
-    <Compile Include="frmTimeCardv2.vb">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="frmTimeCard.vb">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="frmTimeCard.Designer.vb">
-      <DependentUpon>frmTimeCard.vb</DependentUpon>
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="frmUserMaster.Designer.vb">
@@ -219,12 +228,6 @@
     <EmbeddedResource Include="frmCustomerMaster.resx">
       <DependentUpon>frmCustomerMaster.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="frmParametersv2.resx">
-      <DependentUpon>frmParametersv2.vb</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="frmParameters.resx">
-      <DependentUpon>frmParameters.vb</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="frmProjectMaster.resx">
       <DependentUpon>frmProjectMaster.vb</DependentUpon>
     </EmbeddedResource>
@@ -246,11 +249,11 @@
     <EmbeddedResource Include="frmTimeCardMaster.resx">
       <DependentUpon>frmTimeCardMaster.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="frmTimeCardv2.resx">
-      <DependentUpon>frmTimeCardv2.vb</DependentUpon>
+    <EmbeddedResource Include="frmTimeCardMatrixReport.resx">
+      <DependentUpon>frmTimeCardMatrixReport.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="frmTimeCard.resx">
-      <DependentUpon>frmTimeCard.vb</DependentUpon>
+    <EmbeddedResource Include="frmTimeCardReport.resx">
+      <DependentUpon>frmTimeCardReport.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmUserMaster.resx">
       <DependentUpon>frmUserMaster.vb</DependentUpon>
@@ -273,6 +276,14 @@
     </EmbeddedResource>
     <EmbeddedResource Include="frmTimeCardMainForm.resx">
       <DependentUpon>frmTimeCardMainForm.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="rptCustomerTimeCardMatrix.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>rptCustomerTimeCardMatrix.vb</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="rptCustomerTimeCard.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>rptCustomerTimeCard.vb</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

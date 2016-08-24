@@ -77,7 +77,7 @@
         Dim customerMaster As TimeCardSupport.CustomerDetails
         If dbConnection.GetConnection() Then
             cmd = dbConnection.Connection.CreateCommand()
-            sSQL = "SELECT RecordId, CustomerId, CustomerName FROM CustomerMaster"
+            sSQL = "SELECT RecordId, CustomerId, CustomerName FROM customerMaster"
             cmd.CommandText = sSQL
             dr = cmd.ExecuteReader()
             DGVProjectMaster.Rows.Clear()
@@ -119,7 +119,7 @@
         Dim oParam As OleDb.OleDbParameter
         Dim sSQL As String
         If dbConnection.GetConnection() Then
-            sSQL = "SELECT RecordId, ProjectId, ProjectDesc, ProjectRate FROM CustomerProjects WHERE ParentId = @RecId"
+            sSQL = "SELECT RecordId, ProjectId, ProjectDesc, ProjectRate FROM customerProjects WHERE ParentId = @RecId"
             cmd = dbConnection.Connection.CreateCommand()
             cmd.CommandText = sSQL
             oParam = cmd.CreateParameter()
@@ -202,10 +202,10 @@
         Dim rw As DataGridViewRow
         rw = DGVProjectMaster.Rows(e.RowIndex)
         If rw.Cells("RecordId").FormattedValue = "" Then
-            sSQL = "INSERT INTO CustomerProjects(ParentId, ProjectId, ProjectDesc, ProjectRate) VALUES"
+            sSQL = "INSERT INTO customerProjects(ParentId, ProjectId, ProjectDesc, ProjectRate) VALUES"
             sSQL = sSQL & "(@ParentId, @ProjectId, @ProjectDesc, @ProjectRate);"
         Else
-            sSQL = "UPDATE CustomerProjects SET ParentId = @ParentId, ProjectId = @ProjectId, ProjectDesc = @ProjectDesc, ProjectRate = @ProjectRate WHERE RecordId = @RecordId"
+            sSQL = "UPDATE customerProjects SET ParentId = @ParentId, ProjectId = @ProjectId, ProjectDesc = @ProjectDesc, ProjectRate = @ProjectRate WHERE RecordId = @RecordId"
         End If
         If dbConnection.GetConnection() Then
             cmd = dbConnection.Connection.CreateCommand()
@@ -246,7 +246,7 @@
             With oParam
                 .ParameterName = "@ProjectRate"
                 .OleDbType = OleDb.OleDbType.Double
-                If rw.Cells("ProjectDesc").FormattedValue = "" Then
+                If rw.Cells("ProjectRate").FormattedValue = "" Then
                     .Value = DBNull.Value
                 Else
                     .Value = rw.Cells("ProjectRate").Value

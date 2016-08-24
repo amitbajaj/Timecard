@@ -29,7 +29,7 @@
         Dim cdCustMaster As TimeCardSupport.CustomerDetails
         cboCustomers.Items.Clear()
         cboCustomers.DisplayMember = "DisplayName"
-        sSQL = "SELECT RecordId, CustomerId, CustomerName FROM CustomerMaster"
+        sSQL = "SELECT RecordId, CustomerId, CustomerName FROM customerMaster"
         If dbConnection.GetConnection() Then
             cmd = dbConnection.Connection.CreateCommand()
             cmd.CommandText = sSQL
@@ -181,7 +181,7 @@
         cboProjects.Items.Clear()
         cboProjects.DisplayMember = "DisplayName"
         If dbConnection.GetConnection() Then
-            sSQL = "SELECT RecordId, ProjectId, ProjectDesc, ProjectRate FROM CustomerProjects WHERE ParentId = @ParentId"
+            sSQL = "SELECT RecordId, ProjectId, ProjectDesc, ProjectRate FROM customerProjects WHERE ParentId = @ParentId"
             cmd = dbConnection.Connection.CreateCommand()
             cmd.CommandText = sSQL
             oParam = cmd.CreateParameter
@@ -230,7 +230,7 @@
         cboPhases.Items.Clear()
         cboPhases.DisplayMember = "DisplayName"
         If dbConnection.GetConnection() Then
-            sSQL = "SELECT RecordId, PhaseId, PhaseDesc FROM ProjectPhases WHERE ParentId = @ParentId"
+            sSQL = "SELECT RecordId, PhaseId, PhaseDesc FROM customerProjectPhases WHERE ParentId = @ParentId"
             cmd = dbConnection.Connection.CreateCommand()
             oParam = cmd.CreateParameter()
             With oParam
@@ -274,7 +274,7 @@
         cboJobs.Items.Clear()
         cboJobs.DisplayMember = "DisplayName"
         If dbConnection.GetConnection() Then
-            sSQL = "SELECT RecordId, JobId, JobDesc, JobRate FROM ProjectPhaseJobs WHERE ParentId = @ParentId"
+            sSQL = "SELECT RecordId, JobId, JobDesc, JobRate FROM customerProjPhaseJobs WHERE ParentId = @ParentId"
             cmd = dbConnection.Connection.CreateCommand()
             cmd.CommandText = sSQL
             oParam = cmd.CreateParameter()
@@ -318,7 +318,7 @@
         cboTimeCards.Items.Clear()
         cboTimeCards.DisplayMember = "DisplayName"
         If dbConnection.GetConnection() Then
-            sSQL = "SELECT RecordId, TimeCardNumber, TimeCardMonth, TimeCardYear FROM ProjectTimeCardMaster WHERE ParentId = @ParentId"
+            sSQL = "SELECT RecordId, TimeCardNumber, TimeCardMonth, TimeCardYear FROM customerProjPhaseJobTimeCard WHERE ParentId = @ParentId"
             cmd = dbConnection.Connection.CreateCommand()
             cmd.CommandText = sSQL
             oParam = cmd.CreateParameter()
@@ -371,7 +371,7 @@
         dTotalCost = 0
         If dbConnection.GetConnection() Then
             cmd = dbConnection.Connection.CreateCommand()
-            cmd.CommandText = "SELECT RecordId, TimeCardDay, IsHoliday, IsAbsent, InTime, OutTime, RegHrs, OT1Hrs, OT2Hrs, TotalCost FROM ProjectTimeCardDetailData WHERE ParentId = @ParentId"
+            cmd.CommandText = "SELECT RecordId, TimeCardDay, IsHoliday, IsAbsent, InTime, OutTime, RegHrs, OT1Hrs, OT2Hrs, TotalCost FROM customerProjPhaseJobTimeCardData WHERE ParentId = @ParentId ORDER BY TimeCardDay ASC"
             oParam = cmd.CreateParameter()
             With oParam
                 .ParameterName = "@ParentId"
@@ -442,7 +442,7 @@
                     rw.Cells("totalCost").Value = Nothing
                 Else
                     rw.Cells("totalCost").Value = dr.GetDouble(iFieldCount).ToString(sNumberFormat)
-                    dTotalCost = dTotalCost + dr.GetDouble(8)
+                    dTotalCost = dTotalCost + dr.GetDouble(iFieldCount)
                 End If
             End While
             oGridTotal.AddValues(dReg, dOT1, dOT2, dTotalCost)
@@ -520,10 +520,10 @@
         bAbsent = False
         If rw.Cells("recordId").FormattedValue = "" Then
             bNewRow = True
-            sSQL = "INSERT INTO ProjectTimeCardDetailData(ParentId, TimeCardDay, IsHoliday, IsAbsent, InTime, OutTime, RegHrs, OT1Hrs, OT2Hrs, TotalCost) VALUES"
+            sSQL = "INSERT INTO customerProjPhaseJobTimeCardData (ParentId, TimeCardDay, IsHoliday, IsAbsent, InTime, OutTime, RegHrs, OT1Hrs, OT2Hrs, TotalCost) VALUES"
             sSQL = sSQL & "(@ParentId, @TimeCardDay, @IsHoliday, @IsAbsent, @InTime, @OutTime, @RegHrs, @OT1Hrs, @OT2Hrs, @TotalCost)"
         Else
-            sSQL = "UPDATE ProjectTimeCardDetailData SET ParentId = @ParentId, TimeCardDay = @TimeCardDay, IsHoliday = @IsHoliday, IsAbsent = @IsAbsent, InTime = @InTime, OutTime = @OutTime, RegHrs = @RegHrs, OT1Hrs = @OT1Hrs, OT2Hrs = @OT2Hrs, TotalCost = @TotalCost WHERE RecordId = @RecordId"
+            sSQL = "UPDATE customerProjPhaseJobTimeCardData  SET ParentId = @ParentId, TimeCardDay = @TimeCardDay, IsHoliday = @IsHoliday, IsAbsent = @IsAbsent, InTime = @InTime, OutTime = @OutTime, RegHrs = @RegHrs, OT1Hrs = @OT1Hrs, OT2Hrs = @OT2Hrs, TotalCost = @TotalCost WHERE RecordId = @RecordId"
         End If
         If dbConnection.GetConnection() Then
             cmd = dbConnection.Connection.CreateCommand()
@@ -645,13 +645,12 @@
 
             oParam = cmd.CreateParameter()
             With oParam
-                .ParameterName = "@TotalHrs"
+                .ParameterName = "@TotalCost"
                 .OleDbType = OleDb.OleDbType.Double
                 If rw.Cells("totalCost").FormattedValue = "" Then
                     .Value = DBNull.Value
                 Else
-                    oTime.SetTime(rw.Cells("totalCost").Value)
-                    .Value = oTime.GetTime()
+                    .Value = rw.Cells("totalCost").Value
                 End If
             End With
             cmd.Parameters.Add(oParam)
@@ -691,14 +690,10 @@
         Dim oParam As OleDb.OleDbParameter
         Dim sSQL As String
         Dim sRecordId As String
-        If DGVTimeCardDetails.Rows.Item(iRowIndex).Cells.Item("recordId").Value IsNot Nothing Then
-            sRecordId = DGVTimeCardDetails.Rows.Item(iRowIndex).Cells.Item("recordId").Value.ToString()
-        Else
-            sRecordId = ""
-        End If
+        sRecordId = DGVTimeCardDetails.Rows.Item(iRowIndex).Cells.Item("recordId").FormattedValue
         If sRecordId <> "" Then
             If dbConnection.GetConnection() Then
-                sSQL = "DELETE FROM ProjectTimeCardDetailData WHERE TimeCardDataId = @RecordId"
+                sSQL = "DELETE FROM customerProjPhaseJobTimeCardData WHERE RecordId = @RecordId"
                 cmd = dbConnection.Connection.CreateCommand()
                 cmd.CommandText = sSQL
                 oParam = cmd.CreateParameter()
@@ -707,6 +702,7 @@
                     .OleDbType = OleDb.OleDbType.Integer
                     .Value = sRecordId
                 End With
+                cmd.Parameters.Add(oParam)
                 Try
                     cmd.ExecuteNonQuery()
                     DGVTimeCardDetails.Rows.RemoveAt(iRowIndex)

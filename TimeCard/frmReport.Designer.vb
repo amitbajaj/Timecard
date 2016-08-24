@@ -23,20 +23,19 @@ Partial Class frmReport
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.rptViewTimeCard = New CrystalDecisions.Windows.Forms.CrystalReportViewer()
-        Me.rptTimeCard1 = New TimeCard.rptTimeCard()
         Me.SuspendLayout()
         '
         'rptViewTimeCard
         '
-        Me.rptViewTimeCard.ActiveViewIndex = 0
+        Me.rptViewTimeCard.ActiveViewIndex = -1
         Me.rptViewTimeCard.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.rptViewTimeCard.Cursor = System.Windows.Forms.Cursors.Default
         Me.rptViewTimeCard.Dock = System.Windows.Forms.DockStyle.Fill
         Me.rptViewTimeCard.Location = New System.Drawing.Point(0, 0)
         Me.rptViewTimeCard.Name = "rptViewTimeCard"
-        Me.rptViewTimeCard.ReportSource = Me.rptTimeCard1
         Me.rptViewTimeCard.Size = New System.Drawing.Size(777, 477)
         Me.rptViewTimeCard.TabIndex = 0
+        Me.rptViewTimeCard.ToolPanelView = CrystalDecisions.Windows.Forms.ToolPanelViewType.None
         '
         'frmReport
         '
@@ -51,5 +50,4 @@ Partial Class frmReport
     End Sub
 
     Friend WithEvents rptViewTimeCard As CrystalDecisions.Windows.Forms.CrystalReportViewer
-    Friend WithEvents rptTimeCard1 As rptTimeCard
 End Class

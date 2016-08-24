@@ -1,6 +1,6 @@
-﻿Public Class frmReport
-    Private Sub rptViewTimeCard_Load(sender As Object, e As EventArgs) Handles rptViewTimeCard.Load
-        Dim oReport As rptTimeCard
+﻿Public Class frmTimeCardReport
+    Private Sub frmTimeCardReport_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        Dim oReport As rptCustomerTimeCard
         Dim dbConn As New TimeCardDataAccess
         Dim da As OleDb.OleDbDataAdapter
         Dim ds As DataSet
@@ -12,10 +12,10 @@
             da.Fill(ds, "TimeCardData")
 
 
-            oReport = New rptTimeCard
+            oReport = New rptCustomerTimeCard
             oReport.SetDataSource(ds.Tables("TimeCardData"))
             oReport.Refresh()
-            rptViewTimeCard.ReportSource = oReport
+            CrystalReportViewer1.ReportSource = oReport
         Else
             MsgBox(dbConn.LastError)
         End If

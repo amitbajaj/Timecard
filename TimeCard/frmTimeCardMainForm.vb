@@ -198,4 +198,68 @@ Public Class frmTimeCardMainForm
             frmProjPhases.Show()
         End If
     End Sub
+
+    Private Sub UserReportToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles UserReportToolStripMenuItem.Click
+        Dim oReportForm As frmReport
+        Dim iChilds As Integer
+        Dim bFound As Boolean
+        bFound = False
+        For iChilds = 0 To MdiChildren.Count - 1
+            If MdiChildren(iChilds).Name = "frmReport" Then
+                bFound = True
+                Exit For
+            End If
+        Next
+        If bFound Then
+            oReportForm = MdiChildren(iChilds)
+            oReportForm.Activate()
+        Else
+            oReportForm = New frmReport
+            oReportForm.MdiParent = Me
+            oReportForm.Show()
+        End If
+
+    End Sub
+
+    Private Sub CustomerReportToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles CustomerReportToolStripMenuItem.Click
+        Dim oReportForm As New frmTimeCardReport
+        Dim iChilds As Integer
+        Dim bFound As Boolean
+        bFound = False
+        For iChilds = 0 To MdiChildren.Count - 1
+            If MdiChildren(iChilds).Name = "frmTimeCardReport" Then
+                bFound = True
+                Exit For
+            End If
+        Next
+        If bFound Then
+            oReportForm = MdiChildren(iChilds)
+            oReportForm.Activate()
+        Else
+            oReportForm = New frmTimeCardReport
+            oReportForm.MdiParent = Me
+            oReportForm.Show()
+        End If
+    End Sub
+
+    Private Sub CustomerReportMatrixToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles CustomerReportMatrixToolStripMenuItem.Click
+        Dim oReportForm As New frmTimeCardMatrixReport
+        Dim iChilds As Integer
+        Dim bFound As Boolean
+        bFound = False
+        For iChilds = 0 To MdiChildren.Count - 1
+            If MdiChildren(iChilds).Name = "frmTimeCardMatrixReport" Then
+                bFound = True
+                Exit For
+            End If
+        Next
+        If bFound Then
+            oReportForm = MdiChildren(iChilds)
+            oReportForm.Activate()
+        Else
+            oReportForm = New frmTimeCardMatrixReport
+            oReportForm.MdiParent = Me
+            oReportForm.Show()
+        End If
+    End Sub
 End Class
