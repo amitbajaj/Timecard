@@ -174,7 +174,7 @@
         End If
         If sRecordId <> "" Then
             If dbConnection.GetConnection() Then
-                sSQL = "DELETE FROM TimeCardDetailData WHERE RecordId = @RecordId"
+                sSQL = "DELETE FROM userTimeCardData WHERE RecordId = @RecordId"
                 cmd = dbConnection.Connection.CreateCommand()
                 oParam = cmd.CreateParameter()
                 With oParam
@@ -213,7 +213,7 @@
         cboTimeCards.Items.Clear()
         cboTimeCards.DisplayMember = "DisplayName"
         If dbConnection.GetConnection() Then
-            sSQL = "SELECT * FROM TimeCardMaster WHERE userId = @RecordId"
+            sSQL = "SELECT * FROM userTimeCards WHERE userId = @RecordId"
             cmd = dbConnection.Connection.CreateCommand()
             cmd.CommandText = sSQL
             oParam = cmd.CreateParameter()
@@ -264,7 +264,7 @@
         DGVTimeCardDetails.Rows.Clear()
         lblTotalCost.Text = ""
         If dbConnection.GetConnection() Then
-            sSQL = "SELECT * FROM TimeCardDetailData WHERE TimeCardId = @RecordId ORDER BY TimeCardDay"
+            sSQL = "SELECT * FROM userTimeCardData WHERE TimeCardId = @RecordId ORDER BY TimeCardDay"
             cmd = dbConnection.Connection.CreateCommand()
             cmd.CommandText = sSQL
             oParam = cmd.CreateParameter()
@@ -332,7 +332,7 @@
                         rw.Cells("totalCost").Value = Nothing
                     Else
                         rw.Cells("totalCost").Value = dr.GetDouble(10).ToString(sNumberFormat)
-                        dTotalCost = dTotalCost + dr.GetDouble(8)
+                        dTotalCost = dTotalCost + dr.GetDouble(10)
                     End If
                 End While
                 oGridTotal.AddValues(dReg, dOT1, dOT2, dTotalCost)
@@ -387,10 +387,10 @@
         bAbsent = False
         If rw.Cells("recordId").Value Is Nothing Then
             bNewRow = True
-            sSQL = "INSERT INTO TimeCardDetailData(TimeCardId, TimeCardDay, IsHoliday, IsAbsent, InTime, OutTime, RegHrs, OT1Hrs, OT2Hrs, TotalCost) VALUES"
+            sSQL = "INSERT INTO userTimeCardData(TimeCardId, TimeCardDay, IsHoliday, IsAbsent, InTime, OutTime, RegHrs, OT1Hrs, OT2Hrs, TotalCost) VALUES"
             sSQL = sSQL & "(@TimeCardId, @TimeCardDay, @IsHoliday, @IsAbsent, @InTime, @OutTime, @RegHrs, @OT1Hrs, @OT2Hrs, @TotalCost);"
         Else
-            sSQL = "UPDATE TimeCardDetailData SET TimeCardId = @TimeCardId, TimeCardDay = @TimeCardDay, IsHoliday = @IsHoliday, IsAbsent = @IsAbsent, InTime = @InTime, OutTime = @OutTime, RegHrs = @RegHrs, OT1Hrs = @OT1Hrs, OT2Hrs = @OT2Hrs, TotalCost = @TotalCost WHERE RecordId = @RecordId"
+            sSQL = "UPDATE userTimeCardData SET TimeCardId = @TimeCardId, TimeCardDay = @TimeCardDay, IsHoliday = @IsHoliday, IsAbsent = @IsAbsent, InTime = @InTime, OutTime = @OutTime, RegHrs = @RegHrs, OT1Hrs = @OT1Hrs, OT2Hrs = @OT2Hrs, TotalCost = @TotalCost WHERE RecordId = @RecordId"
         End If
 
         If dbConnection.GetConnection() Then

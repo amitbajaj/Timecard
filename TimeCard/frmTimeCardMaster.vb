@@ -118,7 +118,7 @@
         Dim oParam As OleDb.OleDbParameter
         Dim sSQL As String
         If dbConnection.GetConnection() Then
-            sSQL = "SELECT RecordId, TimeCardNumber, TimeCardMonth, TimeCardYear FROM TimeCardMaster WHERE UserId = @UserId"
+            sSQL = "SELECT RecordId, TimeCardNumber, TimeCardMonth, TimeCardYear FROM userTimeCards WHERE UserId = @UserId"
             cmd = dbConnection.Connection.CreateCommand()
             cmd.CommandText = sSQL
             oParam = cmd.CreateParameter()
@@ -167,7 +167,7 @@
         If cboUsers.SelectedIndex >= 0 Then
             iNewItem = DGVTimeCardMaster.Rows.Add()
             If dbConnection.GetConnection() Then
-                sSQL = "INSERT INTO TimeCardMaster(UserId) VALUES (@UserId);"
+                sSQL = "INSERT INTO userTimeCards(UserId) VALUES (@UserId);"
                 cmd = dbConnection.Connection.CreateCommand()
                 cmd.CommandText = sSQL
                 oParam = cmd.CreateParameter()
@@ -192,10 +192,10 @@
         Dim rw As DataGridViewRow
         rw = DGVTimeCardMaster.Rows(e.RowIndex)
         If rw.Cells("recordId").FormattedValue = "" Then
-            sSQL = "INSERT INTO TimeCardMaster (UserId, timeCardNumber, timeCardMonth, timeCardYear) VALUES "
+            sSQL = "INSERT INTO userTimeCards (UserId, timeCardNumber, timeCardMonth, timeCardYear) VALUES "
             sSQL = sSQL & "(@UserId, @timeCardNumber, @timeCardMonth, @timeCardYear)"
         Else
-            sSQL = "UPDATE TimeCardMaster SET UserId = @UserId, timeCardNumber = @timeCardNumber, "
+            sSQL = "UPDATE userTimeCards SET UserId = @UserId, timeCardNumber = @timeCardNumber, "
             sSQL = sSQL & "timeCardMonth = @timeCardMonth, timeCardYear = @timeCardYear WHERE RecordId = @RecordId"
         End If
         If dbConnection.GetConnection() Then
@@ -206,7 +206,7 @@
             With oParam
                 .ParameterName = "@UserId"
                 .OleDbType = OleDb.OleDbType.Integer
-                .Value = cboUsers.SelectedItem.UserId
+                .Value = cboUsers.SelectedItem.RecordId
             End With
             cmd.Parameters.Add(oParam)
 
@@ -276,7 +276,7 @@
                     cmd = dbConnection.Connection.CreateCommand()
                     For Each rw In DGVTimeCardMaster.SelectedRows
                         If rw.Cells("recordId").Value IsNot Nothing Then
-                            sSQL = "DELETE FROM TimeCardMaster WHERE RecordId = @RecordId"
+                            sSQL = "DELETE FROM userTimeCards WHERE RecordId = @RecordId"
                             cmd.CommandText = sSQL
                             oParam = cmd.CreateParameter()
                             With oParam
@@ -391,7 +391,7 @@
             Try
                 cmd = dbConnection.Connection.CreateCommand()
                 If rw.Cells("recordId").Value IsNot Nothing Then
-                    sSQL = "DELETE FROM TimeCardMaster WHERE RecordId = @RecordId"
+                    sSQL = "DELETE FROM userTimeCards WHERE RecordId = @RecordId"
                     cmd.CommandText = sSQL
                     oParam = cmd.CreateParameter()
                     With oParam
