@@ -1,13 +1,22 @@
 ﻿Public Class TimeCardDataAccess
     Implements IDisposable
-
-
-    Private _defaultDatabaseFile As String
     Private disposed As Boolean = False
+
     Private _connection As OleDb.OleDbConnection
     Private _connectString As String
     Private _dbFileName As String
+    Private _defaultDatabaseFile As String
     Private _lastError As String
+    Private _server As String
+    Private _trusted As Boolean
+    Private _userId As String
+    Private _password As String
+
+    Public NotInheritable Class DBType
+        Public Const AccessDB As Integer = 0
+        Public Const SQLLocalDB As Integer = 1
+        Public Const MySQL As Integer = 2
+    End Class
 
     Public ReadOnly Property DefaultDatabaseFile As String
         Get

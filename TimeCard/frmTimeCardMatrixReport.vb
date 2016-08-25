@@ -1,24 +1,27 @@
 ﻿Public Class frmTimeCardMatrixReport
     Private Sub frmTimeCardMatrixReport_Load(sender As Object, e As EventArgs) Handles Me.Load
         Dim oReport As rptCustomerTimeCardMatrix
-        Dim dbConn As New OleDb.OleDbConnection
+        Dim dbConn As New TimeCardDataAccess
         Dim da As OleDb.OleDbDataAdapter
         Dim ds As DataSet
-        dbConn.ConnectionString = "Provider=SQLNCLI11;Server=(localdb)\TimeCard;Database=TimeCard;Trusted_Connection=yes;"
+        dbConn.DatabaseFile = My.Settings.DBFile
         Try
-            dbConn.Open()
-            da = New OleDb.OleDbDataAdapter("SELECT * FROM vw_customerProjectTimeCardReport", dbConn)
-            ds = New DataSet("TimeCards")
-            da.Fill(ds, "vw_customerProjectTimeCardReport")
-            oReport = New rptCustomerTimeCardMatrix
-            oReport.SetDataSource(ds.Tables("vw_customerProjectTimeCardReport"))
-            oReport.Refresh()
-            CrystalReportViewer1.ReportSource = oReport
+            If dbConn.GetConnection() Then
+                da = New OleDb.OleDbDataAdapter("SELECT * FROM vw_customerProjectTimeCardReport", dbConn.Connection)
+                ds = New DataSet("TimeCards")
+                da.Fill(ds, "vw_customerProjectTimeCardReport")
+                oReport = New rptCustomerTimeCardMatrix
+                oReport.SetDataSource(ds.Tables("vw_customerProjectTimeCardReport"))
+                oReport.Refresh()
+                CrystalReportViewer1.ReportSource = oReport
+            Else
+                MsgBox(dbConn.LastError)
+            End If
         Catch ex As Exception
             MsgBox(ex.Message)
         End Try
         Try
-            dbConn.Close()
+            dbConn.Connection.Close()
         Catch ex As Exception
         End Try
         dbConn = Nothing
