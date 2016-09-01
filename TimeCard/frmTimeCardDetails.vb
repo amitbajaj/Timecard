@@ -4,8 +4,7 @@
     Private sNumberFormat As String = My.Settings.Item("NumberFormat")
 
     Private Sub frmTimeCardDetails_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        dbConnection = New TimeCardDataAccess()
-        dbConnection.DatabaseFile = My.Settings.Item("DBFile")
+        dbConnection = frmTimeCardMainForm.dbConn
         lblTotalCost.Text = ""
         lblTotalCost.TextAlign = ContentAlignment.TopRight
         lblRegHrs.Text = ""
@@ -22,13 +21,13 @@
 
 
     Private Sub LoadUserMaster()
-        Dim cmd As OleDb.OleDbCommand
-        Dim dr As OleDb.OleDbDataReader
+        Dim cmd As IDbCommand
+        Dim dr As IDataReader
         Dim sSQL As String
         Dim udUser As TimeCardSupport.UserDetails
         cboUsers.Items.Clear()
         cboUsers.DisplayMember = "DisplayName"
-        sSQL = "SELECT RecordId, UserNumber, UserName, Trade, Basic FROM UserMaster"
+        sSQL = "SELECT RecordId, UserNumber, UserName, Trade, Basic FROM userMaster"
         If dbConnection.GetConnection() Then
             cmd = dbConnection.Connection.CreateCommand()
             cmd.CommandText = sSQL
@@ -36,14 +35,17 @@
             While dr.Read()
                 udUser = New TimeCardSupport.UserDetails
                 With udUser
-                    .recordId = dr.GetInt32(0)
-                    .userId = dr.GetInt16(1)
-                    .userName = dr.GetString(2)
-                    .Trade = dr.GetString(3)
-                    .Basic = dr.GetDouble(4)
+                    .recordId = dr.GetValue(0)
+                    .userId = dr.GetValue(1)
+                    .userName = dr.GetValue(2)
+                    .Trade = dr.GetValue(3)
+                    .Basic = dr.GetValue(4)
                 End With
                 cboUsers.Items.Add(udUser)
             End While
+            dr.Close()
+            cmd.Dispose()
+            dbConnection.Connection.Close()
         Else
             MsgBox("Error connecting to database!" & vbCrLf & dbConnection.LastError)
         End If
@@ -163,8 +165,8 @@
     End Sub
 
     Private Sub RemoveRow(iRowIndex As Integer)
-        Dim cmd As OleDb.OleDbCommand
-        Dim oParam As OleDb.OleDbParameter
+        Dim cmd As IDbCommand
+        Dim oParam As IDataParameter
         Dim sSQL As String
         Dim sRecordId As String
         If DGVTimeCardDetails.Rows.Item(iRowIndex).Cells.Item("recordId").Value IsNot Nothing Then
@@ -179,7 +181,7 @@
                 oParam = cmd.CreateParameter()
                 With oParam
                     .ParameterName = "@RecordId"
-                    .OleDbType = OleDb.OleDbType.Integer
+                    .DbType = DbType.Int32
                     .Value = sRecordId
                 End With
                 cmd.Parameters.Add(oParam)
@@ -189,6 +191,8 @@
                     DGVTimeCardDetails.Rows.RemoveAt(iRowIndex)
                 Catch
                 End Try
+                cmd.Dispose()
+                dbConnection.Connection.Close()
             End If
         Else
             DGVTimeCardDetails.Rows.RemoveAt(iRowIndex)
@@ -205,9 +209,9 @@
     End Sub
 
     Private Sub LoadTimeCardMaster(udUser As TimeCardSupport.UserDetails)
-        Dim cmd As OleDb.OleDbCommand
-        Dim dr As OleDb.OleDbDataReader
-        Dim oParam As OleDb.OleDbParameter
+        Dim cmd As IDbCommand
+        Dim dr As IDataReader
+        Dim oParam As IDataParameter
         Dim sSQL As String
         Dim tcmTimeCard As TimeCardSupport.TimeCardMasterDetails
         cboTimeCards.Items.Clear()
@@ -219,18 +223,18 @@
             oParam = cmd.CreateParameter()
             With oParam
                 .ParameterName = "@RecordId"
-                .OleDbType = OleDb.OleDbType.Integer
+                .DbType = DbType.Int32
                 .Value = udUser.recordId
             End With
             cmd.Parameters.Add(oParam)
             dr = cmd.ExecuteReader()
             While dr.Read()
                 tcmTimeCard = New TimeCardSupport.TimeCardMasterDetails()
-                tcmTimeCard.RecordId = dr.GetInt32(0)
-                tcmTimeCard.UserId = dr.GetInt32(1)
-                tcmTimeCard.TimeCardNumber = dr.GetInt32(2)
-                tcmTimeCard.TimeCardMonth = dr.GetInt16(3)
-                tcmTimeCard.TimeCardYear = dr.GetInt16(4)
+                tcmTimeCard.RecordId = dr.GetValue(0)
+                tcmTimeCard.UserId = dr.GetValue(1)
+                tcmTimeCard.TimeCardNumber = dr.GetValue(2)
+                tcmTimeCard.TimeCardMonth = dr.GetValue(3)
+                tcmTimeCard.TimeCardYear = dr.GetValue(4)
                 cboTimeCards.Items.Add(tcmTimeCard)
             End While
             dr.Close()
@@ -248,9 +252,9 @@
     End Sub
 
     Private Sub LoadTimeCardDetails(iRecordId As Integer)
-        Dim cmd As OleDb.OleDbCommand
-        Dim oParam As OleDb.OleDbParameter
-        Dim dr As OleDb.OleDbDataReader
+        Dim cmd As IDbCommand
+        Dim oParam As IDataParameter
+        Dim dr As IDataReader
         Dim sSQL As String
         Dim iNewItem As Integer
         Dim rw As DataGridViewRow
@@ -270,78 +274,86 @@
             oParam = cmd.CreateParameter()
             With oParam
                 .ParameterName = "@RecordId"
-                .OleDbType = OleDb.OleDbType.Integer
+                .DbType = DbType.Int32
                 .Value = iRecordId
             End With
             cmd.Parameters.Add(oParam)
             dr = cmd.ExecuteReader()
-            If dr.HasRows() Then
-                While dr.Read()
-                    iNewItem = DGVTimeCardDetails.Rows.Add()
-                    rw = DGVTimeCardDetails.Rows(iNewItem)
-                    rw.Cells("recordStatus").Value = Nothing
-                    rw.Cells("recordId").Value = dr.GetInt32(0)
-                    If dr.IsDBNull(2) Then
-                        rw.Cells("logDay").Value = Nothing
+            While dr.Read()
+                iNewItem = DGVTimeCardDetails.Rows.Add()
+                rw = DGVTimeCardDetails.Rows(iNewItem)
+                rw.Cells("recordStatus").Value = Nothing
+                rw.Cells("recordId").Value = dr.GetValue(0)
+                If dr.IsDBNull(2) Then
+                    rw.Cells("logDay").Value = Nothing
+                Else
+                    rw.Cells("logDay").Value = dr.GetValue(2)
+                End If
+                If dr.IsDBNull(3) Then
+                    rw.Cells("isHoliday").Value = Nothing
+                Else
+                    rw.Cells("isHoliday").Value = dr.GetValue(3)
+                End If
+                If dr.IsDBNull(4) Then
+                    rw.Cells("isAbsent").Value = Nothing
+                Else
+                    rw.Cells("isAbsent").Value = dr.GetValue(4)
+                End If
+
+                If dr.IsDBNull(5) Then
+                    rw.Cells("inTime").Value = Nothing
+                Else
+                    If dbConnection.DBType = TimeCardDataAccess.DatabaseType.AccessDB Then
+                        rw.Cells("inTime").Value = dr.GetDateTime(5).TimeOfDay.ToString()
                     Else
-                        rw.Cells("logDay").Value = dr.GetInt16(2)
-                    End If
-                    If dr.IsDBNull(3) Then
-                        rw.Cells("isHoliday").Value = Nothing
-                    Else
-                        rw.Cells("isHoliday").Value = dr.GetBoolean(3)
-                    End If
-                    If dr.IsDBNull(4) Then
-                        rw.Cells("isAbsent").Value = Nothing
-                    Else
-                        rw.Cells("isAbsent").Value = dr.GetBoolean(4)
+                        rw.Cells("inTime").Value = dr.GetValue(5).ToString()
                     End If
 
-                    If dr.IsDBNull(5) Then
-                        rw.Cells("inTime").Value = Nothing
-                    Else
-                        rw.Cells("inTime").Value = dr.GetDateTime(5).TimeOfDay.ToString()
-                    End If
+                End If
                     If dr.IsDBNull(6) Then
-                        rw.Cells("outTime").Value = Nothing
-                    Else
+                    rw.Cells("outTime").Value = Nothing
+                Else
+                    If dbConnection.DBType = TimeCardDataAccess.DatabaseType.AccessDB Then
                         rw.Cells("outTime").Value = dr.GetDateTime(6).TimeOfDay.ToString()
-                    End If
-                    If dr.IsDBNull(7) Then
-                        rw.Cells("regularHrs").Value = Nothing
                     Else
-                        oTime.SetTime(dr.GetDouble(7))
-                        dReg = dReg + oTime.GetTime()
-                        rw.Cells("regularHrs").Value = oTime.DisplayTime
+                        rw.Cells("outTime").Value = dr.GetValue(6).ToString()
                     End If
-                    If dr.IsDBNull(8) Then
-                        rw.Cells("OT1").Value = Nothing
-                    Else
-                        oTime.SetTime(dr.GetDouble(8))
-                        dOT1 = dOT1 + oTime.GetTime()
-                        rw.Cells("OT1").Value = oTime.DisplayTime
-                    End If
-                    If dr.IsDBNull(9) Then
-                        rw.Cells("OT2").Value = Nothing
-                    Else
-                        oTime.SetTime(dr.GetDouble(9))
-                        dOT2 = dOT2 + oTime.GetTime()
-                        rw.Cells("OT2").Value = oTime.DisplayTime
-                    End If
-                    If dr.IsDBNull(10) Then
-                        rw.Cells("totalCost").Value = Nothing
-                    Else
-                        rw.Cells("totalCost").Value = dr.GetDouble(10).ToString(sNumberFormat)
-                        dTotalCost = dTotalCost + dr.GetDouble(10)
-                    End If
-                End While
-                oGridTotal.AddValues(dReg, dOT1, dOT2, dTotalCost)
-                UpdateGridTotal(oGridTotal)
-                DGVTimeCardDetails.CurrentCell = DGVTimeCardDetails.Rows(0).Cells(1)
-            Else
+                End If
+                If dr.IsDBNull(7) Then
+                    rw.Cells("regularHrs").Value = Nothing
+                Else
+                    oTime.SetTime(dr.GetValue(7))
+                    dReg = dReg + oTime.GetTime()
+                    rw.Cells("regularHrs").Value = oTime.DisplayTime
+                End If
+                If dr.IsDBNull(8) Then
+                    rw.Cells("OT1").Value = Nothing
+                Else
+                    oTime.SetTime(dr.GetValue(8))
+                    dOT1 = dOT1 + oTime.GetTime()
+                    rw.Cells("OT1").Value = oTime.DisplayTime
+                End If
+                If dr.IsDBNull(9) Then
+                    rw.Cells("OT2").Value = Nothing
+                Else
+                    oTime.SetTime(dr.GetValue(9))
+                    dOT2 = dOT2 + oTime.GetTime()
+                    rw.Cells("OT2").Value = oTime.DisplayTime
+                End If
+                If dr.IsDBNull(10) Then
+                    rw.Cells("totalCost").Value = Nothing
+                Else
+                    rw.Cells("totalCost").Value = dr.GetDecimal(10).ToString(sNumberFormat)
+                    dTotalCost = dTotalCost + dr.GetValue(10)
+                End If
+            End While
+            oGridTotal.AddValues(dReg, dOT1, dOT2, dTotalCost)
+            UpdateGridTotal(oGridTotal)
+            If DGVTimeCardDetails.Rows.Count = 0 Then
                 iNewItem = DGVTimeCardDetails.Rows.Add()
                 DGVTimeCardDetails.CurrentCell = DGVTimeCardDetails.Rows(iNewItem).Cells(1)
             End If
+            DGVTimeCardDetails.CurrentCell = DGVTimeCardDetails.Rows(0).Cells(1)
             dr.Close()
             cmd.Dispose()
             dbConnection.Connection.Close()
@@ -371,8 +383,8 @@
     End Sub
 
     Private Sub SaveData(iRow As Integer)
-        Dim cmd As OleDb.OleDbCommand
-        Dim oParam As OleDb.OleDbParameter
+        Dim cmd As IDbCommand
+        Dim oParam As IDataParameter
         Dim sSQL As String
         Dim rw As DataGridViewRow
         Dim tInTime, tOutTime As Date
@@ -398,8 +410,8 @@
             cmd.CommandText = sSQL
             oParam = cmd.CreateParameter()
             With oParam
-                .ParameterName = "@ParentId"
-                .OleDbType = OleDb.OleDbType.Integer
+                .ParameterName = "@TimeCardId"
+                .DbType = DbType.Int32
                 .Value = cboTimeCards.SelectedItem.RecordId
             End With
             cmd.Parameters.Add(oParam)
@@ -407,7 +419,7 @@
             oParam = cmd.CreateParameter()
             With oParam
                 .ParameterName = "@TimeCardDay"
-                .OleDbType = OleDb.OleDbType.SmallInt
+                .DbType = DbType.Int16
                 If rw.Cells("logDay").Value Is Nothing Then
                     .Value = DBNull.Value
                 Else
@@ -419,7 +431,7 @@
             oParam = cmd.CreateParameter()
             With oParam
                 .ParameterName = "@IsHoliday"
-                .OleDbType = OleDb.OleDbType.Boolean
+                .DbType = DbType.Boolean
                 If rw.Cells("isHoliday").Value Is Nothing Then
                     .Value = False
                 Else
@@ -432,7 +444,7 @@
             oParam = cmd.CreateParameter()
             With oParam
                 .ParameterName = "@IsAbsent"
-                .OleDbType = OleDb.OleDbType.Boolean
+                .DbType = DbType.Boolean
                 If rw.Cells("isAbsent").Value Is Nothing Then
                     .Value = False
                 Else
@@ -445,7 +457,7 @@
             oParam = cmd.CreateParameter()
             With oParam
                 .ParameterName = "@InTime"
-                .OleDbType = OleDb.OleDbType.Date
+                .DbType = DbType.DateTime
                 If Date.TryParse(rw.Cells("inTime").FormattedValue, tInTime) Then
                     .Value = tInTime.TimeOfDay.ToString()
                     bInTime = True
@@ -458,7 +470,7 @@
             oParam = cmd.CreateParameter()
             With oParam
                 .ParameterName = "@OutTime"
-                .OleDbType = OleDb.OleDbType.Date
+                .DbType = DbType.DateTime
                 If Date.TryParse(rw.Cells("outTime").FormattedValue, tOutTime) Then
                     .Value = tOutTime.TimeOfDay.ToString()
                     bOutTime = True
@@ -475,7 +487,7 @@
             oParam = cmd.CreateParameter()
             With oParam
                 .ParameterName = "@RegHrs"
-                .OleDbType = OleDb.OleDbType.Double
+                .DbType = DbType.Double
                 If rw.Cells("regularHrs").FormattedValue = "" Then
                     .Value = DBNull.Value
                 Else
@@ -488,7 +500,7 @@
             oParam = cmd.CreateParameter()
             With oParam
                 .ParameterName = "@OT1Hrs"
-                .OleDbType = OleDb.OleDbType.Double
+                .DbType = DbType.Double
                 If rw.Cells("OT1").FormattedValue = "" Then
                     .Value = DBNull.Value
                 Else
@@ -501,7 +513,7 @@
             oParam = cmd.CreateParameter()
             With oParam
                 .ParameterName = "@OT2Hrs"
-                .OleDbType = OleDb.OleDbType.Double
+                .DbType = DbType.Double
                 If rw.Cells("OT2").FormattedValue = "" Then
                     .Value = DBNull.Value
                 Else
@@ -513,13 +525,12 @@
 
             oParam = cmd.CreateParameter()
             With oParam
-                .ParameterName = "@TotalHrs"
-                .OleDbType = OleDb.OleDbType.Double
+                .ParameterName = "@TotalCost"
+                .DbType = DbType.Double
                 If rw.Cells("totalCost").FormattedValue = "" Then
                     .Value = DBNull.Value
                 Else
-                    oTime.SetTime(rw.Cells("totalCost").Value)
-                    .Value = oTime.GetTime()
+                    .Value = rw.Cells("totalCost").Value
                 End If
             End With
             cmd.Parameters.Add(oParam)
@@ -531,7 +542,7 @@
                 oParam = cmd.CreateParameter()
                 With oParam
                     .ParameterName = "@RecordId"
-                    .OleDbType = OleDb.OleDbType.Integer
+                    .DbType = DbType.Int32
                     .Value = rw.Cells("RecordId").FormattedValue
                 End With
                 cmd.Parameters.Add(oParam)

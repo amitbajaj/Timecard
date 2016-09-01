@@ -1,8 +1,8 @@
 ﻿Public Class frmTimeCardMaster
     Private dbConnection As TimeCardDataAccess
     Private Sub frmTimeCardMaster_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        dbConnection = New TimeCardDataAccess()
-        dbConnection.DatabaseFile = My.Settings.Item("DBFile")
+        dbConnection = frmTimeCardMainForm.dbConn
+        'dbConnection.DatabaseFile = My.Settings.Item("DBFile")
         InitializeGrid()
         LoadUsers()
     End Sub
@@ -70,13 +70,13 @@
 
     Private Sub LoadUsers()
         Dim sSQL As String
-        Dim cmd As OleDb.OleDbCommand
-        Dim dr As OleDb.OleDbDataReader
+        Dim cmd As IDbCommand
+        Dim dr As IDataReader
         Dim iNewItem As Integer
         Dim userMaster As TimeCardSupport.UserDetails
         If dbConnection.GetConnection() Then
             cmd = dbConnection.Connection.CreateCommand()
-            sSQL = "SELECT RecordId, UserNumber, UserName FROM UserMaster"
+            sSQL = "SELECT RecordId, UserNumber, UserName FROM userMaster"
             cmd.CommandText = sSQL
             dr = cmd.ExecuteReader()
             DGVTimeCardMaster.Rows.Clear()
@@ -88,13 +88,13 @@
                 If dr.IsDBNull(1) Then
                     userMaster.userId = -1
                 Else
-                    userMaster.userId = dr.GetInt16(1)
+                    userMaster.userId = dr.GetValue(1)
                 End If
 
                 If dr.IsDBNull(2) Then
                     userMaster.userName = "--"
                 Else
-                    userMaster.userName = dr.GetString(2)
+                    userMaster.userName = dr.GetValue(2)
                 End If
 
                 iNewItem = cboUsers.Items.Add(userMaster)
@@ -113,9 +113,10 @@
     Private Sub LoadData(iRecordId As Integer)
         Dim rw As DataGridViewRow
         Dim iNewRow As Integer
-        Dim cmd As OleDb.OleDbCommand
-        Dim dr As OleDb.OleDbDataReader
-        Dim oParam As OleDb.OleDbParameter
+        Dim cmd As IDbCommand
+        Dim dr As IDataReader
+        Dim oParam As IDataParameter
+        Dim iCurrentField As Integer = 0
         Dim sSQL As String
         If dbConnection.GetConnection() Then
             sSQL = "SELECT RecordId, TimeCardNumber, TimeCardMonth, TimeCardYear FROM userTimeCards WHERE UserId = @UserId"
@@ -124,30 +125,34 @@
             oParam = cmd.CreateParameter()
             With oParam
                 .ParameterName = "@UserId"
-                .OleDbType = OleDb.OleDbType.Integer
+                .DbType = DbType.Int32
                 .Value = iRecordId
             End With
             cmd.Parameters.Add(oParam)
             dr = cmd.ExecuteReader()
             DGVTimeCardMaster.Rows.Clear()
             While dr.Read()
+                iCurrentField = 0
                 iNewRow = DGVTimeCardMaster.Rows.Add()
                 rw = DGVTimeCardMaster.Rows(iNewRow)
-                rw.Cells("recordId").Value = dr.GetInt32(0)
-                If dr.IsDBNull(2) Then
+                rw.Cells("recordId").Value = dr.GetValue(iCurrentField)
+                iCurrentField = iCurrentField + 1
+                If dr.IsDBNull(iCurrentField) Then
                     rw.Cells("timeCardNumber").Value = Nothing
                 Else
-                    rw.Cells("timeCardNumber").Value = dr.GetInt32(2)
+                    rw.Cells("timeCardNumber").Value = dr.GetValue(iCurrentField)
                 End If
-                If dr.IsDBNull(3) Then
+                iCurrentField = iCurrentField + 1
+                If dr.IsDBNull(iCurrentField) Then
                     rw.Cells("timeCardMonth").Value = Nothing
                 Else
-                    rw.Cells("timeCardMonth").Value = dr.GetInt16(3)
+                    rw.Cells("timeCardMonth").Value = dr.GetValue(iCurrentField)
                 End If
-                If dr.IsDBNull(4) Then
+                iCurrentField = iCurrentField + 1
+                If dr.IsDBNull(iCurrentField) Then
                     rw.Cells("timeCardYear").Value = Nothing
                 Else
-                    rw.Cells("timeCardYear").Value = dr.GetInt16(4)
+                    rw.Cells("timeCardYear").Value = dr.GetValue(iCurrentField)
                 End If
             End While
             dr.Close()
@@ -161,8 +166,8 @@
 
     Private Sub btnAdd_Click(sender As Object, e As EventArgs)
         Dim iNewItem As Integer
-        Dim cmd As OleDb.OleDbCommand
-        Dim oParam As OleDb.OleDbParameter
+        Dim cmd As IDbCommand
+        Dim oParam As IDataParameter
         Dim sSQL As String
         If cboUsers.SelectedIndex >= 0 Then
             iNewItem = DGVTimeCardMaster.Rows.Add()
@@ -173,7 +178,7 @@
                 oParam = cmd.CreateParameter()
                 With oParam
                     .ParameterName = "@UserId"
-                    .OleDbType = OleDb.OleDbType.Integer
+                    .DbType = DbType.Int32
                     .Value = cboUsers.SelectedItem.recordId
                 End With
                 cmd.Parameters.Add(oParam)
@@ -186,8 +191,8 @@
     End Sub
 
     Private Sub DGVTimeCardMaster_CellEndEdit(sender As Object, e As DataGridViewCellEventArgs) Handles DGVTimeCardMaster.CellEndEdit
-        Dim cmd As OleDb.OleDbCommand
-        Dim oParam As OleDb.OleDbParameter
+        Dim cmd As IDbCommand
+        Dim oParam As IDataParameter
         Dim sSQL As String
         Dim rw As DataGridViewRow
         rw = DGVTimeCardMaster.Rows(e.RowIndex)
@@ -205,7 +210,7 @@
             oParam = cmd.CreateParameter()
             With oParam
                 .ParameterName = "@UserId"
-                .OleDbType = OleDb.OleDbType.Integer
+                .DbType = DbType.Int32
                 .Value = cboUsers.SelectedItem.RecordId
             End With
             cmd.Parameters.Add(oParam)
@@ -213,7 +218,7 @@
             oParam = cmd.CreateParameter()
             With oParam
                 .ParameterName = "@timeCardNumber"
-                .OleDbType = OleDb.OleDbType.Integer
+                .DbType = DbType.Int32
                 If rw.Cells("timeCardNumber").FormattedValue = "" Then
                     .Value = DBNull.Value
                 Else
@@ -225,7 +230,7 @@
             oParam = cmd.CreateParameter()
             With oParam
                 .ParameterName = "@timeCardMonth"
-                .OleDbType = OleDb.OleDbType.SmallInt
+                .DbType = DbType.Int16
                 If rw.Cells("timeCardMonth").FormattedValue = "" Then
                     .Value = DBNull.Value
                 Else
@@ -237,7 +242,7 @@
             oParam = cmd.CreateParameter()
             With oParam
                 .ParameterName = "@timeCardYear"
-                .OleDbType = OleDb.OleDbType.SmallInt
+                .DbType = DbType.Int16
                 If rw.Cells("timeCardYear").FormattedValue = "" Then
                     .Value = DBNull.Value
                 Else
@@ -254,7 +259,7 @@
                 oParam = cmd.CreateParameter()
                 With oParam
                     .ParameterName = "@RecordId"
-                    .OleDbType = OleDb.OleDbType.Integer
+                    .DbType = DbType.Int32
                     .Value = rw.Cells("recordId").FormattedValue
                 End With
                 cmd.Parameters.Add(oParam)
@@ -384,8 +389,8 @@
     Private Sub RemoveRow(iRowIndex As Integer)
         Dim rw As DataGridViewRow
         Dim sSQL As String
-        Dim cmd As OleDb.OleDbCommand
-        Dim oParam As OleDb.OleDbParameter
+        Dim cmd As IDbCommand
+        Dim oParam As IDataParameter
         rw = DGVTimeCardMaster.Rows(iRowIndex)
         If dbConnection.GetConnection() Then
             Try
@@ -396,7 +401,7 @@
                     oParam = cmd.CreateParameter()
                     With oParam
                         .ParameterName = "@RecordId"
-                        .OleDbType = OleDb.OleDbType.Integer
+                        .DbType = DbType.Int32
                         .Value = rw.Cells("recordId").FormattedValue
                     End With
                     cmd.Parameters.Add(oParam)

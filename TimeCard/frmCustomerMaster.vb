@@ -28,8 +28,8 @@ Public Class frmCustomerMaster
     End Sub
 
     Private Function DeleteRecord(iRecordId As String) As Boolean
-        Dim cmd As OleDb.OleDbCommand
-        Dim cmdParam As OleDb.OleDbParameter
+        Dim cmd As IDbCommand
+        Dim cmdParam As IDataParameter
         If iRecordId = "" Then
             DeleteRecord = True
         Else
@@ -56,8 +56,8 @@ Public Class frmCustomerMaster
     End Function
 
     Private Sub CreateRecord(rw As DataGridViewRow)
-        Dim cmd As OleDb.OleDbCommand
-        Dim oParam As OleDb.OleDbParameter
+        Dim cmd As IDbCommand
+        Dim oParam As IDataParameter
         Dim sCustomerId, sCustomerName As String
         If rw.Cells("CustomerId").Value Is Nothing Then
             sCustomerId = ""
@@ -76,8 +76,7 @@ Public Class frmCustomerMaster
                 oParam = cmd.CreateParameter()
                 With oParam
                     .ParameterName = "@CustId"
-                    .OleDbType = OleDb.OleDbType.VarChar
-                    .Direction = ParameterDirection.Input
+                    .DbType = DbType.String
                     .Value = sCustomerId
                 End With
                 cmd.Parameters.Add(oParam)
@@ -86,8 +85,7 @@ Public Class frmCustomerMaster
                 oParam = cmd.CreateParameter()
                 With oParam
                     .ParameterName = "@CustName"
-                    .OleDbType = OleDb.OleDbType.VarChar
-                    .Direction = ParameterDirection.Input
+                    .DbType = DbType.String
                     .Value = sCustomerName
                 End With
                 cmd.Parameters.Add(oParam)
@@ -104,8 +102,8 @@ Public Class frmCustomerMaster
     End Sub
 
     Private Sub UpdateRecord(iRecordId As Integer, sCustomerId As String, sCustomerName As String)
-        Dim cmd As OleDb.OleDbCommand
-        Dim oParam As OleDb.OleDbParameter
+        Dim cmd As IDbCommand
+        Dim oParam As IDataParameter
         Try
             If dbConnection.GetConnection() Then
                 cmd = dbConnection.Connection.CreateCommand()
@@ -113,8 +111,7 @@ Public Class frmCustomerMaster
                 oParam = cmd.CreateParameter()
                 With oParam
                     .ParameterName = "@CustId"
-                    .OleDbType = OleDb.OleDbType.VarChar
-                    .Direction = ParameterDirection.Input
+                    .DbType = DbType.String
                     .Value = sCustomerId
                 End With
                 cmd.Parameters.Add(oParam)
@@ -123,8 +120,7 @@ Public Class frmCustomerMaster
                 oParam = cmd.CreateParameter()
                 With oParam
                     .ParameterName = "@CustName"
-                    .OleDbType = OleDb.OleDbType.VarChar
-                    .Direction = ParameterDirection.Input
+                    .DbType = DbType.String
                     .Value = sCustomerName
                 End With
                 cmd.Parameters.Add(oParam)
@@ -133,8 +129,7 @@ Public Class frmCustomerMaster
                 oParam = cmd.CreateParameter()
                 With oParam
                     .ParameterName = "@RecId"
-                    .OleDbType = OleDb.OleDbType.Integer
-                    .Direction = ParameterDirection.Input
+                    .DbType = DbType.Int32
                     .Value = iRecordId
                 End With
                 cmd.Parameters.Add(oParam)
@@ -149,8 +144,7 @@ Public Class frmCustomerMaster
     End Sub
 
     Private Sub frmCategoryMaster_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        dbConnection = New TimeCardDataAccess
-        dbConnection.DatabaseFile = My.Settings.Item("DBFile")
+        dbConnection = frmTimeCardMainForm.dbConn
         InitializeGrid()
         LoadData()
     End Sub
@@ -215,8 +209,8 @@ Public Class frmCustomerMaster
     End Sub
 
     Private Sub LoadData()
-        Dim cmd As OleDb.OleDbCommand
-        Dim dr As OleDb.OleDbDataReader
+        Dim cmd As IDbCommand
+        Dim dr As IDataReader
         Dim rw As DataGridViewRow
         Dim iNewRow As Integer
         If dbConnection.GetConnection() Then
@@ -227,9 +221,9 @@ Public Class frmCustomerMaster
             While dr.Read()
                 iNewRow = DGVCustomers.Rows.Add()
                 rw = DGVCustomers.Rows.Item(iNewRow)
-                rw.Cells.Item("RecordId").Value = dr.GetInt32(0)
-                rw.Cells.Item("CustomerId").Value = dr.GetString(1)
-                rw.Cells.Item("CustomerName").Value = dr.GetString(2)
+                rw.Cells.Item("RecordId").Value = dr.GetValue(0)
+                rw.Cells.Item("CustomerId").Value = dr.GetValue(1)
+                rw.Cells.Item("CustomerName").Value = dr.GetValue(2)
             End While
             dr.Close()
             cmd.Dispose()

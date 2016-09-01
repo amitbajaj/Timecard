@@ -1,6 +1,13 @@
 ﻿Imports System.Windows.Forms
 
 Public Class frmTimeCardMainForm
+    Friend dbConn As TimeCardDataAccess
+
+    Private Sub TimeCardMainForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        Me.WindowState = FormWindowState.Maximized
+        dbConn = New TimeCardDataAccess()
+    End Sub
+
     Private Sub UserMasterToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles UserMasterToolStripMenuItem.Click
         Dim frmUM As frmUserMaster
         Dim iChilds As Integer
@@ -67,9 +74,6 @@ Public Class frmTimeCardMainForm
 
     End Sub
 
-    Private Sub TimeCardMainForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Me.WindowState = FormWindowState.Maximized
-    End Sub
 
     Private Sub CustomerToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles CustomerToolStripMenuItem.Click
         Dim frmCustMaster As frmCustomerMaster
@@ -221,7 +225,7 @@ Public Class frmTimeCardMainForm
 
     End Sub
 
-    Private Sub CustomerReportToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles CustomerReportToolStripMenuItem.Click
+    Private Sub CustomerReportToolStripMenuItem_Click(sender As Object, e As EventArgs) 
         Dim oReportForm As New frmTimeCardReport
         Dim iChilds As Integer
         Dim bFound As Boolean
@@ -261,5 +265,17 @@ Public Class frmTimeCardMainForm
             oReportForm.MdiParent = Me
             oReportForm.Show()
         End If
+    End Sub
+
+    Private Sub SetAccessDBToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles SetAccessDBToolStripMenuItem.Click
+        dbConn.setAccessDB(My.Settings.DBFile)
+    End Sub
+
+    Private Sub SetMySQLDBToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles SetMySQLDBToolStripMenuItem.Click
+        dbConn.setMySQLDB("sql6.freemysqlhosting.net", "3306", "sql6132175", "sql6132175", "KrKBurlFsr")
+    End Sub
+
+    Private Sub SetSQLLocalDBToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles SetSQLLocalDBToolStripMenuItem.Click
+        dbConn.setSQLLocalDB("TimeCard", "TimeCard", True)
     End Sub
 End Class

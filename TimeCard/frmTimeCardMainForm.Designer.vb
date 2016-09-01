@@ -25,6 +25,10 @@ Partial Class frmTimeCardMainForm
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
         Me.MenuStrip = New System.Windows.Forms.MenuStrip()
+        Me.FileMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.SetAccessDBToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.SetMySQLDBToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.SetSQLLocalDBToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.UserMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.UserMasterToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.TimeCardMasterToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -38,30 +42,54 @@ Partial Class frmTimeCardMainForm
         Me.ProjectTimeCardDetailsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ReportsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.UserReportToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.CustomerReportToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.CustomerReportMatrixToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.StatusStrip = New System.Windows.Forms.StatusStrip()
         Me.ToolStripStatusLabel = New System.Windows.Forms.ToolStripStatusLabel()
         Me.ToolTip = New System.Windows.Forms.ToolTip(Me.components)
-        Me.CustomerReportMatrixToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.MenuStrip.SuspendLayout()
         Me.StatusStrip.SuspendLayout()
         Me.SuspendLayout()
         '
         'MenuStrip
         '
-        Me.MenuStrip.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.UserMenuItem, Me.CustomerMenuItem, Me.ReportsToolStripMenuItem})
+        Me.MenuStrip.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.FileMenuItem, Me.UserMenuItem, Me.CustomerMenuItem, Me.ReportsToolStripMenuItem})
         Me.MenuStrip.Location = New System.Drawing.Point(0, 0)
         Me.MenuStrip.Name = "MenuStrip"
         Me.MenuStrip.Size = New System.Drawing.Size(766, 24)
         Me.MenuStrip.TabIndex = 5
         Me.MenuStrip.Text = "MenuStrip"
         '
+        'FileMenuItem
+        '
+        Me.FileMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.SetAccessDBToolStripMenuItem, Me.SetMySQLDBToolStripMenuItem, Me.SetSQLLocalDBToolStripMenuItem})
+        Me.FileMenuItem.Name = "FileMenuItem"
+        Me.FileMenuItem.Size = New System.Drawing.Size(37, 20)
+        Me.FileMenuItem.Text = "&File"
+        '
+        'SetAccessDBToolStripMenuItem
+        '
+        Me.SetAccessDBToolStripMenuItem.Name = "SetAccessDBToolStripMenuItem"
+        Me.SetAccessDBToolStripMenuItem.Size = New System.Drawing.Size(163, 22)
+        Me.SetAccessDBToolStripMenuItem.Text = "Set Access DB"
+        '
+        'SetMySQLDBToolStripMenuItem
+        '
+        Me.SetMySQLDBToolStripMenuItem.Name = "SetMySQLDBToolStripMenuItem"
+        Me.SetMySQLDBToolStripMenuItem.Size = New System.Drawing.Size(163, 22)
+        Me.SetMySQLDBToolStripMenuItem.Text = "Set MySQL DB"
+        '
+        'SetSQLLocalDBToolStripMenuItem
+        '
+        Me.SetSQLLocalDBToolStripMenuItem.Name = "SetSQLLocalDBToolStripMenuItem"
+        Me.SetSQLLocalDBToolStripMenuItem.Size = New System.Drawing.Size(163, 22)
+        Me.SetSQLLocalDBToolStripMenuItem.Text = "Set SQL Local DB"
+        '
         'UserMenuItem
         '
         Me.UserMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.UserMasterToolStripMenuItem, Me.TimeCardMasterToolStripMenuItem, Me.TimeCardDetailsToolStripMenuItem})
         Me.UserMenuItem.Name = "UserMenuItem"
         Me.UserMenuItem.Size = New System.Drawing.Size(47, 20)
-        Me.UserMenuItem.Text = "Users"
+        Me.UserMenuItem.Text = "&Users"
         '
         'UserMasterToolStripMenuItem
         '
@@ -86,7 +114,7 @@ Partial Class frmTimeCardMainForm
         Me.CustomerMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.CustomerToolStripMenuItem, Me.CustomerProjectStripMenuItem, Me.ProjectPhasesStripMenuItem, Me.ProjectJobsStripMenuItem, Me.ProjectTimeCardToolStripMenuItem, Me.ProjectTimeCardDetailsToolStripMenuItem})
         Me.CustomerMenuItem.Name = "CustomerMenuItem"
         Me.CustomerMenuItem.Size = New System.Drawing.Size(76, 20)
-        Me.CustomerMenuItem.Text = "Customers"
+        Me.CustomerMenuItem.Text = "&Customers"
         '
         'CustomerToolStripMenuItem
         '
@@ -126,10 +154,10 @@ Partial Class frmTimeCardMainForm
         '
         'ReportsToolStripMenuItem
         '
-        Me.ReportsToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.UserReportToolStripMenuItem, Me.CustomerReportToolStripMenuItem, Me.CustomerReportMatrixToolStripMenuItem})
+        Me.ReportsToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.UserReportToolStripMenuItem, Me.CustomerReportMatrixToolStripMenuItem})
         Me.ReportsToolStripMenuItem.Name = "ReportsToolStripMenuItem"
         Me.ReportsToolStripMenuItem.Size = New System.Drawing.Size(59, 20)
-        Me.ReportsToolStripMenuItem.Text = "Reports"
+        Me.ReportsToolStripMenuItem.Text = "&Reports"
         '
         'UserReportToolStripMenuItem
         '
@@ -137,11 +165,11 @@ Partial Class frmTimeCardMainForm
         Me.UserReportToolStripMenuItem.Size = New System.Drawing.Size(208, 22)
         Me.UserReportToolStripMenuItem.Text = "User Report"
         '
-        'CustomerReportToolStripMenuItem
+        'CustomerReportMatrixToolStripMenuItem
         '
-        Me.CustomerReportToolStripMenuItem.Name = "CustomerReportToolStripMenuItem"
-        Me.CustomerReportToolStripMenuItem.Size = New System.Drawing.Size(208, 22)
-        Me.CustomerReportToolStripMenuItem.Text = "Customer Report"
+        Me.CustomerReportMatrixToolStripMenuItem.Name = "CustomerReportMatrixToolStripMenuItem"
+        Me.CustomerReportMatrixToolStripMenuItem.Size = New System.Drawing.Size(208, 22)
+        Me.CustomerReportMatrixToolStripMenuItem.Text = "Customer Report (Matrix)"
         '
         'StatusStrip
         '
@@ -157,12 +185,6 @@ Partial Class frmTimeCardMainForm
         Me.ToolStripStatusLabel.Name = "ToolStripStatusLabel"
         Me.ToolStripStatusLabel.Size = New System.Drawing.Size(39, 17)
         Me.ToolStripStatusLabel.Text = "Status"
-        '
-        'CustomerReportMatrixToolStripMenuItem
-        '
-        Me.CustomerReportMatrixToolStripMenuItem.Name = "CustomerReportMatrixToolStripMenuItem"
-        Me.CustomerReportMatrixToolStripMenuItem.Size = New System.Drawing.Size(208, 22)
-        Me.CustomerReportMatrixToolStripMenuItem.Text = "Customer Report (Matrix)"
         '
         'frmTimeCardMainForm
         '
@@ -200,6 +222,9 @@ Partial Class frmTimeCardMainForm
     Friend WithEvents ProjectPhasesStripMenuItem As ToolStripMenuItem
     Friend WithEvents ReportsToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents UserReportToolStripMenuItem As ToolStripMenuItem
-    Friend WithEvents CustomerReportToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents CustomerReportMatrixToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents FileMenuItem As ToolStripMenuItem
+    Friend WithEvents SetAccessDBToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents SetMySQLDBToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents SetSQLLocalDBToolStripMenuItem As ToolStripMenuItem
 End Class

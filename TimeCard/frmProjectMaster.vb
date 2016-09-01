@@ -4,8 +4,7 @@
     Private sNumberFormat As String = TimeCardSupport.NumberFormat
 
     Private Sub frmProjectMaster_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        dbConnection = New TimeCardDataAccess()
-        dbConnection.DatabaseFile = TimeCardSupport.DatabaseFile
+        dbConnection = frmTimeCardMainForm.dbConn
         InitializeGrid()
         LoadCustomers()
     End Sub
@@ -71,8 +70,8 @@
 
     Private Sub LoadCustomers()
         Dim sSQL As String
-        Dim cmd As OleDb.OleDbCommand
-        Dim dr As OleDb.OleDbDataReader
+        Dim cmd As IDbCommand
+        Dim dr As IDataReader
         Dim iNewItem As Integer
         Dim customerMaster As TimeCardSupport.CustomerDetails
         If dbConnection.GetConnection() Then
@@ -114,9 +113,9 @@
     Private Sub LoadData(iRecordId As Integer)
         Dim rw As DataGridViewRow
         Dim iNewRow As Integer
-        Dim cmd As OleDb.OleDbCommand
-        Dim dr As OleDb.OleDbDataReader
-        Dim oParam As OleDb.OleDbParameter
+        Dim cmd As IDbCommand
+        Dim dr As IDataReader
+        Dim oParam As IDataParameter
         Dim sSQL As String
         If dbConnection.GetConnection() Then
             sSQL = "SELECT RecordId, ProjectId, ProjectDesc, ProjectRate FROM customerProjects WHERE ParentId = @RecId"
@@ -125,7 +124,7 @@
             oParam = cmd.CreateParameter()
             With oParam
                 .ParameterName = "@RecId"
-                .OleDbType = OleDb.OleDbType.Integer
+                .DbType = DbType.Int32
                 .Value = iRecordId
             End With
             cmd.Parameters.Add(oParam)
@@ -134,21 +133,21 @@
             While dr.Read()
                 iNewRow = DGVProjectMaster.Rows.Add()
                 rw = DGVProjectMaster.Rows(iNewRow)
-                rw.Cells("recordId").Value = dr.GetInt32(0)
+                rw.Cells("recordId").Value = dr.GetValue(0)
                 If dr.IsDBNull(1) Then
                     rw.Cells("ProjectNumber").Value = Nothing
                 Else
-                    rw.Cells("ProjectNumber").Value = dr.GetString(1)
+                    rw.Cells("ProjectNumber").Value = dr.GetValue(1)
                 End If
                 If dr.IsDBNull(2) Then
                     rw.Cells("ProjectDesc").Value = Nothing
                 Else
-                    rw.Cells("ProjectDesc").Value = dr.GetString(2)
+                    rw.Cells("ProjectDesc").Value = dr.GetValue(2)
                 End If
                 If dr.IsDBNull(3) Then
                     rw.Cells("ProjectRate").Value = Nothing
                 Else
-                    rw.Cells("ProjectRate").Value = Math.Round(dr.GetDouble(3), iDecimals).ToString(sNumberFormat)
+                    rw.Cells("ProjectRate").Value = Math.Round(dr.GetDecimal(3), iDecimals).ToString(sNumberFormat)
                 End If
             End While
             dr.Close()
@@ -162,20 +161,20 @@
 
     Private Sub RemoveRow(iRowIndex As Integer)
         Dim rw As DataGridViewRow
-        Dim oParam As OleDb.OleDbParameter
+        Dim oParam As IDataParameter
         Dim sSQL As String
-        Dim cmd As OleDb.OleDbCommand
+        Dim cmd As IDbCommand
         Try
             rw = DGVProjectMaster.Rows(iRowIndex)
             If rw.Cells("recordId").FormattedValue <> "" Then
                 If dbConnection.GetConnection() Then
                     cmd = dbConnection.Connection.CreateCommand()
-                    sSQL = "DELETE FROM CustomerProjects WHERE recordId = @RecordId"
+                    sSQL = "DELETE FROM customerProjects WHERE recordId = @RecordId"
                     cmd.CommandText = sSQL
                     oParam = cmd.CreateParameter()
                     With oParam
                         .ParameterName = "@RecordId"
-                        .OleDbType = OleDb.OleDbType.Integer
+                        .DbType = DbType.Int32
                         .Value = rw.Cells("recordId").Value
                     End With
                     cmd.Parameters.Add(oParam)
@@ -196,8 +195,8 @@
     End Sub
 
     Private Sub DGVProjectMaster_CellEndEdit(sender As Object, e As DataGridViewCellEventArgs) Handles DGVProjectMaster.CellEndEdit
-        Dim cmd As OleDb.OleDbCommand
-        Dim oParam As OleDb.OleDbParameter
+        Dim cmd As IDbCommand
+        Dim oParam As IDataParameter
         Dim sSQL As String
         Dim rw As DataGridViewRow
         rw = DGVProjectMaster.Rows(e.RowIndex)
@@ -213,7 +212,7 @@
             oParam = cmd.CreateParameter()
             With oParam
                 .ParameterName = "@ParentId"
-                .OleDbType = OleDb.OleDbType.Integer
+                .DbType = DbType.Int32
                 .Value = cboCustomers.SelectedItem.RecordId
             End With
             cmd.Parameters.Add(oParam)
@@ -221,7 +220,7 @@
             oParam = cmd.CreateParameter()
             With oParam
                 .ParameterName = "@ProjectId"
-                .OleDbType = OleDb.OleDbType.WChar
+                .DbType = DbType.String
                 If rw.Cells("ProjectNumber").FormattedValue = "" Then
                     .Value = DBNull.Value
                 Else
@@ -233,7 +232,7 @@
             oParam = cmd.CreateParameter()
             With oParam
                 .ParameterName = "@ProjectDesc"
-                .OleDbType = OleDb.OleDbType.WChar
+                .DbType = DbType.String
                 If rw.Cells("ProjectDesc").FormattedValue = "" Then
                     .Value = DBNull.Value
                 Else
@@ -245,7 +244,7 @@
             oParam = cmd.CreateParameter()
             With oParam
                 .ParameterName = "@ProjectRate"
-                .OleDbType = OleDb.OleDbType.Double
+                .DbType = DbType.Decimal
                 If rw.Cells("ProjectRate").FormattedValue = "" Then
                     .Value = DBNull.Value
                 Else
@@ -254,7 +253,6 @@
             End With
             cmd.Parameters.Add(oParam)
 
-
             If rw.Cells("RecordId").FormattedValue = "" Then
                 cmd.ExecuteNonQuery()
                 cmd.CommandText = "SELECT @@IDENTITY"
@@ -262,8 +260,8 @@
             Else
                 oParam = cmd.CreateParameter()
                 With oParam
-                    .ParameterName = "@ParentId"
-                    .OleDbType = OleDb.OleDbType.Integer
+                    .ParameterName = "@RecordId"
+                    .DbType = DbType.Int32
                     .Value = rw.Cells("RecordId").FormattedValue
                 End With
                 cmd.Parameters.Add(oParam)

@@ -1,10 +1,8 @@
-﻿
-Public Class frmUserMaster
+﻿Public Class frmUserMaster
     Dim dbConnection As TimeCardDataAccess
 
     Private Sub frmUserMaster_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        dbConnection = New TimeCardDataAccess
-        dbConnection.DatabaseFile = My.Settings.Item("DBFile")
+        dbConnection = frmTimeCardMainForm.dbConn
         InitializeGrid()
         LoadData()
     End Sub
@@ -76,12 +74,12 @@ Public Class frmUserMaster
     End Sub
 
     Private Sub LoadData()
-        Dim cmd As OleDb.OleDbCommand
-        Dim dr As OleDb.OleDbDataReader
+        Dim cmd As IDbCommand
+        Dim dr As IDataReader
         Dim iRow As Integer
         If dbConnection.GetConnection() Then
             cmd = dbConnection.Connection.CreateCommand()
-            cmd.CommandText = "SELECT RecordId, UserNumber, UserName, Trade, Basic FROM UserMaster"
+            cmd.CommandText = "SELECT RecordId, UserNumber, UserName, Trade, Basic FROM userMaster"
             dr = cmd.ExecuteReader()
             DGVUserMaster.Rows.Clear()
             While dr.Read()
@@ -89,31 +87,31 @@ Public Class frmUserMaster
                 If dr.IsDBNull(0) Then
                     DGVUserMaster.Rows(iRow).Cells("recordId").Value = Nothing
                 Else
-                    DGVUserMaster.Rows(iRow).Cells("recordId").Value = dr.GetInt32(0)
+                    DGVUserMaster.Rows(iRow).Cells("recordId").Value = dr.GetValue(0)
                 End If
 
                 If dr.IsDBNull(1) Then
                     DGVUserMaster.Rows(iRow).Cells("userNumber").Value = Nothing
                 Else
-                    DGVUserMaster.Rows(iRow).Cells("userNumber").Value = dr.GetInt16(1)
+                    DGVUserMaster.Rows(iRow).Cells("userNumber").Value = dr.GetValue(1)
                 End If
 
                 If dr.IsDBNull(2) Then
                     DGVUserMaster.Rows(iRow).Cells("userName").Value = Nothing
                 Else
-                    DGVUserMaster.Rows(iRow).Cells("userName").Value = dr.GetString(2)
+                    DGVUserMaster.Rows(iRow).Cells("userName").Value = dr.GetValue(2)
                 End If
 
                 If dr.IsDBNull(3) Then
                     DGVUserMaster.Rows(iRow).Cells("trade").Value = Nothing
                 Else
-                    DGVUserMaster.Rows(iRow).Cells("trade").Value = dr.GetString(3)
+                    DGVUserMaster.Rows(iRow).Cells("trade").Value = dr.GetValue(3)
                 End If
 
                 If dr.IsDBNull(4) Then
                     DGVUserMaster.Rows(iRow).Cells("basic").Value = Nothing
                 Else
-                    DGVUserMaster.Rows(iRow).Cells("basic").Value = dr.GetDouble(4)
+                    DGVUserMaster.Rows(iRow).Cells("basic").Value = dr.GetValue(4)
                 End If
             End While
             dr.Close()
@@ -125,16 +123,16 @@ Public Class frmUserMaster
     End Sub
 
     Private Sub DGVUserMaster_CellEndEdit(sender As Object, e As DataGridViewCellEventArgs) Handles DGVUserMaster.CellEndEdit
-        Dim cmd As OleDb.OleDbCommand
-        Dim oParam As OleDb.OleDbParameter
+        Dim cmd As IDbCommand
+        Dim oParam As IDataParameter
         Dim sSQL As String
         Dim rw As DataGridViewRow
         rw = DGVUserMaster.Rows(e.RowIndex)
         If rw.Cells("recordId").FormattedValue = "" Then
-            sSQL = "INSERT INTO UserMaster (userNumber, userName, trade, basic) VALUES "
-            sSQL = sSQL & "(@userNumber, @userName, @trade, @basic);"
+            sSQL = "INSERT INTO userMaster (userNumber, userName, trade, basic) VALUES "
+            sSQL = sSQL & "(@userNumber, @userName, @trade, @basic)"
         Else
-            sSQL = "UPDATE UserMaster SET UserNumber = @userNumber, userName = @userName, trade = @trade, basic = @basic WHERE RecordId = @RecordId"
+            sSQL = "UPDATE userMaster SET UserNumber = @userNumber, userName = @userName, trade = @trade, basic = @basic WHERE RecordId = @RecordId"
         End If
         If dbConnection.GetConnection() Then
             cmd = dbConnection.Connection.CreateCommand()
@@ -143,7 +141,7 @@ Public Class frmUserMaster
             oParam = cmd.CreateParameter()
             With oParam
                 .ParameterName = "@userNumber"
-                .OleDbType = OleDb.OleDbType.SmallInt
+                .DbType = DbType.Int32
                 If rw.Cells("userNumber").FormattedValue = "" Then
                     .Value = DBNull.Value
                 Else
@@ -155,7 +153,7 @@ Public Class frmUserMaster
             oParam = cmd.CreateParameter()
             With oParam
                 .ParameterName = "@userName"
-                .OleDbType = OleDb.OleDbType.WChar
+                .DbType = DbType.String
                 If rw.Cells("userName").FormattedValue = "" Then
                     .Value = DBNull.Value
                 Else
@@ -167,7 +165,7 @@ Public Class frmUserMaster
             oParam = cmd.CreateParameter()
             With oParam
                 .ParameterName = "@trade"
-                .OleDbType = OleDb.OleDbType.WChar
+                .DbType = DbType.String
                 If rw.Cells("trade").FormattedValue = "" Then
                     .Value = DBNull.Value
                 Else
@@ -179,7 +177,7 @@ Public Class frmUserMaster
             oParam = cmd.CreateParameter()
             With oParam
                 .ParameterName = "@basic"
-                .OleDbType = OleDb.OleDbType.Double
+                .DbType = DbType.Double
                 If rw.Cells("basic").FormattedValue = "" Then
                     .Value = DBNull.Value
                 Else
@@ -189,15 +187,15 @@ Public Class frmUserMaster
             cmd.Parameters.Add(oParam)
 
             If rw.Cells("recordId").FormattedValue = "" Then
-
                 cmd.ExecuteNonQuery()
                 cmd.CommandText = "SELECT @@IDENTITY"
+                cmd.Parameters.Clear()
                 rw.Cells("recordId").Value = cmd.ExecuteScalar()
             Else
                 oParam = cmd.CreateParameter()
                 With oParam
                     .ParameterName = "@RecordId"
-                    .OleDbType = OleDb.OleDbType.Integer
+                    .DbType = DbType.Int32
                     .Value = rw.Cells("recordId").FormattedValue
                 End With
                 cmd.Parameters.Add(oParam)
@@ -222,19 +220,19 @@ Public Class frmUserMaster
     Private Sub RemoveRow(iRowIndex As Integer)
         Dim rw As DataGridViewRow
         Dim sSQL As String
-        Dim cmd As OleDb.OleDbCommand
-        Dim oParam As OleDb.OleDbParameter
+        Dim cmd As IDbCommand
+        Dim oParam As IDataParameter
         rw = DGVUserMaster.Rows(iRowIndex)
         If dbConnection.GetConnection() Then
             Try
                 cmd = dbConnection.Connection.CreateCommand()
                 If rw.Cells("recordId").Value IsNot Nothing Then
-                    sSQL = "DELETE FROM UserMaster WHERE recordId = @RecordId"
+                    sSQL = "DELETE FROM userMaster WHERE recordId = @RecordId"
                     cmd.CommandText = sSQL
                     oParam = cmd.CreateParameter()
                     With oParam
                         .ParameterName = "@RecordId"
-                        .OleDbType = OleDb.OleDbType.Integer
+                        .DbType = DbType.Int32
                         .Value = rw.Cells("recordId").Value
                     End With
                     cmd.Parameters.Add(oParam)

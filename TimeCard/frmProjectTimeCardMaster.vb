@@ -1,8 +1,7 @@
 ﻿Public Class frmProjectTimeCardMaster
     Private dbConnection As TimeCardDataAccess
     Private Sub frmProjectTimeCardMaster_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        dbConnection = New TimeCardDataAccess()
-        dbConnection.DatabaseFile = My.Settings.Item("DBFile")
+        dbConnection = frmTimeCardMainForm.dbConn
         InitializeGrid()
         LoadCustomers()
     End Sub
@@ -67,8 +66,8 @@
     End Sub
 
     Sub LoadCustomers()
-        Dim cmd As OleDb.OleDbCommand
-        Dim dr As OleDb.OleDbDataReader
+        Dim cmd As IDbCommand
+        Dim dr As IDataReader
         Dim oCust As TimeCardSupport.CustomerDetails
         cboCustomers.Items.Clear()
         cboCustomers.DisplayMember = "displayName"
@@ -78,9 +77,9 @@
             dr = cmd.ExecuteReader()
             While dr.Read()
                 oCust = New TimeCardSupport.CustomerDetails
-                oCust.recordId = dr.GetInt32(0)
-                oCust.customerId = dr.GetString(1)
-                oCust.customerName = dr.GetString(2)
+                oCust.recordId = dr.GetValue(0)
+                oCust.customerId = dr.GetValue(1)
+                oCust.customerName = dr.GetValue(2)
                 cboCustomers.Items.Add(oCust)
             End While
             dr.Close()
@@ -102,9 +101,9 @@
     End Sub
 
     Sub LoadCustomerProjects(oCust As TimeCardSupport.CustomerDetails)
-        Dim cmd As OleDb.OleDbCommand
-        Dim dr As OleDb.OleDbDataReader
-        Dim oPr As OleDb.OleDbParameter
+        Dim cmd As IDbCommand
+        Dim dr As IDataReader
+        Dim oPr As IDataParameter
         Dim oProj As TimeCardSupport.ProjectDetails
         cboJobs.Items.Clear()
         DGVTimeCardMaster.Rows.Clear()
@@ -114,17 +113,17 @@
             cmd = dbConnection.Connection.CreateCommand()
             oPr = cmd.CreateParameter()
             oPr.ParameterName = "@ParentId"
-            oPr.OleDbType = OleDb.OleDbType.Integer
+            oPr.DbType = DbType.Int32
             oPr.Value = oCust.recordId
             cmd.Parameters.Add(oPr)
             cmd.CommandText = "SELECT RecordId, ProjectId, ProjectDesc, ProjectRate FROM customerProjects WHERE ParentId = @ParentId"
             dr = cmd.ExecuteReader()
             While dr.Read()
                 oProj = New TimeCardSupport.ProjectDetails
-                oProj.recordId = dr.GetInt32(0)
-                oProj.projectId = dr.GetString(1)
-                oProj.projectDescription = dr.GetString(2)
-                oProj.projectRate = dr.GetDouble(3)
+                oProj.recordId = dr.GetValue(0)
+                oProj.projectId = dr.GetValue(1)
+                oProj.projectDescription = dr.GetValue(2)
+                oProj.projectRate = dr.GetValue(3)
                 cboProjects.Items.Add(oProj)
             End While
             dr.Close()
@@ -140,9 +139,9 @@
     End Sub
 
     Sub LoadProjectPhases(oProj As TimeCardSupport.ProjectDetails)
-        Dim cmd As OleDb.OleDbCommand
-        Dim dr As OleDb.OleDbDataReader
-        Dim oPr As OleDb.OleDbParameter
+        Dim cmd As IDbCommand
+        Dim dr As IDataReader
+        Dim oPr As IDataParameter
         Dim oProjPhase As TimeCardSupport.ProjectPhaseDetails
         DGVTimeCardMaster.Rows.Clear()
         cboJobs.Items.Clear()
@@ -152,16 +151,16 @@
             cmd = dbConnection.Connection.CreateCommand()
             oPr = cmd.CreateParameter()
             oPr.ParameterName = "@ParentId"
-            oPr.OleDbType = OleDb.OleDbType.Integer
+            oPr.DbType = DbType.Int32
             oPr.Value = oProj.recordId
             cmd.Parameters.Add(oPr)
             cmd.CommandText = "SELECT RecordId, PhaseId, PhaseDesc FROM customerProjectPhases WHERE ParentId = @ParentId"
             dr = cmd.ExecuteReader()
             While dr.Read()
                 oProjPhase = New TimeCardSupport.ProjectPhaseDetails
-                oProjPhase.RecordId = dr.GetInt32(0)
-                oProjPhase.PhaseId = dr.GetString(1)
-                oProjPhase.PhaseDescription = dr.GetString(2)
+                oProjPhase.RecordId = dr.GetValue(0)
+                oProjPhase.PhaseId = dr.GetValue(1)
+                oProjPhase.PhaseDescription = dr.GetValue(2)
                 cboPhases.Items.Add(oProjPhase)
             End While
             dr.Close()
@@ -171,9 +170,9 @@
     End Sub
 
     Sub LoadPhaseJobs(oPhase As TimeCardSupport.ProjectPhaseDetails)
-        Dim cmd As OleDb.OleDbCommand
-        Dim dr As OleDb.OleDbDataReader
-        Dim oPr As OleDb.OleDbParameter
+        Dim cmd As IDbCommand
+        Dim dr As IDataReader
+        Dim oPr As IDataParameter
         Dim oProjJob As TimeCardSupport.ProjectJobDetails
         DGVTimeCardMaster.Rows.Clear()
         cboJobs.Items.Clear()
@@ -182,17 +181,17 @@
             cmd = dbConnection.Connection.CreateCommand()
             oPr = cmd.CreateParameter()
             oPr.ParameterName = "@ParentId"
-            oPr.OleDbType = OleDb.OleDbType.Integer
+            oPr.DbType = DbType.Int32
             oPr.Value = oPhase.RecordId
             cmd.Parameters.Add(oPr)
             cmd.CommandText = "SELECT RecordId, JobId, JobDesc, JobRate FROM customerProjPhaseJobs WHERE ParentId = @ParentId"
             dr = cmd.ExecuteReader()
             While dr.Read()
                 oProjJob = New TimeCardSupport.ProjectJobDetails
-                oProjJob.recordId = dr.GetInt32(0)
-                oProjJob.JobId = dr.GetString(1)
-                oProjJob.JobDescription = dr.GetString(2)
-                oProjJob.JobRate = dr.GetDouble(3)
+                oProjJob.recordId = dr.GetValue(0)
+                oProjJob.JobId = dr.GetValue(1)
+                oProjJob.JobDescription = dr.GetValue(2)
+                oProjJob.JobRate = dr.GetValue(3)
                 cboJobs.Items.Add(oProjJob)
             End While
             dr.Close()
@@ -203,16 +202,16 @@
 
 
     Sub LoadProjectTimeCards(oProjJob As TimeCardSupport.ProjectJobDetails)
-        Dim cmd As OleDb.OleDbCommand
-        Dim dr As OleDb.OleDbDataReader
-        Dim oPr As OleDb.OleDbParameter
+        Dim cmd As IDbCommand
+        Dim dr As IDataReader
+        Dim oPr As IDataParameter
         Dim rw As DataGridViewRow
         DGVTimeCardMaster.Rows.Clear()
         If dbConnection.GetConnection() Then
             cmd = dbConnection.Connection.CreateCommand()
             oPr = cmd.CreateParameter()
             oPr.ParameterName = "@ParentId"
-            oPr.OleDbType = OleDb.OleDbType.Integer
+            oPr.DbType = DbType.Int32
             oPr.Value = oProjJob.recordId
             cmd.Parameters.Add(oPr)
             cmd.CommandText = "SELECT RecordId, TimeCardNumber, TimeCardMonth, TimeCardYear FROM customerProjPhaseJobTimeCard WHERE ParentId = @ParentId"
@@ -223,17 +222,17 @@
                 If dr.IsDBNull(1) Then
                     rw.Cells("timeCardNumber").Value = Nothing
                 Else
-                    rw.Cells("timeCardNumber").Value = dr.GetInt32(1)
+                    rw.Cells("timeCardNumber").Value = dr.GetValue(1)
                 End If
                 If dr.IsDBNull(2) Then
                     rw.Cells("timeCardMonth").Value = Nothing
                 Else
-                    rw.Cells("timeCardMonth").Value = dr.GetInt16(2)
+                    rw.Cells("timeCardMonth").Value = dr.GetValue(2)
                 End If
                 If dr.IsDBNull(3) Then
                     rw.Cells("timeCardYear").Value = Nothing
                 Else
-                    rw.Cells("timeCardYear").Value = dr.GetInt16(3)
+                    rw.Cells("timeCardYear").Value = dr.GetValue(3)
                 End If
             End While
             If DGVTimeCardMaster.Rows.Count = 0 Then
@@ -256,8 +255,8 @@
     End Sub
 
     Sub RemoveRow(iRowIndex As Integer)
-        Dim cmd As OleDb.OleDbCommand
-        Dim oPr As OleDb.OleDbParameter
+        Dim cmd As IDbCommand
+        Dim oPr As IDataParameter
         Dim rw As DataGridViewRow
         rw = DGVTimeCardMaster.Rows(iRowIndex)
         If rw.Cells("recordId").FormattedValue = "" Then
@@ -267,7 +266,7 @@
                 cmd = dbConnection.Connection.CreateCommand()
                 oPr = cmd.CreateParameter()
                 oPr.ParameterName = "@RecordId"
-                oPr.OleDbType = OleDb.OleDbType.Integer
+                oPr.DbType = DbType.Int32
                 oPr.Value = rw.Cells("recordId").FormattedValue
                 cmd.Parameters.Add(oPr)
                 cmd.CommandText = "DELETE FROM customerProjPhaseJobTimeCard WHERE RecordId = @RecordId"
@@ -275,13 +274,16 @@
                 cmd.Dispose()
                 dbConnection.Connection.Close()
                 DGVTimeCardMaster.Rows.RemoveAt(iRowIndex)
+                If DGVTimeCardMaster.Rows.Count = 0 Then
+                    DGVTimeCardMaster.Rows.Add()
+                End If
             End If
         End If
     End Sub
 
     Private Sub DGVTimeCardMaster_CellEndEdit(sender As Object, e As DataGridViewCellEventArgs) Handles DGVTimeCardMaster.CellEndEdit
-        Dim cmd As OleDb.OleDbCommand
-        Dim oParam As OleDb.OleDbParameter
+        Dim cmd As IDbCommand
+        Dim oParam As IDataParameter
         Dim sSQL As String
         Dim rw As DataGridViewRow
         rw = DGVTimeCardMaster.Rows(e.RowIndex)
@@ -296,7 +298,7 @@
             oParam = cmd.CreateParameter()
             With oParam
                 .ParameterName = "@ParentId"
-                .OleDbType = OleDb.OleDbType.Integer
+                .DbType = DbType.Int32
                 .Value = cboJobs.SelectedItem.RecordId
             End With
             cmd.Parameters.Add(oParam)
@@ -304,7 +306,7 @@
             oParam = cmd.CreateParameter()
             With oParam
                 .ParameterName = "@TimeCardNumber"
-                .OleDbType = OleDb.OleDbType.Integer
+                .DbType = DbType.Int32
                 If rw.Cells("timeCardNumber").FormattedValue = "" Then
                     .Value = DBNull.Value
                 Else
@@ -316,7 +318,7 @@
             oParam = cmd.CreateParameter()
             With oParam
                 .ParameterName = "@TimeCardMonth"
-                .OleDbType = OleDb.OleDbType.Integer
+                .DbType = DbType.Int32
                 If rw.Cells("timeCardMonth").FormattedValue = "" Then
                     .Value = DBNull.Value
                 Else
@@ -328,7 +330,7 @@
             oParam = cmd.CreateParameter()
             With oParam
                 .ParameterName = "@TimeCardYear"
-                .OleDbType = OleDb.OleDbType.Integer
+                .DbType = DbType.Int32
                 If rw.Cells("timeCardYear").FormattedValue = "" Then
                     .Value = DBNull.Value
                 Else
@@ -346,7 +348,7 @@
                 oParam = cmd.CreateParameter()
                 With oParam
                     .ParameterName = "@RecordId"
-                    .OleDbType = OleDb.OleDbType.Integer
+                    .DbType = DbType.Int32
                     .Value = rw.Cells("recordId").FormattedValue
                 End With
                 cmd.Parameters.Add(oParam)
